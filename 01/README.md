@@ -107,24 +107,71 @@ Even though Quarkus application can be created using Maven, Quarkus CLI is a con
     quarkus create app cz.muni.fi:flight-service --extension='resteasy-reactive-jackson'
     ```
    
+2. Explore the app
+
     Open the project in IntelliJ IDEA or your favorite IDE. 
    
     The folder `flight-service` should be created. It contains the following files:
-    - `pom.xml` - Maven project file (name, version, dependencies, plugins, ...)
-    - `src/main/resources/application.properties` - application configuration
-    - `src/main/java/cz/muni/fi//GreetingResource.java` - REST endpoint
-    - `src/test/java/cz/muni/fi//GreetingResourceTest.java` - REST endpoint unit test
-    - `src/test/java/cz/muni/fi//GreetingResourceIT.java` - REST endpoint integration test
+    - `pom.xml` - MaThis is the Maven project file. It contains information like the project's name, version, dependencies, and plugins. It's essential for building and managing the project.
+    - `src/main/resources/application.properties` - This file is used for application configuration. You can define various settings related to your application here.
+    - `src/main/java/cz/muni/fi//GreetingResource.java` - This is a REST endpoint. It's a simple Java class that handles HTTP requests and returns responses.
+    - `src/test/java/cz/muni/fi//GreetingResourceTest.java` - This is a unit test for the REST endpoint. It helps ensure your code works as expected.
+    - `src/test/java/cz/muni/fi//GreetingResourceIT.java` - This is an integration test for the REST endpoint. It tests how different parts of the application work together.
 
+### 3. Run the application
 
+```bash
+cd flight-service
+quarkus dev
+```
+
+The application should download dependencies and start on port 8080. You can access the basic REST endpoint at http://localhost:8080/hello. It should return "*Hello from RESTEasy Reactive*".
+
+### 4. What Quarkus development mode?
+
+Quarkus development mode is a powerful feature that makes Quarkus development fast and easy. It offers the following features:
    
+#### 4.1. Live reload
 
-   
-    
+Quarkus automatically reloads the application when you change the configuration. So no more restarting the application after every change.
 
-TODO
+#### 4.2. Dev UI
+
+You can find Dev UI at http://localhost:8080/q/dev-ui. It offers the following features:
+
+- Extension visualization - Shows which extensions are used in the application.
+- Extension documentation - Shows documentation for the extensions used in the application.
+- Configuration visualization - Shows which configuration properties are used in the application. You can also change the configuration and see the changes in the application.
+- Continues testing visualization - Shows status of the tests in graphical form.
+- Dev Services - Starts and stops external services like databases, Kafka, etc. You don't need to setup database for testing. Quarkus will do it for you.
+- Build metrics - Shows how long it takes to build the application.
+
+#### 4.3. Quarkus dev CLI
+
+When you look the console, you can see that Quarkus runs tests after every change. This is called continuous testing. It helps you to find bugs as soon as possible.
+
+- You can also run tests manually by pressing `r` in the console.
+- You can press `s` to force restart the application.
+
+Press `h` to see all available commands and try some of them.
+
+### 5. Change the code
+
+Try to change the code and see how Quarkus reacts. For example, you can change the message in the `hello()` method in `GreetingResource.java` and see how it changes in the browser. You will see live reload in action with continuous testing.
+
+1. Go to `GreetingResource.java` and change the message in the `hello()` method.
+2. Go to `GreetingResourceTest.java` and change the test to match the new message.
+3. Now the test should pass again and http://localhost:8080/hello should return "*Hello*".
+
+### 6. Configure the application
+
+
 
 ## Further reading
 - https://quarkus.io
 - https://www.baeldung.com/spring-boot-vs-quarkus
 - https://quarkus.io/guides/maven-tooling
+- https://quarkus.io/guides/dev-mode-differences
+- https://quarkus.io/guides/dev-ui
+- https://quarkus.io/guides/dev-services#databases
+- 
