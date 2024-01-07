@@ -165,7 +165,45 @@ Try to change the code and see how Quarkus reacts. For example, you can change t
 
 ### 6. Configure the application
 
+In `application.properties` you can configure the application. For example, you can change the port on which the application runs.
 
+Try to adding the following line to `application.properties` and see how it changes in the browser.
+
+```properties
+quarkus.http.port=8079
+```
+
+Now kill the application and run it again. You should see that the application runs on port 8079.
+
+In `application.properties` you can also configure the configuration of the extensions or add your own configuration. We will use it much more in the following lectures. 
+
+#### 6.1. Separate configuration for development and production
+
+For each property, you can define a separate value for development and production by prefix. For example, you can define a different port for development and production.
+
+Prefixes:
+- without prefix - default
+- `%dev` - development
+- `%test` - test
+- `%prod` - production
+
+Add the following lines to `application.properties` and restart dev mode of the application. The application should still run on port 8079.
+
+```properties
+quarkus.http.port=8080
+%dev.quarkus.http.port=8079
+```
+
+
+
+
+### 7. Add extension
+
+Quarkus offers a lot of extensions that you can add to your application. You can find the list of extensions [here](https://quarkus.io/extensions/).
+
+### 8. Submit the solution
+
+[//]: # (TODO after setting up github classroom)
 
 ## Further reading
 - https://quarkus.io
@@ -174,4 +212,5 @@ Try to change the code and see how Quarkus reacts. For example, you can change t
 - https://quarkus.io/guides/dev-mode-differences
 - https://quarkus.io/guides/dev-ui
 - https://quarkus.io/guides/dev-services#databases
-- 
+- https://quarkus.io/guides/config
+- https://quarkus.io/guides/config-reference
