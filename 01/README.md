@@ -194,7 +194,28 @@ quarkus.http.port=8080
 %dev.quarkus.http.port=8079
 ```
 
+#### 6.2. Using configuration in the code
 
+You can inject configuration into your code using `@ConfigProperty` annotation. For example, you can inject the port into the `GreetingResource.java` class.
+
+Add the following property to `GreetingResource.java` class and import the `ConfigProperty`.
+
+```java
+@ConfigProperty(name = "quarkus.http.port")
+int port;
+```
+
+Now you can use the `port` variable in the `hello()` method.
+
+```java
+@GET
+@Produces(MediaType.TEXT_PLAIN)
+public String hello() {
+    return "Hello on " + port;
+}
+```
+
+Repair the unit test in `GreetingResourceTest.java` by adding port property to `GreetingResourceTest` class in the same way as in the `GreetingResource` class.
 
 
 ### 7. Add extension
