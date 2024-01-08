@@ -217,10 +217,23 @@ public String hello() {
 
 Repair the unit test in `GreetingResourceTest.java` by adding port property to `GreetingResourceTest` class in the same way as in the `GreetingResource` class.
 
-
 ### 7. Add extension
 
 Quarkus offers a lot of extensions that you can add to your application. You can find the list of extensions [here](https://quarkus.io/extensions/).
+
+Currently, we have already some extensions present in the application. You can find them in the `pom.xml` file. For example, the `quarkus-resteasy-reactive` extension is present which enables us to make REST endpoints.
+
+So let's add another extension. We will add the `quarkus-smallrye-openapi` extension which enables us to generate OpenAPI documentation for our REST endpoints. We will discuss openapi in more detail in the following lectures.
+
+Put the following line to the console and see how Quarkus adds the extension to the application.
+
+```bash
+quarkus extension add quarkus-smallrye-openapi
+```
+
+Now, you should see the `quarkus-smallrye-openapi` extension in the `pom.xml` file.
+
+Run the application again and go to http://localhost:8079/q/swagger-ui. You should see the OpenAPI documentation for the `GreetingResource` class.
 
 ### 8. Submit the solution
 
@@ -235,3 +248,4 @@ Quarkus offers a lot of extensions that you can add to your application. You can
 - https://quarkus.io/guides/dev-services#databases
 - https://quarkus.io/guides/config
 - https://quarkus.io/guides/config-reference
+- https://quarkus.io/guides/openapi-swaggerui
