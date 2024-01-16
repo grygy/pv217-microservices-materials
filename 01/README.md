@@ -134,7 +134,7 @@ quarkus dev
 The application should download dependencies and start on port 8080. You can access the basic REST endpoint
 at http://localhost:8080/hello. It should return "*Hello from RESTEasy Reactive*".
 
-### 4. What Quarkus development mode?
+### 4. What is Quarkus development mode?
 
 Quarkus development mode is a powerful feature that makes Quarkus development fast and easy. It offers the following
 features:
@@ -169,7 +169,8 @@ Press `h` to see all available commands and try some of them.
 
 ### 5. Change the code
 
-Try to change the code, refresh the site, and see how Quarkus reacts. For example, you can change the message in the `hello()` method
+Try to change the code, refresh the site, and see how Quarkus reacts. For example, you can change the message in
+the `hello()` method
 in `GreetingResource.java` and see how it changes in the browser. You will see live reload in action with continuous
 testing.
 
@@ -246,6 +247,8 @@ extensions [here](https://quarkus.io/extensions/).
 Currently, we have already some extensions present in the application. You can find them in the `pom.xml` file. For
 example, the `quarkus-resteasy-reactive` extension is present which enables us to make REST endpoints.
 
+#### 7.1. Add extension using CLI
+
 So let's add another extension. We will add the `quarkus-smallrye-openapi` extension which enables us to generate
 OpenAPI documentation for our REST endpoints. We will discuss openapi in more detail in the following lectures.
 
@@ -259,6 +262,12 @@ Now, you should see the `quarkus-smallrye-openapi` extension in the `pom.xml` fi
 
 Run the application again and go to http://localhost:8079/q/swagger-ui. You should see the OpenAPI documentation for
 the `GreetingResource` class.
+
+#### 7.2. Other CLI commands related to extensions
+
+- `quarkus extension list` - Lists all available extensions.
+- `quarkus extension list --installed` - Lists all installed extensions.
+- `quarkus extension remove <extension>` - Removes the extension from the application.
 
 ### 8. Submit the solution
 
