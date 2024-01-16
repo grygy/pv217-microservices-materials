@@ -70,6 +70,27 @@ And many more. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers for
 In this quarkus project we have RESTEasy Reactive with Jackson. Jackson is a Java library for serializing and
 deserializing JSON objects. So we can use Java objects and Jackson will convert them to JSON and vice versa.
 
+### Quarkus beans and dependency injection
+
+#### Bean
+
+A bean is a class that is managed by the Quarkus container. Bean is created by the container and it is destroyed by it. 
+
+The main lifecycle methods of bean are:
+- `@ApplicationScoped` - Created when the application starts and destroyed when the application stops.
+- `@Singleton` - Similar to `@ApplicationScoped` except that no client proxy is used.
+- `@RequestScoped` - Created when the request starts and destroyed when the request ends.
+- `@Dependent` - Created when the bean is injected and destroyed when the bean is destroyed.
+
+
+In our case `FlightService` is a bean that is `ApplicationScoped`. It means that there is only one instance of the bean will exist for the lifetime of the application.
+
+Imagine what would happen with `Map<Integer, Flight> flights` in `FlightService` if it was `@RequestScoped`. It would be created for every request and destroyed after the request ends. So we would lose all the data after every request.
+
+#### Dependency injection
+
+We can inject beans into other beans. We can do it by using `@Inject` annotation. You can see the example in `FlightResource.class`. Quarkus will handle the rest for us.
+
 ## Tasks
 
 This week's lecture will focus on creating a REST API with Quarkus. The focus is on the REST API, not on the business
@@ -89,15 +110,19 @@ You can also use other tools, such as curl or httpie for API testing.
 Swagger UI is also a good tool for testing REST APIs. When you run the application in dev mode, you can access Swagger
 on http://localhost:8079/q/swagger-ui/.
 
-### 1. Implement GET endpoint
+### 1. Implement FlightService
+
+In `FlightService.class` implement all the methods based on provided javadoc. You can also use included tests to help you what is expected.
+
+### 2. Implement GET endpoint
 
 In `FlightResource.class` implement `GET` endpoint for retrieving all flights. The endpoint should return all flights.
 
-#### 1.1. Try it
+#### 2.1. Try it
 
 Then test the endpoint with Swagger/Postman. Right now it should return an empty list.
 
-### 2. Implement POST endpoint
+### 3. Implement POST endpoint
 
 In `FlightResource.class` implement `POST` endpoint for creating a new flight. For now, just assume that we will receive
 the id of the flight in the request body. The endpoint should return the created flight.
@@ -105,12 +130,12 @@ the id of the flight in the request body. The endpoint should return the created
 Check if the flight with the given id already exists. If it does, return `409 Conflict` status code (see 2.2 how to do
 it).
 
-#### 2.1. Mapping request body JSON to Java object
+#### 3.1. Mapping request body JSON to Java object
 
 Thanks to Jackson, you can use Java objects directly from request body. Jackson will convert them from JSON for us.
 Thus, the parameter of the method should be `Flight` object.
 
-#### 2.2. Return `RestResponse` object
+#### 3.2. Return `RestResponse` object
 
 In the previous task, we returned `Flight` object. However, we want to return a `RestResponse` object. `RestResponse` is
 a generic class that contains the response body and status code. We will use it to return the response body and status
@@ -125,7 +150,7 @@ return RestResponse.status(Response.Status.CONFLICT);
 return RestResponse.ResponseBuilder.ok(flight).build();
 ```
 
-#### 2.3. Try it
+#### 3.3. Try it
 
 After you implement the endpoint, try it with Swagger/Postman. After creating a new flight, you should be able to
 retrieve it with the `GET` endpoint.
@@ -147,7 +172,7 @@ Example request body:
 }
 ```
 
-### 3. Implement GET endpoint with path parameter
+### 4. Implement GET endpoint with path parameter
 
 In `FlightResource.class` implement `GET` endpoint for retrieving a single flight. The endpoint should return a flight
 with the given id.
@@ -165,7 +190,7 @@ public Flight get(@PathParam("id") int id){
 After you implement the endpoint, try it with Swagger/Postman. After creating a new flight, you should be able to
 retrieve it with the `GET /flight/{id}` endpoint.
 
-### 4. Implement PUT endpoint
+### 5. Implement PUT endpoint
 
 In `FlightResource.class` implement `PUT` endpoint for updating a flight. Don't forget to check if the flight exists.
 
@@ -184,3 +209,4 @@ In `FlightResource.class` implement `PUT` endpoint for updating a flight. Don't 
 - https://en.wikipedia.org/wiki/JSON
 - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
 - https://quarkus.io/guides/resteasy-reactive
+- https://quarkus.io/guides/cdi

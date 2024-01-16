@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ApplicationScoped
+@ApplicationScoped // This beam will be created once per application and live as long as the application lives
 public class FlightService {
     /**
      * This is a temporary storage for flights
@@ -28,6 +28,7 @@ public class FlightService {
      *
      * @param id flight id
      * @return flight with given id
+     * @throws IllegalArgumentException if flight with given id does not exist
      */
     public Flight getFlight(int id) {
         if (flights.get(id) == null) {
@@ -41,6 +42,7 @@ public class FlightService {
      *
      * @param flight flight to create.
      * @return created flight
+     * @throws IllegalArgumentException if flight with given id already exists
      */
     public Flight createFlight(Flight flight) {
         if (flights.get(flight.id) != null) {
@@ -55,6 +57,7 @@ public class FlightService {
      *
      * @param flight flight to update
      * @return updated flight
+     * @throws IllegalArgumentException if flight with given id does not exist
      */
     public Flight updateFlight(Flight flight) {
         if (flights.get(flight.id) == null) {
@@ -68,6 +71,7 @@ public class FlightService {
      * Delete flight
      *
      * @param id flight id
+     * @throws IllegalArgumentException if flight with given id does not exist
      */
     public void deleteFlight(int id) {
         if (flights.get(id) == null) {
