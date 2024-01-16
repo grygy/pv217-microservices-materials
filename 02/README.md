@@ -93,7 +93,7 @@ on http://localhost:8079/q/swagger-ui/.
 
 In `FlightResource.class` implement `GET` endpoint for retrieving all flights. The endpoint should return all flights.
 
-#### 1.1. Test it
+#### 1.1. Try it
 
 Then test the endpoint with Swagger/Postman. Right now it should return an empty list.
 
@@ -125,9 +125,9 @@ return RestResponse.status(Response.Status.CONFLICT);
 return RestResponse.ResponseBuilder.ok(flight).build();
 ```
 
-#### 2.3. Test it
+#### 2.3. Try it
 
-After you implement the endpoint, test it with Swagger/Postman. After creating a new flight, you should be able to
+After you implement the endpoint, try it with Swagger/Postman. After creating a new flight, you should be able to
 retrieve it with the `GET` endpoint.
 
 Don't forget to set the `Content-Type` header to `application/json`.
@@ -162,12 +162,16 @@ public Flight get(@PathParam("id") int id){
         }
 ```
 
-After you implement the endpoint, test it with Swagger/Postman. After creating a new flight, you should be able to
+After you implement the endpoint, try it with Swagger/Postman. After creating a new flight, you should be able to
 retrieve it with the `GET /flight/{id}` endpoint.
 
 ### X. Submit the solution
 
 [//]: # (TODO after setting up github classroom)
+
+## Hints
+
+- See other methods in `FlightResource.class` for examples.
 
 ## Further reading
 
