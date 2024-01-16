@@ -2,7 +2,7 @@
 
 ## What is Quarkus?
 
-Quarkus is an open-source Kubernetes-native Java framework tailored for GraalVM and HotSpot, crafted from best-of-breed Java  libraries and standards. The goal is to make Java the leading platform in Kubernetes and serverless environments while offering developers a framework to address a wider range of distributed application architectures.
+Quarkus is an open-source Kubernetes-native Java framework tailored for GraalVM and HotSpot, crafted from best-of-breed Java libraries and standards. The goal is to make Java the leading platform in Kubernetes and serverless environments while offering developers a framework to address a wider range of distributed application architectures.
 
 ## How is Quarkus different to Spring boot
 
