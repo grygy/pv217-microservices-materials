@@ -1,7 +1,8 @@
 package cz.muni.fi.resources;
 
 import cz.muni.fi.model.Flight;
-import jakarta.enterprise.context.ApplicationScoped;
+import cz.muni.fi.service.FlightService;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -14,20 +15,16 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.reactive.RestResponse;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class is a REST resource that will be hosted on /flight
  */
 @Path("/flight")
-@ApplicationScoped
 public class FlightResource {
-    /**
-     * This is a temporary storage for flights
-     */
-    final Map<Integer, Flight> flights = new HashMap<>();
+
+    @Inject
+    FlightService flightService;
 
 
     /**
@@ -38,7 +35,7 @@ public class FlightResource {
     @GET // This method process GET requests on /flight
     @Produces(MediaType.APPLICATION_JSON) // This will set Content-Type header to application/json
     public List<Flight> list() {
-        return flights.values().stream().toList();
+        return flightService.listAll();
     }
 
     /**
@@ -51,11 +48,12 @@ public class FlightResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON) // This will indicate that this method consumes JSON
     public RestResponse<Flight> create(Flight flight) { // Converts JSON from request body to Flight object
-        if (flights.get(flight.id) != null) {
+        try {
+            var newFlight = flightService.createFlight(flight);
+            return RestResponse.status(Response.Status.CREATED, newFlight);
+        } catch (IllegalArgumentException e) {
             return RestResponse.status(Response.Status.CONFLICT);
         }
-        flights.put(flight.id, flight);
-        return RestResponse.status(Response.Status.CREATED, flight);
     }
 
 
@@ -69,10 +67,12 @@ public class FlightResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public RestResponse<Flight> get(@PathParam("id") int id) {
-        if (flights.get(id) == null) {
+        try {
+            var flight = flightService.getFlight(id);
+            return RestResponse.status(Response.Status.OK, flight);
+        } catch (IllegalArgumentException e) {
             return RestResponse.status(Response.Status.NOT_FOUND);
         }
-        return RestResponse.status(Response.Status.OK, flights.get(id));
     }
 
 
@@ -90,11 +90,12 @@ public class FlightResource {
         if (flight.id != id) {
             return RestResponse.status(Response.Status.BAD_REQUEST);
         }
-        if (flights.get(id) == null) {
+        try {
+            var updatedFlight = flightService.updateFlight(flight);
+            return RestResponse.status(Response.Status.OK, updatedFlight);
+        } catch (IllegalArgumentException e) {
             return RestResponse.status(Response.Status.NOT_FOUND);
         }
-        flights.put(id, flight);
-        return RestResponse.status(Response.Status.OK, flight);
     }
 
     /**
@@ -105,11 +106,12 @@ public class FlightResource {
     @DELETE
     @Path("/{id}")
     public RestResponse<Flight> delete(@PathParam("id") int id) {
-        if (flights.get(id) == null) {
+        try {
+            flightService.deleteFlight(id);
+            return RestResponse.status(Response.Status.OK);
+        } catch (IllegalArgumentException e) {
             return RestResponse.status(Response.Status.NOT_FOUND);
         }
-        flights.remove(id);
-        return RestResponse.status(Response.Status.OK);
     }
 
     /**
@@ -117,7 +119,7 @@ public class FlightResource {
      */
     @DELETE
     public RestResponse<Flight> deleteAll() {
-        flights.clear();
+        flightService.deleteAllFlights();
         return RestResponse.status(Response.Status.OK);
     }
 
