@@ -3,31 +3,26 @@ package cz.muni.fi.resources;
 
 import cz.muni.fi.model.Flight;
 import cz.muni.fi.model.FlightStatus;
+import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
-import jakarta.ws.rs.core.Response;
-import org.jboss.resteasy.reactive.RestResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 
 @QuarkusTest
+@TestHTTPEndpoint(FlightResource.class) // this tells Quarkus that requests will begin with /flight
 class FlightResourceTest {
 
-    private FlightResource flightResource;
     private Flight testFlight;
 
     @BeforeEach
     void setUp() {
-        flightResource = new FlightResource();
         testFlight = new Flight();
         testFlight.id = 1;
         testFlight.name = "Test Flight";
@@ -36,89 +31,141 @@ class FlightResourceTest {
         testFlight.departureTime = new Date();
         testFlight.arrivalTime = new Date();
         testFlight.capacity = 100;
-        testFlight.status = FlightStatus.ACTIVE; // Assuming ACTIVE is a valid enum
-        FlightResource.flights.clear();
+        testFlight.status = FlightStatus.ACTIVE;
+        clearFlights();
     }
 
     @Test
     void testListEmpty() {
-        List<Flight> flights = flightResource.list();
-        assertTrue(flights.isEmpty());
+        given().when()
+                .get()
+                .then()
+                .statusCode(200)
+                .body(is("[]"));
     }
 
     @Test
     void testListWithFlights() {
-        flightResource.create(testFlight);
-        List<Flight> flights = flightResource.list();
-        assertFalse(flights.isEmpty());
-        assertEquals(1, flights.size());
+        createFlight(testFlight);
+
+        given().when()
+                .get()
+                .then()
+                .statusCode(200)
+                .body("size()", is(1));
     }
 
     @Test
     void testCreateFlight() {
-        RestResponse<Flight> response = flightResource.create(testFlight);
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-        assertNotNull(response.getEntity());
+        given().contentType("application/json")
+                .body(testFlight)
+                .when()
+                .post()
+                .then()
+                .statusCode(201)
+                .body("id", equalTo(testFlight.id));
     }
 
     @Test
     void testCreateDuplicateFlight() {
-        flightResource.create(testFlight);
-        RestResponse<Flight> response = flightResource.create(testFlight);
-        assertEquals(Response.Status.CONFLICT.getStatusCode(), response.getStatus());
+        createFlight(testFlight);
+
+        given().contentType("application/json")
+                .body(testFlight)
+                .when()
+                .post()
+                .then()
+                .statusCode(409);
     }
 
     @Test
     void testGetExistingFlight() {
-        flightResource.create(testFlight);
-        Flight retrievedFlight = flightResource.get(testFlight.id);
-        assertNotNull(retrievedFlight);
-        assertEquals(testFlight.id, retrievedFlight.id);
+        createFlight(testFlight);
+
+        given().when()
+                .get("/" + testFlight
+
+                        .id)
+                .then()
+                .statusCode(200)
+                .body("id", equalTo(testFlight.id));
     }
 
     @Test
     void testGetNonExistingFlight() {
-        Flight retrievedFlight = flightResource.get(99); // Assuming ID 99 does not exist
-        assertNull(retrievedFlight);
+        given().when()
+                .get("/99") // Assuming ID 99 does not exist
+                .then()
+                .statusCode(404);
     }
 
     @Test
     void testUpdateExistingFlight() {
-        flightResource.create(testFlight);
+        createFlight(testFlight);
         testFlight.name = "Updated Name";
-        RestResponse<Flight> response = flightResource.update(testFlight.id, testFlight);
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        assertEquals("Updated Name",
 
-                flightResource.get(testFlight.id).name);
+        given().contentType("application/json")
+                .body(testFlight)
+                .when()
+                .put("/" + testFlight.id)
+                .then()
+                .statusCode(200)
+                .body("name", equalTo("Updated Name"));
     }
-
 
     @Test
     void testUpdateNonExistingFlight() {
-        RestResponse<Flight> response = flightResource.update(1, testFlight);
-        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        given().contentType("application/json")
+                .body(testFlight)
+                .when()
+                .put("/1")
+                .then()
+                .statusCode(404);
     }
 
     @Test
     void testUpdateFlightWithMismatchedId() {
-        flightResource.create(testFlight);
-        RestResponse<Flight> response = flightResource.update(99, testFlight); // Mismatched ID
-        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        createFlight(testFlight);
+
+        given().contentType("application/json")
+                .body(testFlight)
+                .when()
+                .put("/99") // Mismatched ID
+                .then()
+                .statusCode(400);
     }
 
     @Test
     void testDeleteExistingFlight() {
-        flightResource.create(testFlight);
-        RestResponse<Flight> response = flightResource.delete(testFlight.id);
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        assertNull(flightResource.get(testFlight.id));
+        createFlight(testFlight);
+
+        given().when()
+                .delete("/" + testFlight.id)
+                .then()
+                .statusCode(200);
     }
 
     @Test
     void testDeleteNonExistingFlight() {
-        RestResponse<Flight> response = flightResource.delete(99); // Assuming ID 99 does not exist
-        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        given().when()
+                .delete("/99") // Assuming ID 99 does not exist
+                .then()
+                .statusCode(404);
     }
 
+    private void createFlight(Flight flight) {
+        given().contentType("application/json")
+                .body(flight)
+                .when()
+                .post()
+                .then()
+                .statusCode(201);
+    }
+
+    private void clearFlights() {
+        given().when()
+                .delete()
+                .then()
+                .statusCode(200);
+    }
 }

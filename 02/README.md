@@ -165,6 +165,10 @@ public Flight get(@PathParam("id") int id){
 After you implement the endpoint, try it with Swagger/Postman. After creating a new flight, you should be able to
 retrieve it with the `GET /flight/{id}` endpoint.
 
+### 4. Implement PUT endpoint
+
+In `FlightResource.class` implement `PUT` endpoint for updating a flight. Don't forget to check if the flight exists.
+
 ### X. Submit the solution
 
 [//]: # (TODO after setting up github classroom)

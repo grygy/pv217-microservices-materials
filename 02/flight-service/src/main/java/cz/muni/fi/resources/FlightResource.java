@@ -27,7 +27,8 @@ public class FlightResource {
     /**
      * This is a temporary storage for flights
      */
-    static final Map<Integer, Flight> flights = new HashMap<>();
+    final Map<Integer, Flight> flights = new HashMap<>();
+
 
     /**
      * Get list of all flights
@@ -108,6 +109,15 @@ public class FlightResource {
             return RestResponse.status(Response.Status.NOT_FOUND);
         }
         flights.remove(id);
+        return RestResponse.status(Response.Status.OK);
+    }
+
+    /**
+     * Helper method for to delete all flights
+     */
+    @DELETE
+    public RestResponse<Flight> deleteAll() {
+        flights.clear();
         return RestResponse.status(Response.Status.OK);
     }
 
