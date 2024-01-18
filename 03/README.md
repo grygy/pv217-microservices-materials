@@ -102,12 +102,16 @@ at http://localhost:8079/q/openapi.
 ## What is gRPC?
 
 gRPC is a high performance, open-source universal Remote Procedure Call (RPC) framework. It's based on HTTP/2 and
-Protocol Buffers.
+Protocol Buffers. You can imagine it as a middleware between your service and outside world. 
+
+![gRPC](img/grpc.png)
+*image from https://grpc.io/docs/what-is-grpc/introduction/*
 
 ### Main features:
 
 - HTTP/2 based - low latency, multiplexing, header compression, stream prioritization
 - High performance - binary protocol, efficient serialization, asynchronous by default
+- Bidirectional streaming - client and server can send messages at the same time
 
 ### Differences between REST and gRPC
 
@@ -119,6 +123,40 @@ Protocol Buffers.
 | Stateless     | Bidirectional streaming      |
 | Client-server | Client-server, server-server |
 | HTTP verbs    | RPC methods                  |
+
+### Protocol Buffers
+
+Protocol Buffers are Interface Definition Language (IDL) for describing both the service interface and the structure of the payload messages. It's a binary format that is smaller and faster than JSON. It's defined in `.proto` files.
+
+Sample `src/main/proto/helloworld.proto` file:
+
+```proto
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.quarkus.example";
+option java_outer_classname = "HelloWorldProto";
+
+package helloworld;
+
+// The greeting service definition.
+service Greeter {
+    // Sends a greeting
+    rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+    string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+    string message = 1;
+}
+```
+
+From this file, Quarkus can generate Java classes that can be used in your application. Use `mvn compile` to generate the classes.
 
 ## Tasks
 
@@ -138,3 +176,5 @@ Protocol Buffers.
 - https://www.openapis.org/
 - https://swagger.io/resources/articles/adopting-an-api-first-approach/
 - https://www.visual-paradigm.com/guide/development/code-first-vs-design-first/ 
+- https://grpc.io/docs/what-is-grpc/introduction/
+- https://quarkus.io/guides/grpc-getting-started
