@@ -148,6 +148,7 @@ service Greeter {
 // The request message containing the user's name.
 message HelloRequest {
     string name = 1;
+    string surname = 2;
 }
 
 // The response message containing the greetings
@@ -156,11 +157,71 @@ message HelloReply {
 }
 ```
 
-From this file, Quarkus can generate Java classes that can be used in your application. Use `mvn compile` to generate the classes.
+From this file, Quarkus can generate Java classes that can be used in your application. To generate the classes use `mvn compile`.
 
 ## Tasks
 
-### 1.
+### 1. Add OpenAPI specification
+
+#### 1.1 Create information about the application
+
+Create `FlightServiceApplication` class in `cz.muni.fi` that extends `Application` class from `jakarta.ws.rs.core.Application`. Add
+`@OpenAPIDefinition` annotation with `info` field. Add title, version and description as shown in the screenshot bellow.
+
+
+#### 1.2 Create information about the resource
+Add `@Tag` annotation for `FlightResource` class. Provide name and description as shown in the screenshot bellow.
+
+![OpenAPI](img/openapi.png)
+
+
+### 2. Generate Grpc classes
+
+#### 2.1. Add `quarkus-grpc` extension
+
+Add `quarkus-grpc` extension.
+
+```bash
+quarkus extension add quarkus-grpc
+```
+
+#### 2.2. Modify `flight-service.proto` file
+
+In `flightcancelation.proto` file add under the configuration `FlightCancellation` service with `CancelFlight` rpc that will take `CancelFlightRequest` with `id` and `reason` fields. It will return `CancelFlightResponse` with `status` field.
+
+#### 2.3. Generate classes
+
+Run `mvn compile` to generate classes from `.proto` files.
+
+When you run this command, you should be able to generated classes in `target/generated-sources/grpc/cz/muni/fi/proto` directory. Check if they are there.
+
+If you are using IntelliJ, run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes.
+
+### 3. Implement `FlightCancellationService`
+
+#### 3.1. Create `FlightCancellationService` class in `cz.muni.fi.grpc` package. That base file should look like this: 
+
+```java
+package cz.muni.fi.grpc;
+import cz.muni.fi.proto.FlightCancellation;
+import cz.muni.fi.proto.FlightCancellationRequest;
+import cz.muni.fi.proto.FlightCancellationResponse;
+import io.quarkus.grpc.GrpcService;
+import io.smallrye.mutiny.Uni;
+
+@GrpcService
+public class FlightCancellationService implements FlightCancellation {
+   // TODO implement methods
+}
+```
+
+Check if idea see the `FlightCancellation` class. If not, run Maven compile from IDE Maven plugin under lifecycle.
+
+#### 3.2. Implement `cancelFlight` method
+
+
+
+
 
 ### X. Submit the solution
 
@@ -168,7 +229,7 @@ From this file, Quarkus can generate Java classes that can be used in your appli
 
 ## Hints
 
--
+- Type of id should be `int32` in `.proto` file.
 
 ## Further reading
 

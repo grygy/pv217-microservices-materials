@@ -1,6 +1,7 @@
 package cz.muni.fi.service;
 
 import cz.muni.fi.model.Flight;
+import cz.muni.fi.model.FlightStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.HashMap;
@@ -85,5 +86,17 @@ public class FlightService {
      */
     public void deleteAllFlights() {
         flights.clear();
+    }
+
+    /**
+     * Cancel flight
+     *
+     * @param id flight id
+     */
+    public void cancelFlight(int id) {
+        if (flights.get(id) == null) {
+            throw new IllegalArgumentException("Flight with id " + id + " does not exist");
+        }
+        flights.get(id).status = FlightStatus.CANCELLED;
     }
 }

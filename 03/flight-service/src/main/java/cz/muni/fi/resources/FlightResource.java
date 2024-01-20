@@ -13,6 +13,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
  * This class is a REST resource that will be hosted on /flight
  */
 @Path("/flight")
+@Tag(name = "Flight", description = "Flight CRUD API")
 public class FlightResource {
 
     @Inject

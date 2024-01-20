@@ -115,4 +115,20 @@ class FlightServiceTest {
         });
     }
 
+    @Test
+    void testCancelFlight_Success() {
+        flightService.createFlight(flight);
+        flightService.cancelFlight(flight.id);
+        Flight cancelled = flightService.getFlight(flight.id);
+        assertNotNull(cancelled);
+        assertEquals(FlightStatus.CANCELLED, cancelled.status);
+    }
+
+    @Test
+    void testCancelFlight_NotFound() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            flightService.cancelFlight(999);
+        });
+    }
+
 }
