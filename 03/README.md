@@ -238,6 +238,10 @@ Check if idea see the `FlightCancellation` class. If not, run Maven compile from
 
 - Type of id should be `int32` in `.proto` file.
 
+## Troubleshooting
+
+- If the `flight-service` cannot find dependency `passenger-service` run `mvn clean install` in `passenger-service` directory.
+
 ## Further reading
 
 - https://quarkus.io
