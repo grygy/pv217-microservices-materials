@@ -34,10 +34,10 @@ public class FlightResource {
      *
      * @return list of all flights
      */
-    @GET // This method process GET requests on /flight
-    @Produces(MediaType.APPLICATION_JSON) // This will set Content-Type header to application/json
-    public List<Flight> list() {
-        return flightService.listAll();
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public RestResponse<List<Flight>> list() {
+        return RestResponse.status(Response.Status.OK, flightService.listAll());
     }
 
     /**
@@ -48,8 +48,8 @@ public class FlightResource {
      */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON) // This will indicate that this method consumes JSON
-    public RestResponse<Flight> create(Flight flight) { // Converts JSON from request body to Flight object
+    @Consumes(MediaType.APPLICATION_JSON)
+    public RestResponse<Flight> create(Flight flight) {
         try {
             var newFlight = flightService.createFlight(flight);
             return RestResponse.status(Response.Status.CREATED, newFlight);

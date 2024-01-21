@@ -159,6 +159,13 @@ message HelloReply {
 
 From this file, Quarkus can generate Java classes that can be used in your application. To generate the classes use `mvn compile`.
 
+## State of the project
+
+We have two services - `passenger-service` and `flight-service`. 
+
+- `flight-service` is a REST service that provides CRUD operations for flights. You already know this service from the previous lectures. Runs on port `8079`.
+- `passenger-service` is a REST service that provides CRUD operations for passengers and get new notifications. Also, it provides a gRPC interface to notify passenger about flight cancellation. Runs on port `8078`.
+
 ## Tasks
 
 ### 1. Add OpenAPI specification
@@ -195,7 +202,7 @@ Run `mvn compile` to generate classes from `.proto` files.
 
 When you run this command, you should be able to generated classes in `target/generated-sources/grpc/cz/muni/fi/proto` directory. Check if they are there.
 
-If you are using IntelliJ, run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes.
+If you are using IntelliJ, run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes. Or reload all maven projects.
 
 ### 3. Implement `FlightCancellationService`
 
