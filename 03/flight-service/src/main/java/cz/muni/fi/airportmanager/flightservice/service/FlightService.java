@@ -3,7 +3,7 @@ package cz.muni.fi.airportmanager.flightservice.service;
 import cz.muni.fi.airportmanager.flightservice.model.Flight;
 import cz.muni.fi.airportmanager.flightservice.model.FlightStatus;
 import cz.muni.fi.airportmanager.proto.FlightCancellationRequest;
-import cz.muni.fi.airportmanager.proto.FlightCancellationResponse;
+import cz.muni.fi.airportmanager.proto.FlightCancellationResponseStatus;
 import cz.muni.fi.airportmanager.proto.MutinyFlightCancellationGrpc;
 import io.quarkus.grpc.GrpcClient;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -105,6 +105,9 @@ public class FlightService {
             throw new IllegalArgumentException("Flight with id " + id + " does not exist");
         }
         flights.get(id).status = FlightStatus.CANCELLED;
-        var response = flightCancellationService.cancelFlight(FlightCancellationRequest.newBuilder().setId(id).setReason("Unknown reason").build()).await().indefinitely();
+        var response = flightCancellationService.cancelFlight(FlightCancellationRequest.newBuilder().setId(id).setReason("Unknown").build()).await().indefinitely();
+        if (response.getStatus() != FlightCancellationResponseStatus.Cancelled) {
+            throw new RuntimeException("Flight cancellation failed");
+        }
     }
 }

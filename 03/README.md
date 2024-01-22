@@ -179,28 +179,22 @@ Create `FlightServiceApplication` class in `cz.muni.fi` that extends `Applicatio
 #### 1.2 Create information about the resource
 Add `@Tag` annotation for `FlightResource` class. Provide name and description as shown in the screenshot bellow.
 
+# TODO add description and example values and responses to endpints
+
 ![OpenAPI](img/openapi.png)
 
 
 ### 2. Generate Grpc classes
 
-#### 2.1. Add `quarkus-grpc` extension
+#### 2.1. Modify `flightcancellation.proto` file in `flight-cancellation-api` module
 
-Add `quarkus-grpc` extension.
-
-```bash
-quarkus extension add quarkus-grpc
-```
-
-#### 2.2. Modify `flight-service.proto` file
-
-In `flightcancelation.proto` file add under the configuration `FlightCancellation` service with `CancelFlight` rpc that will take `CancelFlightRequest` with `id` and `reason` fields. It will return `CancelFlightResponse` with `status` field.
+In `flightcancellation.proto` file add under the configuration `FlightCancellation` service with `CancelFlight` rpc that will take `CancelFlightRequest` with `id` (int) and `reason` (string) fields. It will return `CancelFlightResponse` with `status` field.
 
 #### 2.3. Generate classes
 
-Run `mvn compile` to generate classes from `.proto` files.
+Run `mvn compile` in project root to generate classes from `.proto` files.
 
-When you run this command, you should be able to generated classes in `target/generated-sources/grpc/cz/muni/fi/proto` directory. Check if they are there.
+When you run this command, you should be able to generated classes in `flight-cancellation-api/target/generated-sources/grpc/cz/muni/fi/proto` directory. Check if they are there.
 
 If you are using IntelliJ, run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes. Or reload all maven projects.
 

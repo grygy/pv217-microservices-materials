@@ -15,12 +15,12 @@ message FlightCancellationRequest {
     string reason = 2;
 }
 
-message FlightCancellationResponse {
-    enum ResponseStatus
-    {   // whatever contents...
-        Cancelled = 0;
-        Error = 1;
-    }
+enum FlightCancellationResponseStatus
+{
+    Cancelled = 0;
+    Error = 1;
+}
 
-    ResponseStatus status = 1;
+message FlightCancellationResponse {
+    FlightCancellationResponseStatus status = 1;
 }

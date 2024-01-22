@@ -9,5 +9,6 @@
   <modules>
     <module>passenger-service</module>
     <module>flight-service</module>
+    <module>flight-cancellation-api</module>
   </modules>
 </project>

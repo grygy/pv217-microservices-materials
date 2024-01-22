@@ -30,7 +30,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>passenger-service</artifactId>
+      <artifactId>flight-cancellation-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
