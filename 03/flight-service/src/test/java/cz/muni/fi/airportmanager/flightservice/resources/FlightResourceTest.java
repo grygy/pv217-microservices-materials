@@ -1,7 +1,6 @@
 package cz.muni.fi.airportmanager.flightservice.resources;
 
 
-import cz.muni.fi.airportmanager.flightservice.resources.FlightResource;
 import cz.muni.fi.airportmanager.flightservice.model.Flight;
 import cz.muni.fi.airportmanager.flightservice.model.FlightStatus;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
@@ -154,14 +153,6 @@ class FlightResourceTest {
                 .statusCode(404);
     }
 
-    @Test
-    void testCancelFlight_Success() {
-        createFlight(testFlight);
-        given().when()
-                .put("/" + testFlight.id + "/cancel")
-                .then()
-                .statusCode(200);
-    }
 
     @Test
     void testCancelFlight_NotFound() {

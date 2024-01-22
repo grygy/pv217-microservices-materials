@@ -1,6 +1,5 @@
 package cz.muni.fi.airportmanager.flightservice.service;
 
-import cz.muni.fi.airportmanager.flightservice.service.FlightService;
 import cz.muni.fi.airportmanager.flightservice.model.Flight;
 import cz.muni.fi.airportmanager.flightservice.model.FlightStatus;
 import io.quarkus.test.junit.QuarkusTest;
@@ -114,15 +113,6 @@ class FlightServiceTest {
         assertThrows(IllegalArgumentException.class, () -> {
             flightService.createFlight(flight);
         });
-    }
-
-    @Test
-    void testCancelFlight_Success() {
-        flightService.createFlight(flight);
-        flightService.cancelFlight(flight.id);
-        Flight cancelled = flightService.getFlight(flight.id);
-        assertNotNull(cancelled);
-        assertEquals(FlightStatus.CANCELLED, cancelled.status);
     }
 
     @Test

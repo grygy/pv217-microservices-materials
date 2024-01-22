@@ -1,5 +1,6 @@
 package cz.muni.fi.airportmanager.flightservice.resources;
 
+import cz.muni.fi.airportmanager.flightservice.model.example.Examples;
 import cz.muni.fi.airportmanager.flightservice.service.FlightService;
 import cz.muni.fi.airportmanager.flightservice.model.Flight;
 import jakarta.inject.Inject;
@@ -11,12 +12,19 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import java.util.List;
+
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
  * This class is a REST resource that will be hosted on /flight
@@ -35,7 +43,18 @@ public class FlightResource {
      * @return list of all flights
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    @Operation(summary = "Get list of all flights")
+    @APIResponse(
+            responseCode = "200",
+            description = "Get list of all flights",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Flight.class, required = true),
+                    examples = @ExampleObject(name = "flight", value = Examples.VALID_FLIGHT_LIST)
+            )
+    )
+    //    TODO add openapi docs
     public RestResponse<List<Flight>> list() {
         return RestResponse.status(Response.Status.OK, flightService.listAll());
     }
@@ -47,9 +66,26 @@ public class FlightResource {
      * @return created flight
      */
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public RestResponse<Flight> create(Flight flight) {
+    @Produces(APPLICATION_JSON)
+    @Consumes(APPLICATION_JSON)
+    @Operation(summary = "Create a new flight")
+    @APIResponse(
+            responseCode = "201",
+            description = "Created flight",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Flight.class, required = true),
+                    examples = @ExampleObject(name = "flight", value = Examples.VALID_FLIGHT)
+            )
+    )
+    @APIResponse(
+            responseCode = "409",
+            description = "Conflict - flight with given id already exists"
+    )
+    //    TODO add openapi docs
+    public RestResponse<Flight> create(
+            @Schema(implementation = Flight.class, required = true)
+            Flight flight) {
         try {
             var newFlight = flightService.createFlight(flight);
             return RestResponse.status(Response.Status.CREATED, newFlight);
@@ -67,8 +103,23 @@ public class FlightResource {
      */
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public RestResponse<Flight> get(@PathParam("id") int id) {
+    @Produces(APPLICATION_JSON)
+    @Operation(summary = "Get flight by id")
+    @APIResponse(
+            responseCode = "200",
+            description = "Flight with given id",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Flight.class, required = true),
+                    examples = @ExampleObject(name = "flight", value = Examples.VALID_FLIGHT)
+            )
+    )
+    @APIResponse(
+            responseCode = "404",
+            description = "Flight with given id does not exist"
+    )
+    //    TODO add openapi docs
+    public RestResponse<Flight> get(@Parameter(name = "id", required = true) @PathParam("id") int id) {
         try {
             var flight = flightService.getFlight(id);
             return RestResponse.status(Response.Status.OK, flight);
@@ -86,9 +137,26 @@ public class FlightResource {
      */
     @PUT
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public RestResponse<Flight> update(@PathParam("id") int id, Flight flight) {
+    @Produces(APPLICATION_JSON)
+    @Consumes(APPLICATION_JSON)
+    @Operation(summary = "Update flight")
+    @APIResponse(
+            responseCode = "200",
+            description = "Updated flight",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Flight.class, required = true),
+                    examples = @ExampleObject(name = "flight", value = Examples.VALID_FLIGHT)
+            )
+    )
+    @APIResponse(
+            responseCode = "404",
+            description = "Flight with given id does not exist"
+    )
+    //    TODO add openapi docs
+    public RestResponse<Flight> update(@Parameter(name = "id", required = true) @PathParam("id") int id,
+                                       @Schema(implementation = Flight.class, required = true)
+                                       Flight flight) {
         if (flight.id != id) {
             return RestResponse.status(Response.Status.BAD_REQUEST);
         }
@@ -107,7 +175,17 @@ public class FlightResource {
      */
     @DELETE
     @Path("/{id}")
-    public RestResponse<Flight> delete(@PathParam("id") int id) {
+    @Operation(summary = "Delete flight")
+    @APIResponse(
+            responseCode = "200",
+            description = "Flight deleted"
+    )
+    @APIResponse(
+            responseCode = "404",
+            description = "Flight with given id does not exist"
+    )
+    //    TODO add openapi docs
+    public RestResponse<Flight> delete(@Parameter(name = "id", required = true) @PathParam("id") int id) {
         try {
             flightService.deleteFlight(id);
             return RestResponse.status(Response.Status.OK);
@@ -120,6 +198,11 @@ public class FlightResource {
      * Helper method for to delete all flights
      */
     @DELETE
+    @Operation(summary = "Delete all flights")
+    @APIResponse(
+            responseCode = "200",
+            description = "All flights deleted"
+    )
     public RestResponse<Flight> deleteAll() {
         flightService.deleteAllFlights();
         return RestResponse.status(Response.Status.OK);
@@ -130,7 +213,17 @@ public class FlightResource {
      */
     @PUT
     @Path("/{id}/cancel")
-    public RestResponse<Flight> cancel(@PathParam("id") int id) {
+    @Operation(summary = "Cancel flight")
+    @APIResponse(
+            responseCode = "200",
+            description = "Flight cancelled"
+    )
+    @APIResponse(
+            responseCode = "404",
+            description = "Flight with given id does not exist"
+    )
+    //    TODO add openapi docs
+    public RestResponse<Flight> cancel(@Parameter(name = "id", required = true) @PathParam("id") int id) {
         try {
             flightService.cancelFlight(id);
             return RestResponse.status(Response.Status.OK);

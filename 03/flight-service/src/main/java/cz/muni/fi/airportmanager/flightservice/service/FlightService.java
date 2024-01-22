@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ApplicationScoped // This beam will be created once per application and live as long as the application lives
+@ApplicationScoped
 public class FlightService {
     /**
      * This is a temporary storage for flights
@@ -20,7 +20,7 @@ public class FlightService {
     private final Map<Integer, Flight> flights = new HashMap<>();
 
     @GrpcClient("passenger-service")
-    MutinyFlightCancellationGrpc.MutinyFlightCancellationStub flightCancellationService;
+    MutinyFlightCancellationGrpc.MutinyFlightCancellationStub flightCancellationStub;
 
     /**
      * Get list of all flights
@@ -99,13 +99,18 @@ public class FlightService {
      * Cancel flight
      *
      * @param id flight id
+     * @throws IllegalArgumentException if flight with given id does not exist
      */
     public void cancelFlight(int id) {
+//        TODO if flight exists, call cancelFlight on stub
+//        TODO set flight status to CANCELLED in flights map
+//        TODO use FlightCancellationRequest.newBuilder() to create a request body
+//        TODO await the result
         if (flights.get(id) == null) {
             throw new IllegalArgumentException("Flight with id " + id + " does not exist");
         }
         flights.get(id).status = FlightStatus.CANCELLED;
-        var response = flightCancellationService.cancelFlight(FlightCancellationRequest.newBuilder().setId(id).setReason("Unknown").build()).await().indefinitely();
+        var response = flightCancellationStub.cancelFlight(FlightCancellationRequest.newBuilder().setId(id).setReason("Unknown").build()).await().indefinitely();
         if (response.getStatus() != FlightCancellationResponseStatus.Cancelled) {
             throw new RuntimeException("Flight cancellation failed");
         }

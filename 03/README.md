@@ -56,6 +56,8 @@ document embedding the fundamentals of HTTP and JSON.
 Quarkus supports OpenAPI specification generation from the code via `quarkus-smallrye-openapi` extension that we
 installed in the first lecture.
 
+#### Application annotation
+
 We can extend OpenAPI specification with additional information using `@OpenAPIDefinition` annotation for the whole
 application.
 
@@ -86,6 +88,8 @@ Note that `FlightServiceApplication` extends `Application` class from `jakarta.w
 entry point" for application. It's not necessary to extend this class, but it's required for the use
 of `@OpenAPIDefinition`.
 
+#### Resource annotation
+
 We can also provide additional information for resources using `@Tag` annotation.
 
 ```java
@@ -96,13 +100,63 @@ public class FlightResource {
 }
 ```
 
-When you will run `quarkus dev` in flight-service, you can see the OpenAPI specification in the browser
-at http://localhost:8079/q/openapi.
+#### Endpoint annotation
+
+There are several annotations that can be used to provide additional information for endpoints.
+
+- `@Operation` - provides information about the operation
+- `@APIResponse` - provides information about the response
+- `@Schema` - provides information about the schema
+
+Best understood on an example from `passenger-service`:
+
+```java
+/**
+ * Update passenger
+ *
+ * @param id        id of passenger
+ * @param passenger passenger to update
+ */
+@PUT
+@Path("/{id}")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+@Operation(summary = "Update passenger")
+@APIResponse(
+        responseCode = "200",
+        description = "Updated passenger",
+        content = @Content(
+                mediaType = APPLICATION_JSON,
+                schema = @Schema(implementation = Passenger.class, required = true),
+                examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER)
+        )
+)
+@APIResponse(
+        responseCode = "404",
+        description = "Passenger with given id does not exist"
+)
+public RestResponse<Passenger> update(@Parameter(name = "id", required = true, description = "Passenger id") @PathParam("id") int id,
+                                      @Schema(implementation = Passenger.class, required = true)
+                                      Passenger passenger) {
+    if (passenger.id != id) {
+        return RestResponse.status(Response.Status.BAD_REQUEST);
+    }
+    try {
+        var updatedPassenger = passengerService.updatePassenger(passenger);
+        return RestResponse.status(Response.Status.OK, updatedPassenger);
+    } catch (IllegalArgumentException e) {
+        return RestResponse.status(Response.Status.NOT_FOUND);
+    }
+}
+```
+
+When you will run `quarkus dev` in `passenger-service`, you can see the OpenAPI specification in the browser
+at http://localhost:8078/q/openapi.
 
 ## What is gRPC?
 
 gRPC is a high performance, open-source universal Remote Procedure Call (RPC) framework. It's based on HTTP/2 and
-Protocol Buffers. You can imagine it as a middleware between your service and outside world. 
+Protocol Buffers. You can imagine it as a middleware between your service and outside world. Simply put client service with Stub is calling gRPC service as a async method call. 
 
 ![gRPC](img/grpc.png)
 *image from https://grpc.io/docs/what-is-grpc/introduction/*
@@ -161,14 +215,15 @@ From this file, Quarkus can generate Java classes that can be used in your appli
 
 ## State of the project
 
-We have two services - `passenger-service` and `flight-service`. 
+Since the last lecture the project now includes 3 modules - `flight-service`, `passenger-service` and `flight-cancellation-api`.
 
 - `flight-service` is a REST service that provides CRUD operations for flights. You already know this service from the previous lectures. Runs on port `8079`.
 - `passenger-service` is a REST service that provides CRUD operations for passengers and get new notifications. Also, it provides a gRPC interface to notify passenger about flight cancellation. Runs on port `8078`.
+- `flight-cancellation-api` is a module that contains `.proto` files for gRPC service. It's used by `passenger-service` to generate gRPC classes and `flight-service` to generate gRPC stubs.
 
 ## Tasks
 
-### 1. Add OpenAPI specification
+### 1. Add OpenAPI specification to `flight-service`
 
 #### 1.1 Create information about the application
 
@@ -177,52 +232,71 @@ Create `FlightServiceApplication` class in `cz.muni.fi` that extends `Applicatio
 
 
 #### 1.2 Create information about the resource
+
 Add `@Tag` annotation for `FlightResource` class. Provide name and description as shown in the screenshot bellow.
 
-# TODO add description and example values and responses to endpints
+#### 1.3 Create information about the endpoints
+
+Add `@Operation`, `@APIResponse`, `@Schema`, and `@Parameter` annotation for each method and parameter in `FlightResource` class similar to `PassengerResource` in `passenger-service`. You will find response examples in `Examples` class that you can use.
+
+- `@Operation` - provide summary and description
+- `@APIResponse` - provide response code, description, content and schema
+- `@Schema` - provide implementation and required
+- `@Parameter` - provide name, required and description
 
 ![OpenAPI](img/openapi.png)
-
 
 ### 2. Generate Grpc classes
 
 #### 2.1. Modify `flightcancellation.proto` file in `flight-cancellation-api` module
 
-In `flightcancellation.proto` file add under the configuration `FlightCancellation` service with `CancelFlight` rpc that will take `CancelFlightRequest` with `id` (int) and `reason` (string) fields. It will return `CancelFlightResponse` with `status` field.
+In `flightcancellation.proto` file add under the configuration `FlightCancellation` service with `CancelFlight` rpc that will take `CancelFlightRequest` with `id` (int) and `reason` (string) fields. It will return `CancelFlightResponse` with `status` (`FlightCancellationResponseStatus` enum) field.
 
-#### 2.3. Generate classes
+#### 2.2. Generate classes
 
-Run `mvn compile` in project root to generate classes from `.proto` files.
+Run `mvn compile` in project root to generate classes from `.proto` file.
 
-When you run this command, you should be able to generated classes in `flight-cancellation-api/target/generated-sources/grpc/cz/muni/fi/proto` directory. Check if they are there.
+When you run this command, you should be able to generated classes in `flight-cancellation-api/target/generated-sources/grpc/cz/muni/fi/proto` directory. Check if they are there. This files will be used in `passenger-service` to implement gRPC service and in `flight-service` to implement gRPC stub.
 
 If you are using IntelliJ, run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes. Or reload all maven projects.
 
 ### 3. Implement `FlightCancellationService`
 
-#### 3.1. Create `FlightCancellationService` class in `cz.muni.fi.grpc` package. That base file should look like this: 
+Now we will implement `FlightCancellationService` in `passenger-service` that will implement `FlightCancellation` rpc.
 
-```java
-package cz.muni.fi.grpc;
-import cz.muni.fi.proto.FlightCancellation;
-import cz.muni.fi.proto.FlightCancellationRequest;
-import cz.muni.fi.proto.FlightCancellationResponse;
-import io.quarkus.grpc.GrpcService;
-import io.smallrye.mutiny.Uni;
+#### 3.1. Implement `cancelFlight` method
 
-@GrpcService
-public class FlightCancellationService implements FlightCancellation {
-   // TODO implement methods
-}
-```
+Implement `cancelFlight` method in `FlightCancellationService` class. There is java doc that describes what the method should do. 
 
-Check if idea see the `FlightCancellation` class. If not, run Maven compile from IDE Maven plugin under lifecycle.
+#### 3.2. Test it with Postman
 
-#### 3.2. Implement `cancelFlight` method
+When you will be done, run passenger service in dev mode and try to call the gRPC service from Postman. You need to create new gRPC collection in Postman with url `localhost:9002` and choose CancelFlight. The request shouldn't fail.
 
+![Postman](img/postman_grpc.png)
 
+### 4. Use stub in `flight-service`
 
+Now because both `flight-service` and `passenger-service` have `flight-cancellation-api` as a dependency, we can use stubs in `flight-service` to call `cancelFlight` method. 
 
+#### 4.1. Use Grpc Client to use Stub `FlightCancellationService` in `FlightService`
+
+Now similar to injecting `FlightService` into `FlightResource` with `@Inject` we can inject `FlightCancellationService` into `FlightResource` with `@GrpcClient`. In `@GrpcClient` we need to provide the name of the service that we want to use. In our case it's `passenger-service`.
+
+The class of stub that we are injecting is `MutinyFlightCancellationGrpc.MutinyFlightCancellationStub`. Methods on this class are asynchronous and return `Uni` object. We can use `await().indefinitely()` to wait for the result.
+
+#### 4.2. Implement `cancelFlight` method in `FlightService`
+
+Implement `cancelFlight` method in `FlightService` that will call `cancelFlight` method on stub. You can use `await().indefinitely()` to wait for the result.
+
+#### 4.3. Test it 
+
+Now, everything should be set up. You can run both services in dev mode to try if they are communicating correctly.
+
+Scenario:
+1. Create new flight using `POST localhost:8079/flight`
+2. Create new passenger using `POST localhost:8078/passenger` with flightId = id of flight from step 1
+3. Cancel flight using `PUT localhost:8079/flight/{id}`
+4. Check if there is a list of notifications in `GET localhost:8078/notification` that contains notification about flight cancellation for passenger from step 2
 
 ### X. Submit the solution
 
@@ -231,6 +305,8 @@ Check if idea see the `FlightCancellation` class. If not, run Maven compile from
 ## Hints
 
 - Type of id should be `int32` in `.proto` file.
+- For example OpenAPI specification see `passenger-service` service.
+- `@GrpcClient("passenger-service")`
 
 ## Troubleshooting
 

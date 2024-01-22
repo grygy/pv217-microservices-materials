@@ -21,8 +21,16 @@ public class FlightCancellationService extends MutinyFlightCancellationGrpc.Flig
     @Inject
     PassengerService passengerService;
 
+    /**
+     * Cancel flight and add notification for all passengers
+     *
+     * @param request request with flight id and reason for cancellation
+     * @return response with status of cancellation
+     */
     @Override
     public Uni<FlightCancellationResponse> cancelFlight(FlightCancellationRequest request) {
+//        TODO inject notification service and passenger service to create notifications for all passengers with given flight id
+//        TODO check how Passenger and Notification classes look like
         var flightId = request.getId();
         var reason = request.getReason();
         var passengersOnFlight = passengerService.getPassengersForFlight(flightId);
@@ -34,5 +42,7 @@ public class FlightCancellationService extends MutinyFlightCancellationGrpc.Flig
             notificationService.createNotification(notification);
         }
         return Uni.createFrom().item(FlightCancellationResponse.newBuilder().setStatus(FlightCancellationResponseStatus.Cancelled).build());
+//        Return should look like this:
+//        return Uni.createFrom().item(FlightCancellationResponse.newBuilder().setStatus(FlightCancellationResponseStatus.Cancelled).build());
     }
 }

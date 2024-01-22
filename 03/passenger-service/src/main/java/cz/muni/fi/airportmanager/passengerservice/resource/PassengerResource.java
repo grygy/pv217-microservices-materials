@@ -1,6 +1,7 @@
 package cz.muni.fi.airportmanager.passengerservice.resource;
 
 import cz.muni.fi.airportmanager.passengerservice.model.Passenger;
+import cz.muni.fi.airportmanager.passengerservice.model.examples.Examples;
 import cz.muni.fi.airportmanager.passengerservice.service.PassengerService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -13,10 +14,18 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import java.util.List;
+
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
  * This class is a REST resource that will be hosted on /passenger
@@ -35,6 +44,16 @@ public class PassengerResource {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Get list of all passengers")
+    @APIResponse(
+            responseCode = "200",
+            description = "List of all passengers",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Passenger.class, required = true),
+                    examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER_LIST)
+            )
+    )
     public RestResponse<List<Passenger>> list() {
         return RestResponse.status(Response.Status.OK, passengerService.listAll());
     }
@@ -48,7 +67,23 @@ public class PassengerResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public RestResponse<Passenger> create(Passenger passenger) {
+    @Operation(summary = "Create a new passenger")
+    @APIResponse(
+            responseCode = "201",
+            description = "Created passenger",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Passenger.class, required = true),
+                    examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER)
+            )
+    )
+    @APIResponse(
+            responseCode = "409",
+            description = "Passenger with given id already exists"
+    )
+    public RestResponse<Passenger> create(
+            @Schema(implementation = Passenger.class, required = true)
+            Passenger passenger) {
         try {
             var newPassenger = passengerService.createPassenger(passenger);
             return RestResponse.status(Response.Status.CREATED, newPassenger);
@@ -66,7 +101,21 @@ public class PassengerResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public RestResponse<Passenger> get(@PathParam("id") int id) {
+    @Operation(summary = "Get passenger by id")
+    @APIResponse(
+            responseCode = "200",
+            description = "Passenger with given id",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Passenger.class, required = true),
+                    examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER)
+            )
+    )
+    @APIResponse(
+            responseCode = "404",
+            description = "Passenger with given id does not exist"
+    )
+    public RestResponse<Passenger> get(@Parameter(name = "id", required = true, description = "Passenger id") @PathParam("id") int id) {
         try {
             var passenger = passengerService.getPassenger(id);
             return RestResponse.status(Response.Status.OK, passenger);
@@ -85,7 +134,23 @@ public class PassengerResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public RestResponse<Passenger> update(@PathParam("id") int id, Passenger passenger) {
+    @Operation(summary = "Update passenger")
+    @APIResponse(
+            responseCode = "200",
+            description = "Updated passenger",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Passenger.class, required = true),
+                    examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER)
+            )
+    )
+    @APIResponse(
+            responseCode = "404",
+            description = "Passenger with given id does not exist"
+    )
+    public RestResponse<Passenger> update(@Parameter(name = "id", required = true, description = "Passenger id") @PathParam("id") int id,
+                                          @Schema(implementation = Passenger.class, required = true)
+                                          Passenger passenger) {
         if (passenger.id != id) {
             return RestResponse.status(Response.Status.BAD_REQUEST);
         }
@@ -104,7 +169,8 @@ public class PassengerResource {
      */
     @DELETE
     @Path("/{id}")
-    public RestResponse<Passenger> delete(@PathParam("id") int id) {
+    @Operation(summary = "Delete passenger")
+    public RestResponse<Passenger> delete(@Parameter(name = "id", required = true) @PathParam("id") int id) {
         try {
             passengerService.deletePassenger(id);
             return RestResponse.status(Response.Status.OK);
@@ -117,6 +183,7 @@ public class PassengerResource {
      * Helper method to delete all passengers
      */
     @DELETE
+    @Operation(summary = "Delete all passengers")
     public RestResponse<Passenger> deleteAll() {
         passengerService.deleteAllPassengers();
         return RestResponse.status(Response.Status.OK);
