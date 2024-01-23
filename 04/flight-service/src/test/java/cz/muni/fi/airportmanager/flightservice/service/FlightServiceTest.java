@@ -9,15 +9,11 @@ import org.junit.jupiter.api.Test;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
 class FlightServiceTest {
-    private FlightService flightService;
+    private FlightService flightService; 
 
     private FlightDto flight;
 
@@ -25,7 +21,7 @@ class FlightServiceTest {
     void setUp() {
         flightService = new FlightService();
         flight = new FlightDto();
-        flight.id = 1;
+        flight.id = 1L;
         flight.name = "Test Flight";
         flight.airportFrom = "Airport A";
         flight.airportTo = "Airport B";
@@ -37,8 +33,8 @@ class FlightServiceTest {
 
     @Test
     void testListAllFlights() {
-        flightService.createFlight(flight);
-        List<FlightDto> flights = flightService.listAll();
+        flightService.createFlight(flight).await().indefinitely();
+        List<FlightDto> flights = flightService.listAll().await().indefinitely();
         assertNotNull(flights);
         assertFalse(flights.isEmpty());
         assertEquals(1, flights.size());
@@ -47,8 +43,8 @@ class FlightServiceTest {
 
     @Test
     void testGetFlight_Success() {
-        flightService.createFlight(flight);
-        FlightDto found = flightService.getFlight(flight.id);
+        flightService.createFlight(flight).await().indefinitely();
+        FlightDto found = flightService.getFlight(flight.id).await().indefinitely();
         assertNotNull(found);
         assertEquals(flight, found);
     }
@@ -56,15 +52,15 @@ class FlightServiceTest {
     @Test
     void testGetFlight_NotFound() {
         assertThrows(IllegalArgumentException.class, () -> {
-            flightService.getFlight(999L);
+            flightService.getFlight(999L).await().indefinitely();
         });
     }
 
     @Test
     void testUpdateFlight_Success() {
-        flightService.createFlight(flight);
+        flightService.createFlight(flight).await().indefinitely();
         flight.name = "Updated Test Flight";
-        FlightDto updated = flightService.updateFlight(flight);
+        FlightDto updated = flightService.updateFlight(flight).await().indefinitely();
         assertNotNull(updated);
         assertEquals("Updated Test Flight", updated.name);
     }
@@ -72,54 +68,53 @@ class FlightServiceTest {
     @Test
     void testUpdateFlight_NotFound() {
         assertThrows(IllegalArgumentException.class, () -> {
-            flightService.updateFlight(flight);
+            flightService.updateFlight(flight).await().indefinitely();
         });
     }
 
     @Test
     void testDeleteFlight_Success() {
-        flightService.createFlight(flight);
-        flightService.deleteFlight(flight.id);
+        flightService.createFlight(flight).await().indefinitely();
+        flightService.deleteFlight(flight.id).await().indefinitely();
         assertThrows(IllegalArgumentException.class, () -> {
-            flightService.getFlight(flight.id);
+            flightService.getFlight(flight.id).await().indefinitely();
         });
     }
 
     @Test
     void testDeleteFlight_NotFound() {
         assertThrows(IllegalArgumentException.class, () -> {
-            flightService.deleteFlight(999L);
+            flightService.deleteFlight(999L).await().indefinitely();
         });
     }
 
     @Test
     void testDeleteAllFlights() {
-        flightService.createFlight(flight);
-        flightService.deleteAllFlights();
-        List<FlightDto> flights = flightService.listAll();
+        flightService.createFlight(flight).await().indefinitely();
+        flightService.deleteAllFlights().await().indefinitely();
+        List<FlightDto> flights = flightService.listAll().await().indefinitely();
         assertTrue(flights.isEmpty());
     }
 
     @Test
     void testCreateFlight_Success() {
-        FlightDto created = flightService.createFlight(flight);
+        FlightDto created = flightService.createFlight(flight).await().indefinitely();
         assertNotNull(created);
         assertEquals(flight, created);
     }
 
     @Test
     void testCreateFlight_AlreadyExists() {
-        flightService.createFlight(flight);
+        flightService.createFlight(flight).await().indefinitely();
         assertThrows(IllegalArgumentException.class, () -> {
-            flightService.createFlight(flight);
+            flightService.createFlight(flight).await().indefinitely();
         });
     }
 
     @Test
     void testCancelFlight_NotFound() {
         assertThrows(IllegalArgumentException.class, () -> {
-            flightService.cancelFlight(999L);
+            flightService.cancelFlight(999L).await().indefinitely();
         });
     }
-
 }

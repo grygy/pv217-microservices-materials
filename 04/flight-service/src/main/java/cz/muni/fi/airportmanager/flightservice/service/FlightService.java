@@ -6,6 +6,8 @@ import cz.muni.fi.airportmanager.proto.FlightCancellationRequest;
 import cz.muni.fi.airportmanager.proto.FlightCancellationResponseStatus;
 import cz.muni.fi.airportmanager.proto.MutinyFlightCancellationGrpc;
 import io.quarkus.grpc.GrpcClient;
+import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.unchecked.Unchecked;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.HashMap;
@@ -27,8 +29,8 @@ public class FlightService {
      *
      * @return list of all flights
      */
-    public List<FlightDto> listAll() {
-        return flights.values().stream().toList();
+    public Uni<List<FlightDto>> listAll() {
+        return Uni.createFrom().item(() -> flights.values().stream().toList());
     }
 
     /**
@@ -38,11 +40,13 @@ public class FlightService {
      * @return flight with given id
      * @throws IllegalArgumentException if flight with given id does not exist
      */
-    public FlightDto getFlight(Long id) {
-        if (flights.get(id) == null) {
-            throw new IllegalArgumentException("Flight with id " + id + " does not exist");
-        }
-        return flights.get(id);
+    public Uni<FlightDto> getFlight(Long id) {
+        return Uni.createFrom().item(Unchecked.supplier(() -> {
+            if (flights.get(id) == null) {
+                throw new IllegalArgumentException("Flight with id " + id + " does not exist");
+            }
+            return flights.get(id);
+        }));
     }
 
     /**
@@ -52,13 +56,16 @@ public class FlightService {
      * @return created flight
      * @throws IllegalArgumentException if flight with given id already exists
      */
-    public FlightDto createFlight(FlightDto flight) {
-        if (flights.get(flight.id) != null) {
-            throw new IllegalArgumentException("Flight with id " + flight.id + " already exists");
-        }
-        flights.put(flight.id, flight);
-        return flight;
+    public Uni<FlightDto> createFlight(FlightDto flight) {
+        return Uni.createFrom().item(Unchecked.supplier(() -> {
+            if (flights.get(flight.id) != null) {
+                throw new IllegalArgumentException("Flight with id " + flight.id + " already exists");
+            }
+            flights.put(flight.id, flight);
+            return flight;
+        }));
     }
+
 
     /**
      * Update flight
@@ -67,12 +74,14 @@ public class FlightService {
      * @return updated flight
      * @throws IllegalArgumentException if flight with given id does not exist
      */
-    public FlightDto updateFlight(FlightDto flight) {
-        if (flights.get(flight.id) == null) {
-            throw new IllegalArgumentException("Flight with id " + flight.id + " does not exist");
-        }
-        flights.put(flight.id, flight);
-        return flight;
+    public Uni<FlightDto> updateFlight(FlightDto flight) {
+        return Uni.createFrom().item(Unchecked.supplier(() -> {
+            if (flights.get(flight.id) == null) {
+                throw new IllegalArgumentException("Flight with id " + flight.id + " does not exist");
+            }
+            flights.put(flight.id, flight);
+            return flight;
+        }));
     }
 
     /**
@@ -81,18 +90,24 @@ public class FlightService {
      * @param id flight id
      * @throws IllegalArgumentException if flight with given id does not exist
      */
-    public void deleteFlight(Long id) {
-        if (flights.get(id) == null) {
-            throw new IllegalArgumentException("Flight with id " + id + " does not exist");
-        }
-        flights.remove(id);
+    public Uni<Void> deleteFlight(Long id) {
+        return Uni.createFrom().item(Unchecked.supplier(() -> {
+            if (flights.get(id) == null) {
+                throw new IllegalArgumentException("Flight with id " + id + " does not exist");
+            }
+            flights.remove(id);
+            return null;
+        }));
     }
 
     /**
      * Delete all flights
      */
-    public void deleteAllFlights() {
-        flights.clear();
+    public Uni<Void> deleteAllFlights() {
+        return Uni.createFrom().item(() -> {
+            flights.clear();
+            return null;
+        });
     }
 
     /**
@@ -101,14 +116,23 @@ public class FlightService {
      * @param id flight id
      * @throws IllegalArgumentException if flight with given id does not exist
      */
-    public void cancelFlight(Long id) {
-        if (flights.get(id) == null) {
-            throw new IllegalArgumentException("Flight with id " + id + " does not exist");
-        }
-        flights.get(id).status = FlightStatus.CANCELLED;
-        var response = flightCancellationStub.cancelFlight(FlightCancellationRequest.newBuilder().setId(Math.toIntExact(id)).setReason("Unknown").build()).await().indefinitely();
-        if (response.getStatus() != FlightCancellationResponseStatus.Cancelled) {
-            throw new RuntimeException("Flight cancellation failed");
-        }
+    public Uni<Void> cancelFlight(Long id) {
+        return Uni.createFrom().item(Unchecked.supplier(() -> {
+            if (flights.get(id) == null) {
+                throw new IllegalArgumentException("Flight with id " + id + " does not exist");
+            }
+            flights.get(id).status = FlightStatus.CANCELLED;
+            var response = flightCancellationStub.cancelFlight(
+                    FlightCancellationRequest.newBuilder()
+                            .setId(Math.toIntExact(id))
+                            .setReason("Unknown")
+                            .build()
+            ).await().indefinitely();
+
+            if (response.getStatus() != FlightCancellationResponseStatus.Cancelled) {
+                throw new RuntimeException("Flight cancellation failed");
+            }
+            return null;
+        }));
     }
 }
