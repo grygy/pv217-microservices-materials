@@ -102,10 +102,6 @@ public class FlightService {
      * @throws IllegalArgumentException if flight with given id does not exist
      */
     public void cancelFlight(Long id) {
-//        TODO if flight exists, call cancelFlight on stub
-//        TODO set flight status to CANCELLED in flights map
-//        TODO use FlightCancellationRequest.newBuilder() to create a request body
-//        TODO await the result
         if (flights.get(id) == null) {
             throw new IllegalArgumentException("Flight with id " + id + " does not exist");
         }

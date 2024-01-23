@@ -29,8 +29,6 @@ public class FlightCancellationService extends MutinyFlightCancellationGrpc.Flig
      */
     @Override
     public Uni<FlightCancellationResponse> cancelFlight(FlightCancellationRequest request) {
-//        TODO inject notification service and passenger service to create notifications for all passengers with given flight id
-//        TODO check how Passenger and Notification classes look like
         var flightId = request.getId();
         var reason = request.getReason();
         var passengersOnFlight = passengerService.getPassengersForFlight(flightId);

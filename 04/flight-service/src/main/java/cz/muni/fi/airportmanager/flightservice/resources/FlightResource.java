@@ -54,7 +54,6 @@ public class FlightResource {
                     examples = @ExampleObject(name = "flight", value = Examples.VALID_FLIGHT_LIST)
             )
     )
-    //    TODO add openapi docs
     public RestResponse<List<FlightDto>> list() {
         return RestResponse.status(Response.Status.OK, flightService.listAll());
     }
@@ -153,7 +152,6 @@ public class FlightResource {
             responseCode = "404",
             description = "Flight with given id does not exist"
     )
-    //    TODO add openapi docs
     public RestResponse<FlightDto> update(@Parameter(name = "id", required = true) @PathParam("id") long id,
                                           @Schema(implementation = FlightDto.class, required = true)
                                           FlightDto flight) {
@@ -184,7 +182,6 @@ public class FlightResource {
             responseCode = "404",
             description = "Flight with given id does not exist"
     )
-    //    TODO add openapi docs
     public RestResponse<FlightDto> delete(@Parameter(name = "id", required = true) @PathParam("id") long id) {
         try {
             flightService.deleteFlight(id);
@@ -222,7 +219,6 @@ public class FlightResource {
             responseCode = "404",
             description = "Flight with given id does not exist"
     )
-    //    TODO add openapi docs
     public RestResponse<FlightDto> cancel(@Parameter(name = "id", required = true) @PathParam("id") long id) {
         try {
             flightService.cancelFlight(id);
