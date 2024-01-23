@@ -310,7 +310,7 @@ Scenario:
 
 ## Troubleshooting
 
-- If the `flight-service` cannot find dependency `passenger-service` run `mvn clean install` in `passenger-service` directory.
+- If the `flight-service` cannot find dependency `flight-cancellation-api` run `mvn clean install` in root or services directory.
 
 ## Further reading
 
