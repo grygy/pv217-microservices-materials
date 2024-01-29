@@ -38,6 +38,10 @@ PanacheRepository is a base class for repositories. It provides similar logic as
 
 But you need to define the entity more explicitly. With id, getters and setters, etc. Then you will create a repository class that extends `PanacheRepository<Entity>`.
 
+### `@Transactional` annotation
+
+`@Transactional` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back.
+
 ## Asynchronous Mutiny (side topic)
 
 Since we will be using reactive approach it is a good thing to know something about Mutiny.
@@ -155,6 +159,11 @@ public class PersonRepository implements PanacheRepository<Person> {
 }
 ```
 
+## dev services explanation
+
+[//]: # (TODO docker in dev mode etc.)
+TODO
+
 ## State of the project
 
 - The `flight-service` has implemented the repository pattern with panache.
@@ -163,9 +172,15 @@ public class PersonRepository implements PanacheRepository<Person> {
 
 ## Tasks
 
-### 1. Add notification as active record
+### 0. Running docker
 
-### 2. Add passenger as repository
+Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker container.
+
+### 1. Configure datasource in `application.properties`
+
+### 2. Add notification as active record
+
+### 3. Add passenger as repository
 
 ### X. Submit the solution
 
@@ -177,7 +192,7 @@ public class PersonRepository implements PanacheRepository<Person> {
 
 ## Troubleshooting
 
--  
+- Check if your docker engine is running.
 
 ## Further reading
 
