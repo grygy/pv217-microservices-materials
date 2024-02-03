@@ -36,7 +36,7 @@ class FlightRepositoryTest {
 
     @Test
     @TestReactiveTransaction
-    void testOngoingFlights_Success(UniAsserter asserter) {
+    void shouldGetOngoingFlights(UniAsserter asserter) {
         var flight = createOngoingFlight();
         var currentDate = new Date();
 
@@ -56,7 +56,7 @@ class FlightRepositoryTest {
 
     @Test
     @TestReactiveTransaction
-    void testFutureFlights_Success(UniAsserter asserter) {
+    void shouldGetFutureFlights(UniAsserter asserter) {
         var flight = createOngoingFlight();
         flight.setDepartureTime(Date.from(java.time.Instant.now().plusSeconds(1000*60)));
         flight.setArrivalTime(Date.from(java.time.Instant.now().plusSeconds(1000*60*2)));
@@ -78,7 +78,7 @@ class FlightRepositoryTest {
 
     @Test
     @TestReactiveTransaction
-    void testPastFlights_Success(UniAsserter asserter) {
+    void shouldGetPastFlights(UniAsserter asserter) {
         var flight = createOngoingFlight();
         flight.setDepartureTime(Date.from(java.time.Instant.now().minusSeconds(1000*60*2)));
         flight.setArrivalTime(Date.from(java.time.Instant.now().minusSeconds(1000*60)));
@@ -100,7 +100,7 @@ class FlightRepositoryTest {
 
     @Test
     @TestReactiveTransaction
-    void testFindByStatus_Success(UniAsserter asserter) {
+    void shouldFindFlightsByStatus(UniAsserter asserter) {
         var flight = createOngoingFlight();
 
         asserter.execute(this.flightRepository::deleteAll)
@@ -119,7 +119,7 @@ class FlightRepositoryTest {
 
     @Test
     @TestReactiveTransaction
-    void testChangeStatus_Success(UniAsserter asserter) {
+    void shouldChangeStatusOfFlight(UniAsserter asserter) {
         var flight = createOngoingFlight();
 
         asserter.execute(this.flightRepository::deleteAll)
@@ -141,14 +141,4 @@ class FlightRepositoryTest {
                         }
                 );
     }
-
-//    TODO remove this is just for mocking purposes for use in flight service
-//    @Test
-//    @RunOnVertxContext // Make sure the test method is run on the Vert.x event loop. aka support async
-//    void testFindFutureFlightsFound(UniAsserter asserter) {
-//        asserter.assertEquals(() -> flightRepository.count(), 0L);
-//
-//        asserter.execute(() -> when(flightRepository.count()).thenReturn(Uni.createFrom().item(23L)));
-//        asserter.assertEquals(() -> flightRepository.count(), 23L);
-//    }
 }

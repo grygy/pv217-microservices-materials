@@ -62,11 +62,15 @@ public class FlightRepository implements PanacheRepository<Flight> {
      *
      * @param flightId  flight id
      * @param newStatus new status
+     * @throws IllegalArgumentException if flight with given id does not exist
      */
     @WithTransaction
     public Uni<Void> changeStatus(Long flightId, FlightStatus newStatus) {
         return findById(flightId)
-                .onItem().ifNotNull().transformToUni(flight -> {
+                .onItem().transformToUni(flight -> {
+                    if (flight == null) {
+                        return Uni.createFrom().failure(new IllegalArgumentException("Flight with id " + flightId + " does not exist"));
+                    }
                     flight.setStatus(newStatus);
                     return persist(flight).replaceWithVoid();
                 });

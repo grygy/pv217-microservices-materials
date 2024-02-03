@@ -1,14 +1,19 @@
 package cz.muni.fi.airportmanager.flightservice.resources;
 
 
+import cz.muni.fi.airportmanager.flightservice.model.CreateFlightDto;
 import cz.muni.fi.airportmanager.flightservice.model.FlightDto;
 import cz.muni.fi.airportmanager.flightservice.model.FlightStatus;
+import cz.muni.fi.airportmanager.flightservice.service.FlightService;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.BeforeEach;
+import io.smallrye.mutiny.Uni;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.Date;
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -19,24 +24,13 @@ import static org.hamcrest.Matchers.is;
 @TestHTTPEndpoint(FlightResource.class) // this tells Quarkus that requests will begin with /flight
 class FlightResourceTest {
 
-    private FlightDto testFlight;
-
-    @BeforeEach
-    void setUp() {
-        testFlight = new FlightDto();
-        testFlight.id = 1;
-        testFlight.name = "Test Flight";
-        testFlight.airportFrom = "Airport A";
-        testFlight.airportTo = "Airport B";
-        testFlight.departureTime = new Date();
-        testFlight.arrivalTime = new Date();
-        testFlight.capacity = 100;
-        testFlight.status = FlightStatus.ACTIVE;
-        clearFlights();
-    }
+    @InjectMock
+    FlightService flightService;
 
     @Test
-    void testListEmpty() {
+    void shouldGetEmptyListOfFlights() {
+        Mockito.when(this.flightService.listAll()).thenReturn(Uni.createFrom().item(List.of()));
+
         given().when()
                 .get()
                 .then()
@@ -45,8 +39,8 @@ class FlightResourceTest {
     }
 
     @Test
-    void testListWithFlights() {
-        createFlight(testFlight);
+    void shouldGetListOfFlights() {
+        Mockito.when(this.flightService.listAll()).thenReturn(Uni.createFrom().item(List.of(getFlightDto())));
 
         given().when()
                 .get()
@@ -56,31 +50,25 @@ class FlightResourceTest {
     }
 
     @Test
-    void testCreateFlight() {
+    void shouldCreateFlight() {
+        FlightDto responseFlight = getFlightDto();
+        Mockito.when(this.flightService.createFlight(Mockito.any(CreateFlightDto.class))).thenReturn(Uni.createFrom().item(responseFlight));
+
+        CreateFlightDto testFlight = responseFlight;
+
         given().contentType("application/json")
                 .body(testFlight)
                 .when()
                 .post()
                 .then()
                 .statusCode(201)
-                .body("id", equalTo((int) testFlight.id));
+                .body("id", equalTo((int) responseFlight.id));
     }
 
     @Test
-    void testCreateDuplicateFlight() {
-        createFlight(testFlight);
-
-        given().contentType("application/json")
-                .body(testFlight)
-                .when()
-                .post()
-                .then()
-                .statusCode(409);
-    }
-
-    @Test
-    void testGetExistingFlight() {
-        createFlight(testFlight);
+    void shouldGetExistingFlight() {
+        FlightDto testFlight = getFlightDto();
+        Mockito.when(this.flightService.getFlight(testFlight.id)).thenReturn(Uni.createFrom().item(testFlight));
 
         given().when()
                 .get("/" + testFlight.id)
@@ -90,7 +78,9 @@ class FlightResourceTest {
     }
 
     @Test
-    void testGetNonExistingFlight() {
+    void shouldNotGetNonxistingFlight() {
+        Mockito.when(this.flightService.getFlight(Mockito.anyLong())).thenReturn(Uni.createFrom().failure(new IllegalArgumentException()));
+
         given().when()
                 .get("/99") // Assuming ID 99 does not exist
                 .then()
@@ -98,44 +88,10 @@ class FlightResourceTest {
     }
 
     @Test
-    void testUpdateExistingFlight() {
-        createFlight(testFlight);
-        testFlight.name = "Updated Name";
+    void shouldDeleteExistingFlight() {
+        FlightDto testFlight = getFlightDto();
+        Mockito.when(this.flightService.deleteFlight(testFlight.id)).thenReturn(Uni.createFrom().item(true));
 
-        given().contentType("application/json")
-                .body(testFlight)
-                .when()
-                .put("/" + testFlight.id)
-                .then()
-                .statusCode(200)
-                .body("name", equalTo("Updated Name"));
-    }
-
-    @Test
-    void testUpdateNonExistingFlight() {
-        given().contentType("application/json")
-                .body(testFlight)
-                .when()
-                .put("/1")
-                .then()
-                .statusCode(404);
-    }
-
-    @Test
-    void testUpdateFlightWithMismatchedId() {
-        createFlight(testFlight);
-
-        given().contentType("application/json")
-                .body(testFlight)
-                .when()
-                .put("/99") // Mismatched ID
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void testDeleteExistingFlight() {
-        createFlight(testFlight);
 
         given().when()
                 .delete("/" + testFlight.id)
@@ -144,7 +100,9 @@ class FlightResourceTest {
     }
 
     @Test
-    void testDeleteNonExistingFlight() {
+    void shouldNotDeleteNonexistingFlight() {
+        Mockito.when(this.flightService.deleteFlight(Mockito.anyLong())).thenReturn(Uni.createFrom().item(false));
+
         given().when()
                 .delete("/99") // Assuming ID 99 does not exist
                 .then()
@@ -153,7 +111,7 @@ class FlightResourceTest {
 
 
     @Test
-    void testCancelFlight_NotFound() {
+    void shouldNotCancelNonexistingFlight() {
         given().when()
                 .put("/99/cancel") // Assuming ID 99 does not exist
                 .then()
@@ -161,19 +119,16 @@ class FlightResourceTest {
     }
 
 
-    private void createFlight(FlightDto flight) {
-        given().contentType("application/json")
-                .body(flight)
-                .when()
-                .post()
-                .then()
-                .statusCode(201);
-    }
-
-    private void clearFlights() {
-        given().when()
-                .delete()
-                .then()
-                .statusCode(200);
+    private FlightDto getFlightDto() {
+        FlightDto flight = new FlightDto();
+        flight.id = 1L;
+        flight.name = "Test Flight";
+        flight.airportTo = "Airport A";
+        flight.airportFrom = "Airport B";
+        flight.departureTime = new Date();
+        flight.arrivalTime = new Date();
+        flight.capacity = 100;
+        flight.status = FlightStatus.ACTIVE;
+        return flight;
     }
 }

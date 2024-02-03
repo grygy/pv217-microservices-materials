@@ -1,5 +1,6 @@
 package cz.muni.fi.airportmanager.flightservice.resources;
 
+import cz.muni.fi.airportmanager.flightservice.model.CreateFlightDto;
 import cz.muni.fi.airportmanager.flightservice.model.example.Examples;
 import cz.muni.fi.airportmanager.flightservice.service.FlightService;
 import cz.muni.fi.airportmanager.flightservice.model.FlightDto;
@@ -81,9 +82,9 @@ public class FlightResource {
     )
     @APIResponse(
             responseCode = "409",
-            description = "Conflict - flight with given id already exists"
+            description = "Conflict"
     )
-    public Uni<RestResponse<FlightDto>> create(FlightDto flight) {
+    public Uni<RestResponse<FlightDto>> create(CreateFlightDto flight) {
         return flightService.createFlight(flight)
                 .onItem().transform(newFlight -> RestResponse.status(Response.Status.CREATED, newFlight))
                 .onFailure(IllegalArgumentException.class).recoverWithItem(RestResponse.status(Response.Status.CONFLICT));
@@ -121,41 +122,6 @@ public class FlightResource {
 
 
     /**
-     * Update flight
-     *
-     * @param id     id of flight
-     * @param flight flight to update
-     */
-    @PUT
-    @Path("/{id}")
-    @Produces(APPLICATION_JSON)
-    @Consumes(APPLICATION_JSON)
-    @Operation(summary = "Update flight")
-    @APIResponse(
-            responseCode = "200",
-            description = "Updated flight",
-            content = @Content(
-                    mediaType = APPLICATION_JSON,
-                    schema = @Schema(implementation = FlightDto.class, required = true),
-                    examples = @ExampleObject(name = "flight", value = Examples.VALID_FLIGHT)
-            )
-    )
-    @APIResponse(
-            responseCode = "404",
-            description = "Flight with given id does not exist"
-    )
-    public Uni<RestResponse<FlightDto>> update(@Parameter(name = "id", required = true) @PathParam("id") long id,
-                                               @Schema(implementation = FlightDto.class, required = true)
-                                               FlightDto flight) {
-        if (flight.id != id) {
-            return Uni.createFrom().item(RestResponse.status(Response.Status.BAD_REQUEST));
-        }
-        return flightService.updateFlight(flight)
-                .onItem().transform(updatedFlight -> RestResponse.status(Response.Status.OK, updatedFlight))
-                .onFailure(IllegalArgumentException.class).recoverWithItem(RestResponse.status(Response.Status.NOT_FOUND));
-    }
-
-    /**
      * Delete flight
      *
      * @param id id of flight
@@ -173,7 +139,13 @@ public class FlightResource {
     )
     public Uni<RestResponse<Object>> delete(@Parameter(name = "id", required = true) @PathParam("id") long id) {
         return flightService.deleteFlight(id)
-                .onItem().transform(ignored -> RestResponse.status(Response.Status.OK))
+                .onItem().transform(wasDeleted -> {
+                    if (Boolean.TRUE.equals(wasDeleted)) {
+                        return
+                                RestResponse.status(Response.Status.OK);
+                    }
+                    return RestResponse.status(Response.Status.NOT_FOUND);
+                })
                 .onFailure(IllegalArgumentException.class).recoverWithItem(RestResponse.status(Response.Status.NOT_FOUND));
     }
 
@@ -207,8 +179,12 @@ public class FlightResource {
     )
     public Uni<RestResponse<Object>> cancel(@Parameter(name = "id", required = true) @PathParam("id") long id) {
         return flightService.cancelFlight(id)
-                .onItem().transform(ignored -> RestResponse.status(Response.Status.OK))
-                .onFailure(IllegalArgumentException.class).recoverWithItem(RestResponse.status(Response.Status.NOT_FOUND));
+                .onItem().transform(wasCancelled -> {
+                    if (Boolean.TRUE.equals(wasCancelled)) {
+                        return RestResponse.status(Response.Status.OK);
+                    }
+                    return RestResponse.status(Response.Status.NOT_FOUND);
+                });
     }
 
 }

@@ -63,6 +63,18 @@ Mutiny is a reactive programming library for Java. It is based on Reactive Strea
 
 For more in depth discussion about asynchronous programming and the difference with multithreading, see [this article](https://www.baeldung.com/cs/async-vs-multi-threading). 
 
+### `onItem` and `transform` methods
+
+TODO
+
+[//]: # (TODO)
+
+### Example
+
+TODO
+
+[//]: # (TODO)
+
 ## Active record vs repository
 
 Both active record and repository are patterns for accessing data in a database.
@@ -159,6 +171,17 @@ public class PersonRepository implements PanacheRepository<Person> {
 }
 ```
 
+#### `@WithTransaction` annotation
+
+- `@WithTransaction` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back. This annotation is used if the method changes the state of the database. So it's not necessary to use it for read-only methods.
+- Transactions follow unit of work pattern. It means that all operations in a transaction are treated as a single unit of work. If any operation fails, the whole transaction is rolled back.
+- Used primarily to annotate methods.
+
+#### `@WithSessino` annotation // TODO MAYBE DELETE
+
+- `@WithSession` session can span multiple transactions. Ensures that entities withing the same session are consistent.
+- Used primarily to annotate repositories.
+
 ## dev services explanation
 
 [//]: # (TODO docker in dev mode etc.)
@@ -168,7 +191,7 @@ TODO
 
 - The `flight-service` has implemented the repository pattern with panache.
 - REST APIs and services are now asynchronous. 
-- 
+- Objects DTOs are created for the communication between services.
 
 ## Tasks
 
@@ -177,6 +200,10 @@ TODO
 Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker container.
 
 ### 1. Configure datasource in `application.properties`
+
+Or maybe not coz dev services
+
+### 2. Create passenger entity
 
 ### 2. Add notification as active record
 
@@ -189,6 +216,7 @@ Install [Docker desktop](https://docs.docker.com/desktop/) or other docker clien
 ## Hints
 
 - In `flight-service` you can find implemented repository pattern with panache.
+- If something is not working, and it should (Developers aren't doing mistakes right?) run maven clean and compile commands.
 
 ## Troubleshooting
 

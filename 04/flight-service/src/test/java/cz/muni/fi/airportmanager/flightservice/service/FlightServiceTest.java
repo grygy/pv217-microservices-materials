@@ -1,10 +1,18 @@
 package cz.muni.fi.airportmanager.flightservice.service;
 
-import cz.muni.fi.airportmanager.flightservice.model.FlightDto;
+import cz.muni.fi.airportmanager.flightservice.entity.Flight;
+import cz.muni.fi.airportmanager.flightservice.model.CreateFlightDto;
 import cz.muni.fi.airportmanager.flightservice.model.FlightStatus;
+import cz.muni.fi.airportmanager.flightservice.repository.FlightRepository;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.BeforeEach;
+import io.quarkus.test.vertx.RunOnVertxContext;
+import io.quarkus.test.vertx.UniAsserter;
+import io.smallrye.mutiny.Uni;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.Date;
 import java.util.List;
@@ -13,108 +21,140 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
 class FlightServiceTest {
-    private FlightService flightService; 
 
-    private FlightDto flight;
+    @InjectMock
+    FlightRepository flightRepository;
 
-    @BeforeEach
-    void setUp() {
-        flightService = new FlightService();
-        flight = new FlightDto();
-        flight.id = 1L;
-        flight.name = "Test Flight";
-        flight.airportFrom = "Airport A";
-        flight.airportTo = "Airport B";
-        flight.departureTime = new Date();
-        flight.arrivalTime = new Date();
-        flight.capacity = 100;
-        flight.status = FlightStatus.ACTIVE;
+    @Inject
+    FlightService flightService;
+
+
+    private Flight createOngoingFlight() {
+        var future = Date.from(java.time.Instant.now().plusSeconds(1000 * 60));
+        var past = Date.from(java.time.Instant.now().minusSeconds(1000 * 60));
+        var flight = new Flight();
+        flight.setName("Test Flight");
+        flight.setAirportFrom("Airport A");
+        flight.setAirportTo("Airport B");
+        flight.setDepartureTime(past);
+        flight.setArrivalTime(future);
+        flight.setCapacity(100);
+        flight.setStatus(FlightStatus.ACTIVE);
+        flight.setId(1L);
+
+        return flight;
+    }
+
+
+    @Test
+    @RunOnVertxContext  // Make sure the test method is run on the Vert.x event loop. aka support async
+    // Gives us UniAsserter
+    void shouldGetListOfFlights(UniAsserter asserter) {
+        var flight = createOngoingFlight();
+        asserter.execute(() -> Mockito.when(flightRepository.listAll()).thenReturn(Uni.createFrom().item(List.of(flight))));
+
+        asserter.assertThat(
+                () -> flightService.listAll(),
+                flights -> {
+                    assertNotNull(flights);
+                    assertFalse(flights.isEmpty());
+                    assertEquals(1L, flights.size());
+                    assertEquals(flight.toDto(), flights.get(0));
+                }
+        );
     }
 
     @Test
-    void testListAllFlights() {
-        flightService.createFlight(flight).await().indefinitely();
-        List<FlightDto> flights = flightService.listAll().await().indefinitely();
-        assertNotNull(flights);
-        assertFalse(flights.isEmpty());
-        assertEquals(1, flights.size());
-        assertEquals(flight, flights.get(0));
+    @RunOnVertxContext
+    void shouldGetExistingFlight(UniAsserter asserter) {
+        var flight = createOngoingFlight();
+        asserter.execute(() -> Mockito.when(flightRepository.findById(flight.getId())).thenReturn(Uni.createFrom().item(flight)));
+
+        asserter.assertThat(
+                () -> flightService.getFlight(flight.getId()),
+                found -> {
+                    assertNotNull(found);
+                    assertEquals(flight.toDto(), found);
+                }
+        );
     }
 
     @Test
-    void testGetFlight_Success() {
-        flightService.createFlight(flight).await().indefinitely();
-        FlightDto found = flightService.getFlight(flight.id).await().indefinitely();
-        assertNotNull(found);
-        assertEquals(flight, found);
+    @RunOnVertxContext
+    void shouldNotGetNonexistingFlight(UniAsserter asserter) {
+        asserter.execute(() -> Mockito.when(flightRepository.findById(Mockito.any())).thenReturn(Uni.createFrom().failure(new IllegalArgumentException())));
+
+        asserter.assertFailedWith(
+                () -> flightService.getFlight(999L),
+                IllegalArgumentException.class
+        );
+    }
+
+
+    @Test
+    @RunOnVertxContext
+    void shouldDeleteExistingFlight(UniAsserter asserter) {
+        var flight = createOngoingFlight();
+        asserter.execute(() -> Mockito.when(flightRepository.deleteById(flight.getId())).thenReturn(Uni.createFrom().item(true)));
+
+        asserter.assertThat(
+                () -> flightService.deleteFlight(flight.getId()),
+                Assertions::assertTrue
+        );
     }
 
     @Test
-    void testGetFlight_NotFound() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            flightService.getFlight(999L).await().indefinitely();
-        });
+    @RunOnVertxContext
+    void shouldNotDeleteNonexistingFlight(UniAsserter asserter) {
+        asserter.execute(() -> Mockito.when(flightRepository.deleteById(Mockito.any())).thenReturn(Uni.createFrom().item(false)));
+
+        asserter.assertFalse(
+                () -> flightService.deleteFlight(999L)
+        );
     }
 
     @Test
-    void testUpdateFlight_Success() {
-        flightService.createFlight(flight).await().indefinitely();
-        flight.name = "Updated Test Flight";
-        FlightDto updated = flightService.updateFlight(flight).await().indefinitely();
-        assertNotNull(updated);
-        assertEquals("Updated Test Flight", updated.name);
+    @RunOnVertxContext
+    void shouldDeleteAllFlights(UniAsserter asserter) {
+        asserter.execute(() -> Mockito.when(flightRepository.deleteAll()).thenReturn(Uni.createFrom().item(1L)));
+
+        asserter.assertThat(
+                () -> flightService.deleteAllFlights(),
+                count -> {
+                    assertNotNull(count);
+                    assertEquals(1L, count);
+                }
+        );
     }
 
     @Test
-    void testUpdateFlight_NotFound() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            flightService.updateFlight(flight).await().indefinitely();
-        });
+    @RunOnVertxContext
+    void shouldCreateFlight(UniAsserter asserter) {
+        var flight = createOngoingFlight();
+        var createFlightDto = new CreateFlightDto();
+        createFlightDto.name = (flight.getName());
+        createFlightDto.airportFrom = (flight.getAirportFrom());
+        createFlightDto.airportTo = (flight.getAirportTo());
+        createFlightDto.departureTime = (flight.getDepartureTime());
+        createFlightDto.arrivalTime = (flight.getArrivalTime());
+        createFlightDto.capacity = (flight.getCapacity());
+
+        asserter.execute(() -> Mockito.when(flightRepository.persist(Mockito.any(Flight.class))).thenReturn(Uni.createFrom().item(flight)));
+
+        asserter.assertThat(
+                () -> flightService.createFlight(createFlightDto),
+                created -> {
+                    assertNotNull(created);
+                    assertEquals(flight.toDto(), created);
+                }
+        );
     }
 
     @Test
-    void testDeleteFlight_Success() {
-        flightService.createFlight(flight).await().indefinitely();
-        flightService.deleteFlight(flight.id).await().indefinitely();
-        assertThrows(IllegalArgumentException.class, () -> {
-            flightService.getFlight(flight.id).await().indefinitely();
-        });
-    }
-
-    @Test
-    void testDeleteFlight_NotFound() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            flightService.deleteFlight(999L).await().indefinitely();
-        });
-    }
-
-    @Test
-    void testDeleteAllFlights() {
-        flightService.createFlight(flight).await().indefinitely();
-        flightService.deleteAllFlights().await().indefinitely();
-        List<FlightDto> flights = flightService.listAll().await().indefinitely();
-        assertTrue(flights.isEmpty());
-    }
-
-    @Test
-    void testCreateFlight_Success() {
-        FlightDto created = flightService.createFlight(flight).await().indefinitely();
-        assertNotNull(created);
-        assertEquals(flight, created);
-    }
-
-    @Test
-    void testCreateFlight_AlreadyExists() {
-        flightService.createFlight(flight).await().indefinitely();
-        assertThrows(IllegalArgumentException.class, () -> {
-            flightService.createFlight(flight).await().indefinitely();
-        });
-    }
-
-    @Test
-    void testCancelFlight_NotFound() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            flightService.cancelFlight(999L).await().indefinitely();
-        });
+    @RunOnVertxContext
+    void shouldNotCancelNonexistingFlight(UniAsserter asserter) {
+        asserter.assertFalse(
+                () -> flightService.cancelFlight(999L)
+        );
     }
 }
