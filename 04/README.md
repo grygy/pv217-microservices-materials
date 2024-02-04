@@ -1,4 +1,42 @@
-# 04 - Persistence
+# 04 - Async, Persistence
+
+## Asynchronous Mutiny
+
+Since we will be using reactive approach it is a good thing to know something about Mutiny.
+
+Mutiny is a reactive programming library for Java. It is based on Reactive Streams and Reactive Streams Operators. So when you see `Uni` or `Multi` in the code, it means that the method returns a reactive type and the method is asynchronous.
+
+**What `Uni` and `Multi` are?**
+
+`Uni` is a type that emits either a single item or an error. `Multi` is a type that emits a stream of items or an error.
+
+**Pros of asynchronous programming:**
+- Non-blocking
+- Better resource utilization
+- Better scalability
+
+**Cons of asynchronous programming:**
+- Complexity of callbacks, exceptions
+- Harder to debug
+- Harder to test
+
+For more in depth discussion about asynchronous programming and the difference with multithreading, see [this article](https://www.baeldung.com/cs/async-vs-multi-threading).
+
+### `onItem` and `transform` methods
+
+- `onItem` and `transform` methods are used to process the result of the asynchronous operation. It's event driven reaction to the result of the operation when it's done.
+
+Example:
+```java
+Uni<String> processedUni = Uni.createFrom().item("Hello") // Creates an async uni that emits a single item
+        .onItem() // Reacts to the item
+        .transform(item -> item + " World"); // Transforms the item to antoher item that is synchronous
+
+
+Uni<String> chainedUni = Uni.createFrom().item(123) // Creates an async uni that emits a single item
+        .onItem() // Reacts to the item
+        .transformToUni(id -> fetchNameById(id)); // Transforms the item to another uni
+```
 
 ## Persistence with Panache
 
@@ -11,7 +49,6 @@ For both PanacheEntity and PanacheRepository, you can see examples bellow.
 ORM is a technique that lets you query and manipulate data from a database using an object-oriented paradigm. Thus, instead of writing SQL queries, you can write Java code to perform the same operations.
 
 It introduces abstraction between the database and the application. You can change more easily the database without changing the application code.
-
 
 ### PanacheEntity
 
@@ -38,42 +75,57 @@ PanacheRepository is a base class for repositories. It provides similar logic as
 
 But you need to define the entity more explicitly. With id, getters and setters, etc. Then you will create a repository class that extends `PanacheRepository<Entity>`.
 
-### `@Transactional` annotation
+### Entities with relations
 
-`@Transactional` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back.
+If you have entities with relations, you can use `@OneToMany`, `@ManyToOne`, `@OneToOne`, `@ManyToMany` annotations to define the relation between entities. Then with `@JoinColumn` you can define the column that will be used for the join.
 
-## Asynchronous Mutiny (side topic)
+#### Example
 
-Since we will be using reactive approach it is a good thing to know something about Mutiny.
+```java
+@Entity
+public class Post {
 
-Mutiny is a reactive programming library for Java. It is based on Reactive Streams and Reactive Streams Operators. So when you see `Uni` or `Multi` in the code, it means that the method returns a reactive type and the method is asynchronous. 
+    @Id
+    @GeneratedValue
+    private Long id;
 
-**What `Uni` and `Multi` are?**
+    private String title;
 
-`Uni` is a type that emits either a single item or an error. `Multi` is a type that emits a stream of items or an error.
+    @OneToMany(
+            mappedBy = "post", // The name of the attribute in the child entity that owns the relationship
+            cascade = CascadeType.ALL, // All operations on the child will be cascaded to the parent
+            orphanRemoval = true // If the child is removed from the collection, it will be removed from the database
+    )
+    @JoinColumn(name = "postId") // The name of the column that will be used for the join
+    private List<PostComment> comments = new ArrayList<>();
 
-**Pros of asynchronous programming:**
-- Non-blocking
-- Better resource utilization
-- Better scalability
+    //Constructors, getters and setters removed for brevity
 
-**Cons of asynchronous programming:**
-- Complexity of callbacks, exceptions
-- Harder to debug
+    public void addComment(PostComment comment) {
+        comments.add(comment);
+        comment.setPost(this);
+    }
 
-For more in depth discussion about asynchronous programming and the difference with multithreading, see [this article](https://www.baeldung.com/cs/async-vs-multi-threading). 
+    public void removeComment(PostComment comment) {
+        comments.remove(comment);
+        comment.setPost(null);
+    }
+}
 
-### `onItem` and `transform` methods
+@Entity
+public class PostComment {
 
-TODO
+    @Id
+    @GeneratedValue
+    private Long id;
 
-[//]: # (TODO)
+    private String review;
 
-### Example
+    private Long postId; // foreign key
 
-TODO
-
-[//]: # (TODO)
+    //Constructors, getters and setters removed for brevity
+}
+```
 
 ## Active record vs repository
 
@@ -175,23 +227,25 @@ public class PersonRepository implements PanacheRepository<Person> {
 
 - `@WithTransaction` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back. This annotation is used if the method changes the state of the database. So it's not necessary to use it for read-only methods.
 - Transactions follow unit of work pattern. It means that all operations in a transaction are treated as a single unit of work. If any operation fails, the whole transaction is rolled back.
-- Used primarily to annotate methods.
 
-#### `@WithSessino` annotation // TODO MAYBE DELETE
 
-- `@WithSession` session can span multiple transactions. Ensures that entities withing the same session are consistent.
-- Used primarily to annotate repositories.
+## How does dev services help us in development?
 
-## dev services explanation
+Dev services gives us a way to make development easier. 
 
-[//]: # (TODO docker in dev mode etc.)
-TODO
+What gives us dev services?
+- Automatic startup -- check configuration, download dependencies and start the service
+- Continuous testing -- automatic testing of the service
+- Configuration management -- automatic configuration of the service and database connection
+
+For this week's lecture the main benefit is a way to run a database in a docker container without any configuration from developer side. Of course, it's only for development purposes. But during the initial development phase, it's very useful. Before we will create a configuration to dockerized database.
 
 ## State of the project
 
 - The `flight-service` has implemented the repository pattern with panache.
 - REST APIs and services are now asynchronous. 
-- Objects DTOs are created for the communication between services.
+- Objects DTOs are created where needed. Eg. `NotificationDto` in `passenger-service`.
+- Panache extension and 
 
 ## Tasks
 
@@ -199,15 +253,35 @@ TODO
 
 Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker container.
 
-### 1. Configure datasource in `application.properties`
+### 1. Make `Notification` active record entity
 
-Or maybe not coz dev services
+In `passenger-service` make Notification entity as active record using PanacheEntity.
 
-### 2. Create passenger entity
+Implement `deleteAll` in `NotificationService` with the usage of  `Notification` active record. The `listAll` method will be implemented in the next task.
 
-### 2. Add notification as active record
+Check if the tests for Notification entity deletion are passing.
 
-### 3. Add passenger as repository
+### 2. Make `Passenger` entity
+
+In `Passenger` entity add correct annotations with getters and setters to make it persistence entity that will be used in PassengerRepository.
+
+Hmm, but what about the relation with notifications? Passenger can have multiple notifications. Add the relation between `Passenger` and `Notification` entities.
+
+### 3. Implement `PassengerRepository`
+
+Implement methods in `PassengerRepository` to make it a repository for `Passenger` entity.
+
+Don't forget to implement `NotificationService.listAll` method using `PassengerRepository`.
+
+#### 3.1. How to test if everything is working?
+
+- Tests are passing
+
+Test scenario
+- Create a flight using swagger ui
+- Create a passenger using swagger ui with appropriate flight id
+- Call cancel flight endpoint
+- Check if the GET notification endpoint returns the notification for the passenger with his email.
 
 ### X. Submit the solution
 
@@ -228,3 +302,5 @@ Or maybe not coz dev services
 - https://quarkus.io/guides/hibernate-reactive-panache
 - https://medium.com/@shiiyan/active-record-pattern-vs-repository-pattern-making-the-right-choice-f36d8deece94
 - https://quarkus.io/guides/mutiny-primer
+- https://medium.com/@rajibrath20/the-best-way-to-map-a-onetomany-relationship-with-jpa-and-hibernate-dbbf6dba00d3
+- https://quarkus.io/guides/dev-services
