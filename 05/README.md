@@ -176,6 +176,16 @@ Go to `PassengerRepositoryTest` and implement the todo's. You don't need to mock
 
 Don't forget to add at least two of your own tests.
 
+### 2. Implement unit tests for `PassengerService`
+
+Go to `PassengerServiceTest` and implement the todo's. You will need to mock the `PassengerRepository` to isolate the service from the database.
+
+Don't forget to add at least two of your own tests.
+
+### 3. Implement unit tests for `PassengerResource`
+
+Go to `PassengerResourceTest` and implement the todo's. You will need to mock the `PassengerService` to isolate the resource from the service.
+
 #### X.y. How to test if everything is working?
 
 - Tests are passing
@@ -193,6 +203,7 @@ Test scenario
 ## Hints
 
 - You can inspire yourself from tests in `flilght-service`.
+- Create helper methods in tests for create example object.
 
 ## Troubleshooting
 

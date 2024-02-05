@@ -10,6 +10,7 @@ import io.quarkus.test.vertx.RunOnVertxContext;
 import io.quarkus.test.vertx.UniAsserter;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -57,6 +58,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldGetListOfPassengers(UniAsserter asserter) {
+        // TODO implement this test
         var passenger = createTestPassenger();
         asserter.execute(() -> Mockito.when(passengerRepository.listAll()).thenReturn(Uni.createFrom().item(List.of(passenger))));
 
@@ -74,6 +76,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldGetExistingPassenger(UniAsserter asserter) {
+        // TODO implement this test
         var passenger = createTestPassenger();
         asserter.execute(() -> Mockito.when(passengerRepository.findById(passenger.getId())).thenReturn(Uni.createFrom().item(passenger)));
 
@@ -89,6 +92,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldGetPassengersForFlight(UniAsserter asserter) {
+        // TODO implement this test
         var passenger = createTestPassenger();
         Long flightId = 123L;
         asserter.execute(() -> Mockito.when(passengerRepository.findPassengersForFlight(flightId)).thenReturn(Uni.createFrom().item(List.of(passenger))));
@@ -107,6 +111,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldCreatePassenger(UniAsserter asserter) {
+        // TODO implement this test
         var passengerDto = createTestPassengerDto();
         var passenger = Passenger.fromDto(passengerDto);
         asserter.execute(() -> Mockito.when(passengerRepository.persist(passenger)).thenReturn(Uni.createFrom().item(passenger)));
@@ -123,6 +128,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldDeleteExistingPassenger(UniAsserter asserter) {
+        // TODO implement this test
         Long passengerId = 1L;
         asserter.execute(() -> Mockito.when(passengerRepository.deleteById(passengerId)).thenReturn(Uni.createFrom().item(true)));
 
@@ -134,6 +140,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldDeleteAllPassengers(UniAsserter asserter) {
+        // TODO implement this test
         asserter.execute(() -> Mockito.when(passengerRepository.deleteAll()).thenReturn(Uni.createFrom().item(1L)));
 
         asserter.assertThat(
@@ -148,6 +155,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldAddNotificationByFlightId(UniAsserter asserter) {
+        // TODO implement this test
         Long flightId = 123L;
         Long passengerId = 1L;
         var notification = createNotification();
@@ -166,6 +174,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldFindNotificationsForPassenger(UniAsserter asserter) {
+        // TODO implement this test
         Long passengerId = 1L;
         var notification = createNotification();
         List<Notification> testNotifications = List.of(notification);
@@ -182,4 +191,42 @@ class PassengerServiceTest {
                 }
         );
     }
+
+    @Test
+    @RunOnVertxContext
+    void shouldHandleNoPassengerFound(UniAsserter asserter) {
+        // TODO implement this test
+        Long invalidId = -1L;
+        asserter.execute(() -> Mockito.when(passengerRepository.findById(invalidId)).thenReturn(Uni.createFrom().nullItem()));
+
+        asserter.assertThat(
+                () -> passengerService.getPassenger(invalidId),
+                Assertions::assertNull
+        );
+    }
+
+    @Test
+    @RunOnVertxContext
+    void shouldNotDeleteNonExistentPassenger(UniAsserter asserter) {
+        // TODO implement this test
+        Long invalidId = -1L;
+        asserter.execute(() -> Mockito.when(passengerRepository.deleteById(invalidId)).thenReturn(Uni.createFrom().item(false)));
+
+        asserter.assertFalse(
+                () -> passengerService.deletePassenger(invalidId)
+        );
+    }
+
+    @Test
+    @RunOnVertxContext
+    void shouldHandleEmptyListOfPassengers(UniAsserter asserter) {
+        // TODO implement this test
+        asserter.execute(() -> Mockito.when(passengerRepository.listAll()).thenReturn(Uni.createFrom().item(List.of())));
+
+        asserter.assertThat(
+                passengerService::listAll,
+                passengers -> assertTrue(passengers.isEmpty())
+        );
+    }
+
 }
