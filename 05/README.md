@@ -186,15 +186,19 @@ Don't forget to add at least two of your own tests.
 
 Go to `PassengerResourceTest` and implement the todo's. You will need to mock the `PassengerService` to isolate the resource from the service.
 
-#### X.y. How to test if everything is working?
+### 4. Implement integration tests for `PassengerResource`
 
-- Tests are passing
+Go to `PassengerResourceIT` and implement the todo's. There is one test already implemented, use it as an example. In this test you don't need to mock anything, you will test the whole system.
 
-Test scenario
-- Create a flight using swagger ui
-- Create a passenger using swagger ui with appropriate flight id
-- Call cancel flight endpoint
-- Check if the GET notification endpoint returns the notification for the passenger with his email.
+### 5. Verify if everything is working
+
+Run the following command in the root of the project:
+
+```bash
+mvn verify -DskipITs=false
+```
+
+If everything is working, all tests should pass and you are ready to submit the solution.
 
 ### X. Submit the solution
 
