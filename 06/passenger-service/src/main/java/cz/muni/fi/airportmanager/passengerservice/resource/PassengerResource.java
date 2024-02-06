@@ -1,8 +1,10 @@
 package cz.muni.fi.airportmanager.passengerservice.resource;
 
+import cz.muni.fi.airportmanager.passengerservice.client.BaggageResource;
 import cz.muni.fi.airportmanager.passengerservice.entity.Notification;
 import cz.muni.fi.airportmanager.passengerservice.entity.Passenger;
 import cz.muni.fi.airportmanager.passengerservice.model.CreatePassengerDto;
+import cz.muni.fi.airportmanager.passengerservice.model.PassengerWithBaggageDto;
 import cz.muni.fi.airportmanager.passengerservice.model.examples.Examples;
 import cz.muni.fi.airportmanager.passengerservice.service.PassengerService;
 import io.smallrye.mutiny.Uni;
@@ -24,6 +26,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import java.util.List;
@@ -194,4 +197,32 @@ public class PassengerResource {
         return passengerService.deleteAllPassengers()
                 .onItem().transform(ignored -> RestResponse.status(Response.Status.OK));
     }
+
+    /**
+     * Get passenger with baggage
+     */
+    @GET
+    @Path("/{passengerId}/baggage")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Get passenger with baggage")
+    @APIResponse(
+            responseCode = "200",
+            description = "Passenger with baggage",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = PassengerWithBaggageDto.class, required = true),
+                    examples = @ExampleObject(name = "passenger with baggage", value = Examples.VALID_PASSENGER_WITH_BAGGAGE)
+            )
+    )
+    public Uni<RestResponse<?>> getPassengerWithBaggage(@Parameter(name = "passengerId", required = true, description = "Passenger id") @PathParam("passengerId") Long passengerId) {
+        return passengerService.getPassengerWithBaggage(passengerId)
+                .onItem().transform(passenger -> {
+                    if (Objects.isNull(passenger)) {
+                        return RestResponse.status(Response.Status.NOT_FOUND);
+                    }
+                    return RestResponse.status(Response.Status.OK, passenger);
+                });
+    }
+
+
 }

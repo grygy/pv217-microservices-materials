@@ -82,6 +82,17 @@ public class BaggageService {
     }
 
     /**
+     * Get bagged by passenger id
+     *
+     * @param passengerId passenger id
+     *                    @return baggage with given passenger id
+     */
+    @WithTransaction
+    public Uni<List<Baggage>> getBaggageByPassengerId(Long passengerId) {
+        return Baggage.find("passengerId", passengerId).list();
+    }
+
+    /**
      * Mark baggage as lost
      *
      * @param id baggage id

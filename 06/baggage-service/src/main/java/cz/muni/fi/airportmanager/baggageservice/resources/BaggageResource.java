@@ -183,5 +183,26 @@ public class BaggageResource {
                 });
     }
 
+    /**
+     * Get bagged by passenger id
+     */
+    @GET
+    @Path("/passenger/{passengerId}")
+    @Produces(APPLICATION_JSON)
+    @Operation(summary = "Get bagged by passenger id")
+    @APIResponse(
+            responseCode = "200",
+            description = "Baggage with given passenger id",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Baggage.class, required = true),
+                    examples = @ExampleObject(name = "baggage", value = Examples.VALID_BAGGAGE_LIST)
+            )
+    )
+    public Uni<RestResponse<List<Baggage>>> getBaggageByPassengerId(@Parameter(name = "passengerId", required = true) @PathParam("passengerId") long passengerId) {
+        return baggageService.getBaggageByPassengerId(passengerId)
+                .onItem().transform(baggage -> RestResponse.status(Response.Status.OK, baggage));
+    }
+
 }
 

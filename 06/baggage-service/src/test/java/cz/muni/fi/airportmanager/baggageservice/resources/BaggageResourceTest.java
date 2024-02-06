@@ -151,4 +151,21 @@ class BaggageResourceTest {
                 .then()
                 .statusCode(404);
     }
+
+    @Test
+    void shouldGetBaggageByPassengerId() {
+        var baggage = new Baggage();
+        baggage.id = 1L;
+        baggage.weight = 20;
+        baggage.passengerId = 123L;
+        baggage.status = BaggageStatus.CHECKED_IN;
+
+        Mockito.when(this.baggageService.getBaggageByPassengerId(baggage.passengerId)).thenReturn(Uni.createFrom().item(List.of(baggage)));
+
+        given().when()
+                .get("/passenger/" + baggage.passengerId)
+                .then()
+                .statusCode(200)
+                .body("size()", is(1));
+    }
 }
