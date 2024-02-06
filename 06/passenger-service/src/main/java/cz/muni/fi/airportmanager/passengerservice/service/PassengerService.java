@@ -1,6 +1,6 @@
 package cz.muni.fi.airportmanager.passengerservice.service;
 
-import cz.muni.fi.airportmanager.passengerservice.client.BaggageResource;
+import cz.muni.fi.airportmanager.passengerservice.client.BaggageClientResource;
 import cz.muni.fi.airportmanager.passengerservice.entity.Notification;
 import cz.muni.fi.airportmanager.passengerservice.entity.Passenger;
 import cz.muni.fi.airportmanager.passengerservice.model.CreatePassengerDto;
@@ -12,9 +12,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @ApplicationScoped // This bean will be created once per application and live as long as the application lives
 public class PassengerService {
@@ -23,7 +21,7 @@ public class PassengerService {
     PassengerRepository passengerRepository;
 
     @RestClient
-    BaggageResource baggageResource;
+    BaggageClientResource baggageClientResource;
 
 
     /**
@@ -119,10 +117,11 @@ public class PassengerService {
      */
     @WithTransaction
     public Uni<PassengerWithBaggageDto> getPassengerWithBaggage(Long passengerId) {
+        // TODO implement this method. It should get passenger and call rest client to get baggage
         var passengerWithBaggage = new PassengerWithBaggageDto();
         return passengerRepository.findById(passengerId)
                 .onItem().transformToUni(passenger ->
-                        baggageResource.getBaggageForPassengerId(passenger.getId())
+                        baggageClientResource.getBaggageForPassengerId(passenger.getId())
                                 .onItem().transform(baggage -> {
                                             passengerWithBaggage.id = passenger.getId();
                                             passengerWithBaggage.firstName = passenger.getFirstName();

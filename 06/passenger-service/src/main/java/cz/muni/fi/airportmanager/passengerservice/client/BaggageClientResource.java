@@ -8,14 +8,13 @@ import jakarta.ws.rs.PathParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 
 /**
  * Client for baggage service
  */
 @Path("/baggage/passenger")
 @RegisterRestClient(configKey = "baggage-resource")
-public interface BaggageResource {
+public interface BaggageClientResource {
 
     @GET
     @Path("/{passengerId}")

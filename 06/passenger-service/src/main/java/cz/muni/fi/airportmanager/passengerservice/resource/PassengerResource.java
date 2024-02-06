@@ -1,6 +1,5 @@
 package cz.muni.fi.airportmanager.passengerservice.resource;
 
-import cz.muni.fi.airportmanager.passengerservice.client.BaggageResource;
 import cz.muni.fi.airportmanager.passengerservice.entity.Notification;
 import cz.muni.fi.airportmanager.passengerservice.entity.Passenger;
 import cz.muni.fi.airportmanager.passengerservice.model.CreatePassengerDto;
@@ -13,7 +12,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -26,7 +24,6 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import java.util.List;

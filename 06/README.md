@@ -28,13 +28,13 @@ Install [Docker desktop](https://docs.docker.com/desktop/) or other docker clien
 
 - Run `baggage-service` and go to `http://localhost:8077/swagger-ui/` and check the baggage service API. You should be able to see the API documentation.
 
-- Focus on `GET /baggage/passenger/{passengerId}` endpoint. It returns baggage for passenger with given id. We will use this endpoint in `BaggageService` in `passenger-service`.
+- Focus on `GET /baggage/passenger/{passengerId}` endpoint. It returns baggage for passenger with given id. We will use this endpoint in `BaggageClientResource` in `passenger-service`.
 
-#### 1.2. Implement `BaggageService`
+#### 1.2. Implement `BaggageClientResource` in `passenger-service`
 
 TODO
 
-#### 1.3. Use `BaggageService` in `PassengerService`
+#### 1.3. Use `BaggageClientResource` in `PassengerService`
 
 TODO
 
