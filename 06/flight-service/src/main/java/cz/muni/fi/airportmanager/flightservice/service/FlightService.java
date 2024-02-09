@@ -108,6 +108,7 @@ public class FlightService {
                         throw new RuntimeException("Flight cancellation failed");
                     }
                     return true;
-                }).onFailure().recoverWithItem(false);
+                });
+//                .onFailure().recoverWithItem(false);
     }
 }
