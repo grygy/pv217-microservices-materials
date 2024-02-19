@@ -266,7 +266,7 @@ Now we will implement `FlightCancellationService` in `passenger-service` that wi
 
 #### 3.1. Implement `cancelFlight` method
 
-Implement `cancelFlight` method in `FlightCancellationService` class. There is java doc that describes what the method should do. 
+Implement `cancelFlight` method in `FlightCancellationService` class. There is a JavaDoc that describes what the method should do. 
 
 #### 3.2. Test it with Postman
 
