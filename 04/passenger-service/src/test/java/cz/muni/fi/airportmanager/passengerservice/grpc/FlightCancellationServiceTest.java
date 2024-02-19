@@ -20,12 +20,9 @@ class FlightCancellationServiceTest {
     @Test
     @RunOnVertxContext
     void testCancelFlight(UniAsserter asserter) {
-//        TODO this not working
         asserter.assertThat(() -> flightCancellationStub.cancelFlight(FlightCancellationRequest.newBuilder().setId(1).setReason("Unknown").build()),
                 response -> {
                     assertEquals(FlightCancellationResponseStatus.Cancelled, response.getStatus());
                 });
-//        var response = flightCancellationStub.cancelFlight(FlightCancellationRequest.newBuilder().setId(1).setReason("Unknown").build()).await().indefinitely();
-//        assertEquals(FlightCancellationResponseStatus.Cancelled, response.getStatus());
     }
 }
