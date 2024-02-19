@@ -2,7 +2,7 @@
 
 ## What is REST?
 
-REST stands for Representational State Transfer. It is an architectural style for designing distributed systems.
+REST stands for Representational State Transfer on top of the HTTP protocol. It is an architectural style for designing distributed systems.
 
 ### Endpoint
 
@@ -20,7 +20,7 @@ Examples:
   and `/v1/employees/1`. Usually used to identify a resource.
 - **Query string** - The query string is the part of the URL after the path. It starts with a question mark `?` and
   followed by key-value pairs. The key-value pairs are separated by an ampersand `&`. In the example above, there is no
-  query string. Usually used for filtering, sorting, pagination, etc.
+  query string. Usually used for filtering, sorting, pagination, etc. Example: `/v1/employees?page=2&size=10`
 
 ### Methods
 
@@ -28,8 +28,8 @@ REST API is an API that uses HTTP requests to `GET`, `PUT`, `POST` and `DELETE`.
 are the most common ones.
 
 - GET - used to retrieve data from a specified resource
-- POST - used to send data to a server to create/update a resource
-- PUT - used to send data to a server to create/update a resource
+- POST - used to send data to a server to create a resource
+- PUT - used to send data to a server to update a resource
 - DELETE - used to delete a specified resource
 
 #### Request body
@@ -56,6 +56,8 @@ REST APIs use HTTP status codes to indicate the status of the request. Examples:
 - 404 - Not Found
 - 500 - Internal Server Error
 
+And many more. See [Mozzila docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) for more status codes.
+
 ### Headers
 
 Headers are used to provide additional information about the request or the response. Examples:
@@ -74,22 +76,24 @@ deserializing JSON objects. So we can use Java objects and Jackson will convert 
 
 #### Bean
 
-A bean is a class that is managed by the Quarkus container. Bean is created by the container and it is destroyed by it. 
+A bean is an object that is managed by the Quarkus container. Bean is created by the container and it is destroyed by it. 
+
 
 The main lifecycle methods of bean are:
 - `@ApplicationScoped` - Created when the application starts and destroyed when the application stops.
-- `@Singleton` - Similar to `@ApplicationScoped` except that no client proxy is used.
+- `@Singleton` - Similar to `@ApplicationScoped` but lacks client proxy that allows for lazy initialization.
 - `@RequestScoped` - Created when the request starts and destroyed when the request ends.
-- `@Dependent` - Created when the bean is injected and destroyed when the bean is destroyed.
+- `@Dependent` - Created when the bean is injected and destroyed when the bean is destroyed. It follows the lifecycle of
+  the bean that it is injected into.
 
 
-In our case `FlightService` is a bean that is `ApplicationScoped`. It means that there is only one instance of the bean will exist for the lifetime of the application.
+In our case `FlightService` is a bean that is `@ApplicationScoped`. It means that there is only one instance of the bean will exist for the lifetime of the application.
 
 Imagine what would happen with `Map<Integer, Flight> flights` in `FlightService` if it was `@RequestScoped`. It would be created for every request and destroyed after the request ends. So we would lose all the data after every request.
 
 #### Dependency injection
 
-We can inject beans into other beans. We can do it by using `@Inject` annotation. You can see the example in `FlightResource.class`. Quarkus will handle the rest for us.
+We can inject beans into other beans. We can do it by using `@Inject` annotation. You can see the example in `FlightResource.java`. Quarkus will handle the rest for us.
 
 ## Tasks
 
@@ -112,11 +116,11 @@ on http://localhost:8079/q/swagger-ui/.
 
 ### 1. Implement FlightService
 
-In `FlightService.class` implement all the methods based on provided javadoc. You can also use included tests to help you what is expected.
+In `FlightService.java` implement all the methods based on provided javadoc. You can also use included tests to help you what is expected.
 
 ### 2. Implement GET endpoint
 
-In `FlightResource.class` implement `GET` endpoint for retrieving all flights. The endpoint should return all flights.
+In `FlightResource.java` implement `GET` endpoint for retrieving all flights. The endpoint should return all flights.
 
 #### 2.1. Try it
 
@@ -124,10 +128,10 @@ Then test the endpoint with Swagger/Postman. Right now it should return an empty
 
 ### 3. Implement POST endpoint
 
-In `FlightResource.class` implement `POST` endpoint for creating a new flight. For now, just assume that we will receive
+In `FlightResource.java` implement `POST` endpoint for creating a new flight. For now, just assume that we will receive
 the id of the flight in the request body. The endpoint should return the created flight.
 
-Check if the flight with the given id already exists. If it does, return `409 Conflict` status code (see 2.2 how to do
+Check if the flight with the given id already exists. If it does, return `409 Conflict` status code (see 3.2 how to do
 it).
 
 #### 3.1. Mapping request body JSON to Java object
@@ -174,7 +178,7 @@ Example request body:
 
 ### 4. Implement GET endpoint with path parameter
 
-In `FlightResource.class` implement `GET` endpoint for retrieving a single flight. The endpoint should return a flight
+In `FlightResource.java` implement `GET` endpoint for retrieving a single flight. The endpoint should return a flight
 with the given id.
 
 You will need to use `PathParam` annotation. Example:
@@ -192,7 +196,7 @@ retrieve it with the `GET /flight/{id}` endpoint.
 
 ### 5. Implement PUT endpoint
 
-In `FlightResource.class` implement `PUT` endpoint for updating a flight. Don't forget to check if the flight exists.
+In `FlightResource.java` implement `PUT` endpoint for updating a flight. Don't forget to check if the flight exists.
 
 ### X. Submit the solution
 
@@ -200,7 +204,7 @@ In `FlightResource.class` implement `PUT` endpoint for updating a flight. Don't 
 
 ## Hints
 
-- See other methods in `FlightResource.class` for examples.
+- See other methods in `FlightResource.java` for examples.
 
 ## Further reading
 
