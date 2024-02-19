@@ -270,7 +270,7 @@ Implement `cancelFlight` method in `FlightCancellationService` class. There is j
 
 #### 3.2. Test it with Postman
 
-When you will be done, run passenger service in dev mode and try to call the gRPC service from Postman. You need to create new gRPC collection in Postman with url `localhost:9002` and choose CancelFlight. The request shouldn't fail.
+When you will be done, run passenger service in dev mode and try to call the gRPC service from Postman. You need to create new gRPC collection in Postman with url `localhost:9000` and choose CancelFlight. The request shouldn't fail.
 
 ![Postman](img/postman_grpc.png)
 
