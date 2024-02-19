@@ -84,8 +84,7 @@ public class FlightServiceApplication extends Application {
 }
 ```
 
-Note that `FlightServiceApplication` extends `Application` class from `jakarta.ws.rs.core.Application`. It's kinda "
-entry point" for application. It's not necessary to extend this class, but it's required for the use
+Note that `FlightServiceApplication` extends `Application` class from `jakarta.ws.rs.core.Application`. It defines the components of an application and supplies additional meta-data. It's not necessary to extend this class, but it's required for the use
 of `@OpenAPIDefinition`.
 
 #### Resource annotation
@@ -159,7 +158,6 @@ gRPC is a high performance, open-source universal Remote Procedure Call (RPC) fr
 Protocol Buffers. You can imagine it as a middleware between your service and outside world. Simply put client service with Stub is calling gRPC service as a async method call. 
 
 ![gRPC](img/grpc.png)
-*image from https://grpc.io/docs/what-is-grpc/introduction/*
 
 ### Main features:
 
@@ -169,14 +167,13 @@ Protocol Buffers. You can imagine it as a middleware between your service and ou
 
 ### Differences between REST and gRPC
 
-| REST          | gRPC                         |
-|---------------|------------------------------|
-| HTTP/1.1      | HTTP/2                       |
-| Text based    | Binary                       |
-| JSON, XML     | Protocol Buffers             |
-| Stateless     | Bidirectional streaming      |
-| Client-server | Client-server, server-server |
-| HTTP verbs    | RPC methods                  |
+| x             | REST                                   | gRPC                                                        |
+|---------------|----------------------------------------|-------------------------------------------------------------|
+| Data          | Text based                             | Binary                                                      |
+| Schema        | Loose, often using JSON or XML schemas | Strict, uses Protocol Buffers for schema definition         |
+| Communication | One-directional                        | Supports bidirectional streaming                            |
+| Architecture  | Primarily client-server                | Supports both client-server and server-server communication |
+| Methods       | HTTP verbs (POST, GET,...)             | RPC methods                                                 |
 
 ### Protocol Buffers
 
@@ -258,7 +255,9 @@ Run `mvn compile` in project root to generate classes from `.proto` file.
 
 When you run this command, you should be able to generated classes in `flight-cancellation-api/target/generated-sources/grpc/cz/muni/fi/proto` directory. Check if they are there. This files will be used in `passenger-service` to implement gRPC service and in `flight-service` to implement gRPC stub.
 
-If you are using IntelliJ, run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes. Or reload all maven projects.
+If you are using IntelliJ, run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes. Or reload all maven projects. 
+
+It is also possible to run compile elsewhere and just mark the generated sources as sources dir by right click.
 
 ### 3. Implement `FlightCancellationService`
 
