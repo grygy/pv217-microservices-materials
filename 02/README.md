@@ -67,7 +67,7 @@ And many more. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers for
 
 ### Mapping Java objects to JSON
 
-In this quarkus project we have RESTEasy Reactive with Jackson. Jackson is a Java library for serializing and
+In this quarkus project we have a RESTEasy Reactive with Jackson extension. Jackson is a Java library for serializing and
 deserializing JSON objects. So we can use Java objects and Jackson will convert them to JSON and vice versa.
 
 ### Quarkus beans and dependency injection
