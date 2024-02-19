@@ -237,7 +237,7 @@ Add `@Tag` annotation for `FlightResource` class. Provide name and description a
 
 #### 1.3 Create information about the endpoints
 
-Add `@Operation`, `@APIResponse`, `@Schema`, and `@Parameter` annotation for each method and parameter in `FlightResource` class similar to `PassengerResource` in `passenger-service`. You will find response examples in `Examples` class that you can use.
+Add `@Operation`, `@APIResponse`, `@Schema`, and `@Parameter` annotations for each method and parameter in `FlightResource` class similar to `PassengerResource` in `passenger-service`. You will find response examples in `Examples` class that you can use.
 
 - `@Operation` - provide summary and description
 - `@APIResponse` - provide response code, description, content and schema
