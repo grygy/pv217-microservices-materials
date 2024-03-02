@@ -212,11 +212,10 @@ From this file, Quarkus can generate Java classes that can be used in your appli
 
 ## State of the project
 
-Since the last lecture the project now includes 3 modules - `flight-service`, `passenger-service` and `flight-cancellation-api`.
+Since the last lecture the project now includes 2 modules - `flight-service` and `passenger-service`.
 
 - `flight-service` is a REST service that provides CRUD operations for flights. You already know this service from the previous lectures. Runs on port `8079`.
 - `passenger-service` is a REST service that provides CRUD operations for passengers and get new notifications. Also, it provides a gRPC interface to notify passenger about flight cancellation. Runs on port `8078`.
-- `flight-cancellation-api` is a module that contains `.proto` files for gRPC service. It's used by `passenger-service` to generate gRPC classes and `flight-service` to generate gRPC stubs.
 
 ## Tasks
 
@@ -245,15 +244,15 @@ Add `@Operation`, `@APIResponse`, `@Schema`, and `@Parameter` annotations for ea
 
 ### 2. Generate Grpc classes
 
-#### 2.1. Modify `flightcancellation.proto` file in `flight-cancellation-api` module
+#### 2.1. Modify `flightcancellation.proto` file in `flight-service` and `passenger-service` module
 
 In `flightcancellation.proto` file add under the configuration `FlightCancellation` service with `CancelFlight` rpc that will take `CancelFlightRequest` with `id` (int) and `reason` (string) fields. It will return `CancelFlightResponse` with `status` (`FlightCancellationResponseStatus` enum) field.
 
 #### 2.2. Generate classes
 
-Run `mvn compile` in project root to generate classes from `.proto` file.
+Run `mvn compile` in services to generate classes from `.proto` file.
 
-When you run this command, you should be able to generated classes in `flight-cancellation-api/target/generated-sources/grpc/cz/muni/fi/proto` directory. Check if they are there. This files will be used in `passenger-service` to implement gRPC service and in `flight-service` to implement gRPC stub.
+When you run this command, you should be able to generated classes in `flight-service/target/generated-sources/grpc/cz/muni/fi/proto` and `passenger-service/target/generated-sources/grpc/cz/muni/fi/proto` directories. Check if they are there. This files will be used in `passenger-service` to implement gRPC service and in `flight-service` to implement gRPC stub.
 
 If you are using IntelliJ, run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes. Or reload all maven projects. 
 
@@ -275,7 +274,7 @@ When you will be done, run passenger service in dev mode and try to call the gRP
 
 ### 4. Use stub in `flight-service`
 
-Now because both `flight-service` and `passenger-service` have `flight-cancellation-api` as a dependency, we can use stubs in `flight-service` to call `cancelFlight` method. 
+Now because both `flight-service` and `passenger-service` have proto contract, we can use stubs in `flight-service` to call `cancelFlight` method. 
 
 #### 4.1. Use Grpc Client to use Stub `FlightCancellationService` in `FlightService`
 
