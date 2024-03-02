@@ -9,7 +9,6 @@
   <modules>
     <module>passenger-service</module>
     <module>flight-service</module>
-    <module>flight-cancellation-api</module>
     <module>baggage-service</module>
   </modules>
 </project>
