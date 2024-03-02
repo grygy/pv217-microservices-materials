@@ -84,7 +84,7 @@ public class FlightServiceApplication extends Application {
 }
 ```
 
-Note that `FlightServiceApplication` extends `Application` class from `jakarta.ws.rs.core.Application`. It defines the components of an application and supplies additional meta-data. It's not necessary to extend this class, but it's required for the use
+Note that `FlightServiceApplication` extends `Application` class from `jakarta.ws.rs.core.Application`. It can define the components of an application and supplies additional meta-data. It's not necessary to extend this class, but it's required for the use
 of `@OpenAPIDefinition`.
 
 #### Resource annotation
@@ -246,6 +246,8 @@ Add `@Operation`, `@APIResponse`, `@Schema`, and `@Parameter` annotations for ea
 
 #### 2.1. Modify `flightcancellation.proto` file in `flight-service` and `passenger-service` module
 
+Because we want from our services to act independently, we have to define the same contract in both services.
+
 In `flightcancellation.proto` file add under the configuration `FlightCancellation` service with `CancelFlight` rpc that will take `CancelFlightRequest` with `id` (int) and `reason` (string) fields. It will return `CancelFlightResponse` with `status` (`FlightCancellationResponseStatus` enum) field.
 
 #### 2.2. Generate classes
@@ -253,10 +255,6 @@ In `flightcancellation.proto` file add under the configuration `FlightCancellati
 Run `mvn compile` in services to generate classes from `.proto` file.
 
 When you run this command, you should be able to generated classes in `flight-service/target/generated-sources/grpc/cz/muni/fi/proto` and `passenger-service/target/generated-sources/grpc/cz/muni/fi/proto` directories. Check if they are there. This files will be used in `passenger-service` to implement gRPC service and in `flight-service` to implement gRPC stub.
-
-If you are using IntelliJ, run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes. Or reload all maven projects. 
-
-It is also possible to run compile elsewhere and just mark the generated sources as sources dir by right click.
 
 ### 3. Implement `FlightCancellationService`
 
@@ -266,7 +264,13 @@ Now we will implement `FlightCancellationService` in `passenger-service` that wi
 
 Implement `cancelFlight` method in `FlightCancellationService` class. There is a JavaDoc that describes what the method should do. 
 
-#### 3.2. Test it with Postman
+#### 3.2. Test it with DevUI or Postman 
+
+**Dev UI**
+
+You can go to http://localhost:8078/q/dev-ui/io.quarkus.quarkus-grpc/services where you can test the gRPC service. You need to provide the id of the flight and the reason for the cancellation. The request shouldn't fail.
+
+**Postman**
 
 When you will be done, run passenger service in dev mode and try to call the gRPC service from Postman. You need to create new gRPC collection in Postman with url `localhost:9000` and choose CancelFlight. The request shouldn't fail.
 
@@ -308,7 +312,7 @@ Scenario:
 
 ## Troubleshooting
 
-- If the `flight-service` cannot find dependency `passenger-service` run `mvn clean install` in `passenger-service` directory.
+- If you are using IntelliJ, you can run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes. Or reload all maven projects.
 
 ## Further reading
 
