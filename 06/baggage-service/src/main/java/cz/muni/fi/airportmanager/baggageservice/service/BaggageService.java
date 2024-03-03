@@ -82,10 +82,10 @@ public class BaggageService {
     }
 
     /**
-     * Get bagged by passenger id
+     * Get baggage by passenger id
      *
      * @param passengerId passenger id
-     *                    @return baggage with given passenger id
+     * @return list of baggage for passenger with given id
      */
     @WithTransaction
     public Uni<List<Baggage>> getBaggageByPassengerId(Long passengerId) {

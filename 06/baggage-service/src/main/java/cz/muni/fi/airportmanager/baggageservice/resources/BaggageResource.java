@@ -184,12 +184,12 @@ public class BaggageResource {
     }
 
     /**
-     * Get bagged by passenger id
+     * Get baggage by passenger id
      */
     @GET
     @Path("/passenger/{passengerId}")
     @Produces(APPLICATION_JSON)
-    @Operation(summary = "Get bagged by passenger id")
+    @Operation(summary = "Get baggage by passenger id")
     @APIResponse(
             responseCode = "200",
             description = "Baggage with given passenger id",

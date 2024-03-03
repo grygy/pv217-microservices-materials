@@ -18,7 +18,10 @@ TODO
 
 ## State of the project
 
-- There is a new `baggage-service` is a REST service for tracking baggage. With this service 
+- There is a new `baggage-service` is a REST service for tracking baggage running on port 8077.
+  - It supports CRUD operations for baggage along with claiming and marking baggage as lost.
+  - You can also retrieve baggage for a passenger based on passenger id.
+  - Check `BaggageResource` for more details.
 
 ## Tasks
 
@@ -29,7 +32,23 @@ container.
 
 ### 1. Define `BaggageClientResource` in `passenger-service`
 
-TODO
+#### 1.1. Run `baggage-service` 
+
+Run the `baggage-service` in dev mode. Then check the swagger UI at http://localhost:8077/q/swagger-ui.
+
+Examine the *Get baggage by passenger id* endpoint. We will use it in `passenger-service`.
+
+#### 1.2. Define `BaggageClientResource` interface
+
+In `passenger-service` define a new interface `BaggageClientResource`. This interface will represent REST client for the Baggage service.
+
+1. Create a config key for the baggage service URL in `application.properties` file. See todo in `application.properties` file.
+2. Follow the TODOs in `BaggageClientResource` interface. 
+
+#### 1.3. Test it
+
+1. In Swagger create a passenger in `passenger-service` and then create a baggage for the passenger in `baggage-service`.
+2. Try to get the baggage fot his passenger using `GET /passenger/{passengerId}/baggage` endpoint.
 
 ### 2. Create docker-compose file for baggage-service
 
