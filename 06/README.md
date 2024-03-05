@@ -196,7 +196,11 @@ In `passenger-service` define a new interface `BaggageClientResource`. This inte
 1. Create a config key for the baggage service URL in `application.properties` file. See todo in `application.properties` file.
 2. Follow the TODOs in `BaggageClientResource` interface. 
 
-#### 1.3. Test it
+#### 1.3. 
+
+Now we want to use the `BaggageClientResource` in `PassengerService` to retrieve baggage for a passenger. Go to `PassengerService` and implement the `getBaggageForPassenger` method.
+
+#### 1.4. Test it
 
 1. In Swagger create a passenger in `passenger-service` and then create a baggage for the passenger in `baggage-service`.
 2. Try to get the baggage fot his passenger using `GET /passenger/{passengerId}/baggage` endpoint.
