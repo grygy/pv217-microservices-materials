@@ -96,6 +96,17 @@ public class PassengerService {
         return passengerRepository.addNotificationByFlightId(flightId, notification);
     }
 
+    /**
+     * Add notification to a passenger
+     * @param passengerId passenger id
+ *                     @param notification notification to add
+     */
+    @WithTransaction
+    public Uni<Void> addNotificationForPassenger(Long passengerId, Notification notification) {
+        return passengerRepository.addNotificationForPassenger(passengerId, notification);
+    }
+
+
 
     /**
      * Get all notifications for passenger

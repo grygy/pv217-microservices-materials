@@ -36,5 +36,4 @@ public class NotificationService {
     public Uni<List<NotificationDto>> listAll() {
         return passengerRepository.findHydratedNotifications();
     }
-
 }

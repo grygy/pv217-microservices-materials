@@ -173,6 +173,23 @@ class PassengerServiceTest {
 
     @Test
     @RunOnVertxContext
+    void shouldAddNotificationForPassenger(UniAsserter asserter) {
+
+        Long passengerId = 1L;
+        var notification = createNotification();
+        // Mock the behavior of the repository
+        asserter.execute(() -> Mockito.when(passengerRepository.addNotificationForPassenger(passengerId, notification)).thenReturn(Uni.createFrom().voidItem()));
+        asserter.execute(() -> Mockito.when(passengerRepository.findNotificationsForPassenger(passengerId)).thenReturn(Uni.createFrom().item(List.of(notification))));
+
+        asserter.execute(() -> passengerService.addNotificationForPassenger(passengerId, notification))
+                .assertThat(
+                () -> passengerService.findNotificationsForPassenger(passengerId),
+                notifications -> assertTrue(notifications.stream().anyMatch(n -> n.message.equals(notification.message)))
+        );
+    }
+
+    @Test
+    @RunOnVertxContext
     void shouldFindNotificationsForPassenger(UniAsserter asserter) {
 
         Long passengerId = 1L;

@@ -31,6 +31,8 @@ services:
       QUARKUS_DATASOURCE_REACTIVE_URL: vertx-reactive:postgresql://passenger-db:5432/passenger-database
 #      It communicates on the internal port not exposed one
       QUARKUS_BAGGAGE_RESOURCE_URL: http://baggage-service:8080
+      # TODO add KAFKA_BOOTSTRAP_SERVERS to the environment
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - passenger-db
     networks:
@@ -47,6 +49,8 @@ services:
       QUARKUS_DATASOURCE_USERNAME: user
       QUARKUS_DATASOURCE_PASSWORD: password
       QUARKUS_DATASOURCE_REACTIVE_URL: vertx-reactive:postgresql://baggage-db:5432/baggage-database
+      # TODO add KAFKA_BOOTSTRAP_SERVERS to the environment
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - baggage-db
     networks:
@@ -82,6 +86,41 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - baggage-db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+# TODO add the Zookeeper service
+
+  zookeeper:
+    image: quay.io/strimzi/kafka:0.39.0-kafka-3.6.1
+    command: [
+      "sh", "-c",
+      "bin/zookeeper-server-start.sh config/zookeeper.properties"
+    ]
+    ports:
+      - "2181:2181"
+    environment:
+      LOG_DIR: /tmp/logs
+    networks:
+      - app-network
+
+  # TODO add the Kafka service
+
+  kafka:
+    image: quay.io/strimzi/kafka:0.39.0-kafka-3.6.1
+    command: [
+      "sh", "-c",
+      "bin/kafka-server-start.sh config/server.properties --override listeners=$${KAFKA_LISTENERS} --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS} --override zookeeper.connect=$${KAFKA_ZOOKEEPER_CONNECT}"
+    ]
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      LOG_DIR: "/tmp/logs"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     networks:
       - app-network
 

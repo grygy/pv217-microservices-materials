@@ -1,18 +1,24 @@
 package cz.muni.fi.airportmanager.baggageservice.service;
 
 import cz.muni.fi.airportmanager.baggageservice.entity.Baggage;
+import cz.muni.fi.airportmanager.baggageservice.kafka.model.BaggageStateChange;
+import cz.muni.fi.airportmanager.baggageservice.kafka.producer.BaggageStateChangeProducer;
 import cz.muni.fi.airportmanager.baggageservice.model.BaggageStatus;
 import cz.muni.fi.airportmanager.baggageservice.model.CreateBaggageDto;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.unchecked.Unchecked;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.List;
 
 @ApplicationScoped
 public class BaggageService {
 
+    // TODO inject BaggageStateChangeProducer
+    @Inject
+    BaggageStateChangeProducer baggageStateChangeProducer;
 
     /**
      * Get list of all baggage
@@ -50,7 +56,14 @@ public class BaggageService {
     @WithTransaction
     public Uni<Baggage> createBaggage(CreateBaggageDto createBaggageDto) {
         var baggage = Baggage.fromDto(createBaggageDto);
-        return baggage.persist();
+
+        return baggage.persist().onItem().transform(
+                persistedBaggage -> {
+//                    TODO produce message to kafka
+                    baggageStateChangeProducer.send((Baggage) persistedBaggage);
+                    return (Baggage) persistedBaggage;
+                }
+        );
     }
 
 
@@ -77,6 +90,8 @@ public class BaggageService {
                 return Uni.createFrom().failure(new IllegalArgumentException("Baggage with id " + id + " does not exist"));
             }
             baggage.status = BaggageStatus.CLAIMED;
+            // TODO produce message to kafka
+            baggageStateChangeProducer.send(baggage);
             return Baggage.persist(baggage).replaceWith(true);
         });
     }
@@ -105,6 +120,8 @@ public class BaggageService {
                 return Uni.createFrom().failure(new IllegalArgumentException("Baggage with id " + id + " does not exist"));
             }
             baggage.status = BaggageStatus.LOST;
+//          // TODO produce message to kafka
+            baggageStateChangeProducer.send(baggage);
             return Baggage.persist(baggage).replaceWith(true);
         });
     }
