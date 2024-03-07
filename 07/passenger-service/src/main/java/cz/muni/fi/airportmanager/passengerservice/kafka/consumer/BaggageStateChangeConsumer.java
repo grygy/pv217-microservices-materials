@@ -1,4 +1,4 @@
-package cz.muni.fi.airportmanager.passengerservice.kafka.processor;
+package cz.muni.fi.airportmanager.passengerservice.kafka.consumer;
 
 import cz.muni.fi.airportmanager.passengerservice.entity.Notification;
 import cz.muni.fi.airportmanager.passengerservice.kafka.model.BaggageStateChange;
@@ -10,7 +10,7 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 
 @ApplicationScoped
-public class BaggageStateChangeProcessor {
+public class BaggageStateChangeConsumer {
 
     // TODO use passengerService to add notification for passenger
 
