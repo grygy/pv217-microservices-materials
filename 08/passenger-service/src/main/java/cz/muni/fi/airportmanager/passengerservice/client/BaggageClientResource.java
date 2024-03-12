@@ -12,11 +12,14 @@ import java.util.List;
 /**
  * Client for baggage service
  */
-@Path("/baggage/passenger")
 @RegisterRestClient(configKey = "baggage-resource")
 public interface BaggageClientResource {
 
     @GET
-    @Path("/{passengerId}")
+    @Path("/baggage/passenger/{passengerId}")
     Uni<List<Baggage>> getBaggageForPassengerId(@PathParam("passengerId") Long passengerId);
+
+    @GET
+    @Path("/q/health/ready")
+    Uni<String> readinessCheck();
 }
