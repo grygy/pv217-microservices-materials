@@ -4,6 +4,7 @@ import cz.muni.fi.airportmanager.baggageservice.entity.Baggage;
 import cz.muni.fi.airportmanager.baggageservice.model.CreateBaggageDto;
 import cz.muni.fi.airportmanager.baggageservice.model.example.Examples;
 import cz.muni.fi.airportmanager.baggageservice.service.BaggageService;
+import io.micrometer.core.annotation.Counted;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -56,6 +57,7 @@ public class BaggageResource {
                     examples = @ExampleObject(name = "baggage", value = Examples.VALID_BAGGAGE_LIST)
             )
     )
+    @Counted(value = "baggage_list_count", description = "How many times baggage list was requested")
     public Uni<RestResponse<List<Baggage>>> list() {
         return baggageService.listAll()
                 .onItem().transform(baggage -> RestResponse.status(Response.Status.OK, baggage));
@@ -84,6 +86,7 @@ public class BaggageResource {
             responseCode = "409",
             description = "Conflict"
     )
+    @Counted(value = "baggage_create", description = "How many baggage have been created")
     public Uni<RestResponse<Baggage>> create(CreateBaggageDto baggage) {
         return baggageService.createBaggage(baggage)
                 .onItem().transform(newBaggage -> RestResponse.status(Response.Status.CREATED, newBaggage))
@@ -149,6 +152,7 @@ public class BaggageResource {
             responseCode = "404",
             description = "Baggage with given id does not exist"
     )
+    @Counted(value = "baggage_claim_count", description = "How many baggage have been claimed")
     public Uni<RestResponse<Object>> claim(@Parameter(name = "id", required = true) @PathParam("id") long id) {
         return baggageService.claimBaggage(id)
                 .onItem().transform(wasClaimed -> {
@@ -173,6 +177,7 @@ public class BaggageResource {
             responseCode = "404",
             description = "Baggage with given id does not exist"
     )
+    @Counted(value = "baggage_lost_count", description = "How many baggage have been marked as lost")
     public Uni<RestResponse<Object>> lost(@Parameter(name = "id", required = true) @PathParam("id") long id) {
         return baggageService.lostBaggage(id)
                 .onItem().transform(wasLost -> {
