@@ -19,6 +19,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
@@ -114,6 +115,7 @@ public class PassengerResource {
             responseCode = "404",
             description = "Passenger with given id does not exist"
     )
+    @Timeout(250)
     public Uni<RestResponse<Passenger>> get(@Parameter(name = "id", required = true, description = "Passenger id") @PathParam("id") Long id) {
         return passengerService.getPassenger(id)
                 .onItem().transform(passenger -> {

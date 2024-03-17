@@ -14,6 +14,7 @@ import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.unchecked.Unchecked;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 
 import java.util.List;
 
@@ -93,6 +94,13 @@ public class FlightService {
      * @return if the flight was cancelled
      */
     @WithTransaction
+    // TODO add CircuitBreaker with requestVolumeThreshold = 4, failureRatio = 0.75, delay = 1000, successThreshold = 2
+    @CircuitBreaker(
+            requestVolumeThreshold = 4,
+            failureRatio = 0.75,
+            delay = 1000,
+            successThreshold = 2
+    )
     public Uni<Boolean> cancelFlight(Long id) {
         return flightRepository.changeStatus(id, FlightStatus.CANCELLED)
                 .onItem().transformToUni(ignored ->
@@ -109,6 +117,5 @@ public class FlightService {
                     }
                     return true;
                 });
-//                .onFailure().recoverWithItem(false);
     }
 }

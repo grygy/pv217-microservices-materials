@@ -6,6 +6,7 @@ import cz.muni.fi.airportmanager.baggageservice.model.example.Examples;
 import cz.muni.fi.airportmanager.baggageservice.service.BaggageService;
 import io.micrometer.core.annotation.Counted;
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -16,6 +17,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
@@ -38,7 +40,6 @@ public class BaggageResource {
 
     @Inject
     BaggageService baggageService;
-
 
     /**
      * Get list of all baggage
@@ -87,6 +88,7 @@ public class BaggageResource {
             description = "Conflict"
     )
     @Counted(value = "baggage_create", description = "How many baggage have been created")
+    @Timeout(250)
     public Uni<RestResponse<Baggage>> create(CreateBaggageDto baggage) {
         return baggageService.createBaggage(baggage)
                 .onItem().transform(newBaggage -> RestResponse.status(Response.Status.CREATED, newBaggage))
@@ -153,6 +155,7 @@ public class BaggageResource {
             description = "Baggage with given id does not exist"
     )
     @Counted(value = "baggage_claim_count", description = "How many baggage have been claimed")
+    @Timeout(250)
     public Uni<RestResponse<Object>> claim(@Parameter(name = "id", required = true) @PathParam("id") long id) {
         return baggageService.claimBaggage(id)
                 .onItem().transform(wasClaimed -> {
@@ -178,6 +181,7 @@ public class BaggageResource {
             description = "Baggage with given id does not exist"
     )
     @Counted(value = "baggage_lost_count", description = "How many baggage have been marked as lost")
+    @Timeout(250)
     public Uni<RestResponse<Object>> lost(@Parameter(name = "id", required = true) @PathParam("id") long id) {
         return baggageService.lostBaggage(id)
                 .onItem().transform(wasLost -> {
@@ -205,6 +209,10 @@ public class BaggageResource {
             )
     )
     public Uni<RestResponse<List<Baggage>>> getBaggageByPassengerId(@Parameter(name = "passengerId", required = true) @PathParam("passengerId") long passengerId) {
+        // 50 % chance of failure for simulation purposes
+        if (Math.random() < 0.5) {
+            return Uni.createFrom().failure(new IllegalArgumentException("Baggage service is not ready. Please try again later."));
+        }
         return baggageService.getBaggageByPassengerId(passengerId)
                 .onItem().transform(baggage -> RestResponse.status(Response.Status.OK, baggage));
     }
