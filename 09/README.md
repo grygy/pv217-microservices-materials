@@ -68,11 +68,31 @@ public class HelloResource {
 
 ## Tracing
 
-TODO
+In modern cloud based application it is important to have visibility into the system. Tracing is a technique to follow the flow of the code and understand how the different services interact with each other. It is useful for debugging, performance analysis, and understanding the system.
+
+### OpenTelemetry
+
+OpenTelemetry is a set of APIs, libraries, agents, and instrumentation to provide observability for cloud-native software. It provides a set of tools to generate, collect, and export telemetry data (traces) for analysis. 
+
+### Jaeger
+
+Jaeger is an open-source, end-to-end distributed tracing system. It is used for monitoring and troubleshooting microservices-based distributed systems. It is used to monitor and troubleshoot distributed systems.
+
+It collects data from the services using OpenTelemetry over gRPC, stores them, and visualizes the traces in a user-friendly way.
+
+It supports:
+- Collecting traces from the services
+- Storing the traces
+- Visualizing the traces 
+- Querying the traces
+
+![Jaeger UI](./img/jaeger-ui.png)
 
 ## State of the project
 
 - In `baggage-service`, there is artificial failure in `BaggageResource.getBaggageByPassengerId` method.
+- Smallrye fault tolerance is added to all services.
+- Opentelemetry extensions is added to the `flight-service` and `baggage-service`.
 
 ## Tasks
 
@@ -99,9 +119,55 @@ Baggage service has 50 % of failure to retrieve baggage by passenger id.
  
 Add a `@CircuitBreaker` annotation to the `cancelFlight` method.
 
-### 3. TODO
+### 3. Add OpenTelemetry config
 
-TODO
+#### 3.1. Add extension opentelemetry to the `passenger-service`
+
+Go to `./passenger-service` and run:
+
+```bash
+quarkus extension add opentelemetry
+```
+
+#### 3.2. Configure Jaeger in docker-compose
+
+Add Jaeger service to the `docker-compose.yml` file.
+
+```yaml
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "4317:4317"   # OTLP gRPC receiver
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - app-network
+```
+
+#### 3.3. Set `QUARKUS_OTEL_ENDPOINT` for the `passenger-service`
+
+In `docker-compose.yaml` set `QUARKUS_OTEL_ENDPOINT` environment variable to mark Jaeger as the endpoint for the `passenger-service`.
+
+### 4. Jaeger UI
+
+#### 4.1. Simulate some traffic
+
+1. Start the services using `docker compose`. (see hints)
+2. Create a passenger and baggage for the passenger.
+3. Try to retrieve the passenger with baggage using `/passenger/{passengerId}/baggage` endpoint more than once.
+
+#### 4.2. Open Jaeger UI
+
+1. Go to `http://localhost:16686` and check if the traces are visible.
+2. Check the traces for the `passenger-service` and `POST /passenger/{passengerId}/baggage` operation.
+3. You should be able to see the traces with retries in both passenger and baggage services similar to the image below.
+
+    ![Jaeger UI](./img/jaeger-ui.png)
+
+4. Open one of the traces
+
+    ![Jaeger UI](./img/jaeger-detail.png)
 
 ### X. Submit the solution
 
@@ -121,3 +187,4 @@ TODO
 ## Further reading
 
 - https://quarkus.io/guides/smallrye-fault-tolerance#adding-resiliency-retries
+- https://quarkus.io/guides/opentelemetry
