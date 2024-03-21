@@ -93,16 +93,30 @@ During the startup, the `User` entity is populated with the following user:
 - username: `passenger-service`
 - password: `secret`
 
+#### 2.2. Test it
+
+1. Run the `baggage-service`.
+2. Authenticate with the username `passenger-service` and password `secret` to access the `GET /baggage/passenger/{passengerId}` endpoint using swagger.
+3. Try to access the `GET /baggage/passenger/{passengerId}` endpoint. It should return ok or fail with 500 (simulation of fault tolerance), but not 401.
+
 
 ### 3. Use username and password in `passenger-service` to access `baggage-service`
 
 In the `baggage-service`, there is a new user with username `passenger-service` and password `secret`. Use this username and password in the `passenger-service` to access the `baggage-service` endpoint.
 
-#### 3.1. Use username and password in `passenger-service` to access `baggage-service`
+#### 3.1. Set username and password in `application.properties` in `passenger-service`
 
+Go to the `passenger-service` and set the username and password in the `application.properties` file. Follow the TODOs. 
 
+#### 3.2. Use username and password in `passenger-service` to access `baggage-service`
 
+Go to `BaggageClientCustomHeaders` and add Authorization header with the username and password to the request. Follow the TODOs.
 
+#### 3.3. Test it
+
+1. Run the `baggage-service` and `passenger-service`.
+2. Create a new passenger in the `passenger-service`.
+3. Get the passenger with baggage. It shouldn't fail with 401 nor 500.
 
 ### X. Submit the solution
 

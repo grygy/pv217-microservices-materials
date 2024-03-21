@@ -11,6 +11,7 @@ import io.smallrye.mutiny.Uni;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Base64;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -169,7 +170,7 @@ class BaggageResourceTest {
     }
 
     @Test
-    void shouldGetBaggageByPassengerId() {
+    void shouldGetUnauthorizedForGetBaggageByPassengerId() {
         var baggage = new Baggage();
         baggage.id = 1L;
         baggage.weight = 20;
@@ -178,11 +179,10 @@ class BaggageResourceTest {
 
         Mockito.when(this.baggageService.getBaggageByPassengerId(baggage.passengerId)).thenReturn(Uni.createFrom().item(List.of(baggage)));
 
-        given().auth().basic("passanger-service", "secret")
+        given()
                 .when()
                 .get("/passenger/" + baggage.passengerId)
                 .then()
-                .statusCode(200)
-                .body("size()", is(1));
+                .statusCode(401);
     }
 }
