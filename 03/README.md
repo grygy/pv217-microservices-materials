@@ -87,6 +87,17 @@ public class FlightServiceApplication extends Application {
 Note that `FlightServiceApplication` extends `Application` class from `jakarta.ws.rs.core.Application`. It can define the components of an application and supplies additional meta-data. It's not necessary to extend this class, but it's required for the use
 of `@OpenAPIDefinition`.
 
+It cal also be done in `application.properties`:
+
+```properties 
+quarkus.smallrye-openapi.tags.widget.name=widget
+quarkus.smallrye-openapi.tags.widget.description=Widget operations.
+quarkus.smallrye-openapi.tags.gasket.name=gasket
+quarkus.smallrye-openapi.tags.gasket.description=Operations related to gaskets
+quarkus.smallrye-openapi.info.title=Example API
+quarkus.smallrye-openapi.info.version=1.0.1
+```
+
 #### Resource annotation
 
 We can also provide additional information for resources using `@Tag` annotation.
@@ -170,9 +181,8 @@ Protocol Buffers. You can imagine it as a middleware between your service and ou
 | x             | REST                                   | gRPC                                                        |
 |---------------|----------------------------------------|-------------------------------------------------------------|
 | Data          | Text based                             | Binary                                                      |
-| Schema        | Loose, often using JSON or XML schemas | Strict, uses Protocol Buffers for schema definition         |
+| Data formats  | Loose, often using JSON or XML schemas | Strict, uses Protocol Buffers for schema definition         |
 | Communication | One-directional                        | Supports bidirectional streaming                            |
-| Architecture  | Primarily client-server                | Supports both client-server and server-server communication |
 | Methods       | HTTP verbs (POST, GET,...)             | RPC methods                                                 |
 
 ### Protocol Buffers
@@ -313,6 +323,7 @@ Scenario:
 ## Troubleshooting
 
 - If you are using IntelliJ, you can run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes. Or reload all maven projects.
+  - There is also an option to right-click the generated sources directory and mark it as sources.
 
 ## Further reading
 
