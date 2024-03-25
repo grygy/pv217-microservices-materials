@@ -18,20 +18,6 @@ class PassengerRepositoryTest {
     @Inject
     PassengerRepository passengerRepository;
 
-    private Passenger createTestPassenger() {
-        Passenger passenger = new Passenger();
-        passenger.setFirstName("John");
-        passenger.setLastName("Doe");
-        passenger.setEmail("johndoe@example.com");
-        passenger.setFlightId(1L);
-        return passenger;
-    }
-
-    private Notification createTestNotification() {
-        Notification notification = new Notification();
-        notification.message = "Test notification message";
-        return notification;
-    }
 
     @Test
     @TestReactiveTransaction
@@ -158,5 +144,20 @@ class PassengerRepositoryTest {
                         passengerRepository::findHydratedNotifications,
                         notifications -> assertEquals(0, notifications.size())
                 );
+    }
+
+    private Passenger createTestPassenger() {
+        Passenger passenger = new Passenger();
+        passenger.setFirstName("John");
+        passenger.setLastName("Doe");
+        passenger.setEmail("johndoe@example.com");
+        passenger.setFlightId(1L);
+        return passenger;
+    }
+
+    private Notification createTestNotification() {
+        Notification notification = new Notification();
+        notification.message = "Test notification message";
+        return notification;
     }
 }

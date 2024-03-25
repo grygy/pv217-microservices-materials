@@ -1,12 +1,12 @@
 # 04 - Async, Persistence
 
-## Asynchronous Mutiny
+## SmallRye Mutiny
 
 Since we will be using reactive approach it is a good thing to know something about Mutiny.
 
-Mutiny is a reactive programming library for Java. It is based on Reactive Streams and Reactive Streams Operators. So when you see `Uni` or `Multi` in the code, it means that the method returns a reactive type and the method is asynchronous.
+Mutiny is a reactive programming library for Java. It is based on Reactive Streams and MicroProfile Reactive Streams Operators. So when you see `Uni` or `Multi` in the code, it means that the method returns a reactive type and the method is asynchronous.
 
-**What `Uni` and `Multi` are?**
+**What are `Uni` and `Multi`?**
 
 `Uni` is a type that emits either a single item or an error. `Multi` is a type that emits a stream of items or an error.
 
@@ -22,6 +22,16 @@ Mutiny is a reactive programming library for Java. It is based on Reactive Strea
 
 For more in depth discussion about asynchronous programming and the difference with multithreading, see [this article](https://www.baeldung.com/cs/async-vs-multi-threading).
 
+### Mutiny's Fluent API
+
+Mutiny provides a fluent API for building reactive streams. It's a chain of operations in a readable and expressive manner. This approach simplifies complexity of asynchronous programming.
+
+The design of the API is designed to be easy to read and understand what the code does. It's a chain of operations that are executed when the previous operation is done.
+
+### Mutiny's JavaDoc
+
+You can leverage the power of JavaDoc that mut
+
 ### `onItem` and `transform` methods
 
 - `onItem` and `transform` methods are used to process the result of the asynchronous operation. It's event driven reaction to the result of the operation when it's done.
@@ -35,7 +45,7 @@ Uni<String> processedUni = Uni.createFrom().item("Hello") // Creates an async un
 
 Uni<String> chainedUni = Uni.createFrom().item(123) // Creates an async uni that emits a single item
         .onItem() // Reacts to the item
-        .transformToUni(id -> fetchNameById(id)); // Transforms the item to another uni
+        .transformToUni(id -> fetchNameById(id)); // Transforms the item to another item
 ```
 
 ## Persistence with Panache
@@ -46,7 +56,7 @@ For both PanacheEntity and PanacheRepository, you can see examples bellow.
 
 ### What is ORM?
 
-ORM is a technique that lets you query and manipulate data from a database using an object-oriented paradigm. Thus, instead of writing SQL queries, you can write Java code to perform the same operations.
+ORM is a technique that lets you query and manipulate data in a database using an object-oriented paradigm. Thus, instead of writing SQL queries, you can write Java code to perform the same operations.
 
 It introduces abstraction between the database and the application. You can change more easily the database without changing the application code.
 
@@ -82,7 +92,7 @@ If you have entities with relations, you can use `@OneToMany`, `@ManyToOne`, `@O
 #### Example
 
 ```java
-@Entity
+@Entity // JPA (Java Persistence API) entity 
 public class Post {
 
     @Id
@@ -92,7 +102,7 @@ public class Post {
     private String title;
 
     @OneToMany(
-            mappedBy = "post", // The name of the attribute in the child entity that owns the relationship
+            mappedBy = "post", // The name of the field in PostComment that references back to this Post entity, indicating PostComment's ownership of the relationship.
             cascade = CascadeType.ALL, // All operations on the child will be cascaded to the parent
             orphanRemoval = true // If the child is removed from the collection, it will be removed from the database
     )
@@ -121,7 +131,9 @@ public class PostComment {
 
     private String review;
 
-    private Long postId; // foreign key
+    @ManyToOne
+    @JoinColumn(name = "postId") // postId is foreign key to the Post entity
+    private Post post; // This field references the Post entity
 
     //Constructors, getters and setters removed for brevity
 }
@@ -142,7 +154,6 @@ Pros:
 Cons:
 - Logic not separated from data
 - Tight coupling between schema and code
-- Hard to test
 
 #### Example
 
@@ -225,8 +236,15 @@ public class PersonRepository implements PanacheRepository<Person> {
 
 #### `@WithTransaction` annotation
 
-- `@WithTransaction` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back. This annotation is used if the method changes the state of the database. So it's not necessary to use it for read-only methods.
+- `@WithTransaction` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back. This annotation is used when accessing the database. Altering the database should be done in a transactional context, but also reading from the database. Example bellow.
 - Transactions follow unit of work pattern. It means that all operations in a transaction are treated as a single unit of work. If any operation fails, the whole transaction is rolled back.
+
+Example of sql query that should run in a transactional context:
+```sql
+myRows = query(SELECT * FROM A); 
+-- between these two queries, another transaction can delete the rows from table A, thus altering the result of the second query --> consistency problem
+moreRows = query(SELECT * FROM B WHERE a_id IN myRows[id]);
+```
 
 
 ## How does dev services help us in development?
@@ -259,11 +277,15 @@ In `passenger-service` make Notification entity as active record using PanacheEn
 
 Implement `deleteAll` in `NotificationService` with the usage of  `Notification` active record. The `listAll` method will be implemented in the next task.
 
-Check if the tests for Notification entity deletion are passing.
+Check if the tests for Notification entity deletion are passing. Run in the passenger-service directory:
+
+```bash
+./mvnw clean test
+```
 
 ### 2. Make `Passenger` entity
 
-In `Passenger` entity add correct annotations with getters and setters to make it persistence entity that will be used in PassengerRepository.
+In `Passenger` entity add correct annotations with getters and setters to make it persistence entity that will be used in `PassengerRepository`.
 
 Hmm, but what about the relation with notifications? Passenger can have multiple notifications. Add the relation between `Passenger` and `Notification` entities.
 
@@ -271,7 +293,7 @@ Hmm, but what about the relation with notifications? Passenger can have multiple
 
 Implement methods in `PassengerRepository` to make it a repository for `Passenger` entity.
 
-Don't forget to implement `NotificationService.listAll` method using `PassengerRepository`.
+Don't forget to implement `NotificationService#listAll` method using `PassengerRepository`.
 
 #### 3.1. How to test if everything is working?
 
