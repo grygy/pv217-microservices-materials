@@ -8,6 +8,7 @@ import io.quarkus.test.vertx.UniAsserter;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,8 +21,8 @@ class FlightRepositoryTest {
     FlightRepository flightRepository;
 
     Flight createOngoingFlight() {
-        var future = Date.from(java.time.Instant.now().plusSeconds(1000*60));
-        var past = Date.from(java.time.Instant.now().minusSeconds(1000*60));
+        var future = Date.from(java.time.Instant.now().plus(Duration.ofMinutes(1000*60)));
+        var past = Date.from(java.time.Instant.now().minus(Duration.ofMinutes(1000*60)));
         var flight = new Flight();
         flight.setName("Test Flight");
         flight.setAirportFrom("Airport A");
