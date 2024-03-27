@@ -29,23 +29,6 @@ class FlightServiceTest {
     FlightService flightService;
 
 
-    private Flight createOngoingFlight() {
-        var future = Date.from(java.time.Instant.now().plusSeconds(1000 * 60));
-        var past = Date.from(java.time.Instant.now().minusSeconds(1000 * 60));
-        var flight = new Flight();
-        flight.setName("Test Flight");
-        flight.setAirportFrom("Airport A");
-        flight.setAirportTo("Airport B");
-        flight.setDepartureTime(past);
-        flight.setArrivalTime(future);
-        flight.setCapacity(100);
-        flight.setStatus(FlightStatus.ACTIVE);
-        flight.setId(1L);
-
-        return flight;
-    }
-
-
     @Test
     @RunOnVertxContext
         // Make sure the test method is run on the Vert.x event loop. aka support async
@@ -149,5 +132,21 @@ class FlightServiceTest {
                     assertEquals(flight.toDto(), created);
                 }
         );
+    }
+
+    private Flight createOngoingFlight() {
+        var future = Date.from(java.time.Instant.now().plusSeconds(1000 * 60));
+        var past = Date.from(java.time.Instant.now().minusSeconds(1000 * 60));
+        var flight = new Flight();
+        flight.setName("Test Flight");
+        flight.setAirportFrom("Airport A");
+        flight.setAirportTo("Airport B");
+        flight.setDepartureTime(past);
+        flight.setArrivalTime(future);
+        flight.setCapacity(100);
+        flight.setStatus(FlightStatus.ACTIVE);
+        flight.setId(1L);
+
+        return flight;
     }
 }

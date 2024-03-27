@@ -30,31 +30,6 @@ class PassengerServiceTest {
     @Inject
     PassengerService passengerService;
 
-    private Passenger createTestPassenger() {
-        Passenger passenger = new Passenger();
-        passenger.setId(1L);
-        passenger.setFirstName("John");
-        passenger.setLastName("Doe");
-        passenger.setFlightId(1L);
-        passenger.setEmail("john@gmail.com");
-        return passenger;
-    }
-
-    private CreatePassengerDto createTestPassengerDto() {
-        CreatePassengerDto passengerDto = new CreatePassengerDto();
-        passengerDto.firstName = "John";
-        passengerDto.lastName = "Doe";
-        passengerDto.flightId = 1L;
-        passengerDto.email = "john@gmail.com";
-        return passengerDto;
-    }
-
-    private Notification createNotification() {
-        Notification notification = new Notification();
-        notification.message = "Test message";
-        return notification;
-    }
-
     @Test
     @RunOnVertxContext
     void shouldGetListOfPassengers(UniAsserter asserter) {
@@ -246,4 +221,28 @@ class PassengerServiceTest {
         );
     }
 
+    private Passenger createTestPassenger() {
+        Passenger passenger = new Passenger();
+        passenger.setId(1L);
+        passenger.setFirstName("John");
+        passenger.setLastName("Doe");
+        passenger.setFlightId(1L);
+        passenger.setEmail("john@gmail.com");
+        return passenger;
+    }
+
+    private CreatePassengerDto createTestPassengerDto() {
+        CreatePassengerDto passengerDto = new CreatePassengerDto();
+        passengerDto.firstName = "John";
+        passengerDto.lastName = "Doe";
+        passengerDto.flightId = 1L;
+        passengerDto.email = "john@gmail.com";
+        return passengerDto;
+    }
+
+    private Notification createNotification() {
+        Notification notification = new Notification();
+        notification.message = "Test message";
+        return notification;
+    }
 }
