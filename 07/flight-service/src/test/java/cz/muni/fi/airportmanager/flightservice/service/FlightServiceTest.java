@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
@@ -28,22 +29,6 @@ class FlightServiceTest {
     @Inject
     FlightService flightService;
 
-
-    private Flight createOngoingFlight() {
-        var future = Date.from(java.time.Instant.now().plusSeconds(1000 * 60));
-        var past = Date.from(java.time.Instant.now().minusSeconds(1000 * 60));
-        var flight = new Flight();
-        flight.setName("Test Flight");
-        flight.setAirportFrom("Airport A");
-        flight.setAirportTo("Airport B");
-        flight.setDepartureTime(past);
-        flight.setArrivalTime(future);
-        flight.setCapacity(100);
-        flight.setStatus(FlightStatus.ACTIVE);
-        flight.setId(1L);
-
-        return flight;
-    }
 
 
     @Test
@@ -153,10 +138,26 @@ class FlightServiceTest {
     @Test
     @RunOnVertxContext
     void shouldNotCancelNonexistingFlight(UniAsserter asserter) {
-//        TODO uncomment this
-//        asserter.assertFalse(
-//                () -> flightService.cancelFlight(999L)
-//        );
-        asserter.assertTrue(() -> Uni.createFrom().item(true));
+        asserter.assertFalse(
+                () -> flightService.cancelFlight(999L)
+        );
     }
+
+
+    private Flight createOngoingFlight() {
+        var future = Date.from(java.time.Instant.now().plus(Duration.ofMinutes(1000*60)));
+        var past = Date.from(java.time.Instant.now().minus(Duration.ofMinutes(1000 * 60)));
+        var flight = new Flight();
+        flight.setName("Test Flight");
+        flight.setAirportFrom("Airport A");
+        flight.setAirportTo("Airport B");
+        flight.setDepartureTime(past);
+        flight.setArrivalTime(future);
+        flight.setCapacity(100);
+        flight.setStatus(FlightStatus.ACTIVE);
+        flight.setId(1L);
+
+        return flight;
+    }
+
 }
