@@ -28,10 +28,6 @@ Mutiny provides a fluent API for building reactive streams. It's a chain of oper
 
 The design of the API is designed to be easy to read and understand what the code does. It's a chain of operations that are executed when the previous operation is done.
 
-### Mutiny's JavaDoc
-
-You can leverage the power of JavaDoc that mut
-
 ### `onItem` and `transform` methods
 
 - `onItem` and `transform` methods are used to process the result of the asynchronous operation. It's event driven reaction to the result of the operation when it's done.
