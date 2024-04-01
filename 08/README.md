@@ -208,8 +208,8 @@ Now you should be able to see the number of flights created in the dashboard as 
 
 - Build and run docker 
   ```bash
-  cd passenger-service && mvn package && cd ../baggage-service && mvn package && cd ../flight-service && mvn package && cd .. && docker compose up --build
-   ```
+  cd passenger-service && mvn clean install && cd ../baggage-service && mvn clean install && cd ../flight-service && mvn clean install && cd .. && docker compose up --build
+  ```
 
 ## Troubleshooting
 
