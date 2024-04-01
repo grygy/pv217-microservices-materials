@@ -8,6 +8,7 @@ import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.mockito.Mockito;
 
 import static io.restassured.RestAssured.given;
@@ -25,7 +26,9 @@ class HealthCheckTest {
     @Test
     @Disabled
     void testServiceShouldBeReady() {
-        Mockito.when(this.baggageClientResource.readinessCheck()).thenReturn(Uni.createFrom().item("UP"));
+        Mockito.when(this.baggageClientResource.readinessCheck()).thenReturn(Uni.createFrom().item(
+                HealthCheckResponse.up("Baggage service is ready")
+        ));
 
         given()
                 .when().get("/q/health/ready")
@@ -36,7 +39,9 @@ class HealthCheckTest {
 
     @Test
     void testServiceShouldNotBeReady() {
-        Mockito.when(this.baggageClientResource.readinessCheck()).thenReturn(Uni.createFrom().item("DOWN"));
+        Mockito.when(this.baggageClientResource.readinessCheck()).thenReturn(Uni.createFrom().item(
+                HealthCheckResponse.down("Baggage service is not ready")
+        ));
 
         given()
                 .when().get("/q/health/ready")

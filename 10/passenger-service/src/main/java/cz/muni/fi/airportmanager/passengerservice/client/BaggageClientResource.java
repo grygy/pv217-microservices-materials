@@ -6,6 +6,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.headers.Header;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
@@ -28,5 +29,5 @@ public interface BaggageClientResource {
 
     @GET
     @Path("/q/health/ready")
-    Uni<String> readinessCheck();
+    Uni<HealthCheckResponse> readinessCheck();
 }

@@ -137,7 +137,7 @@ Go to health package in `passenger-service` and implement `BaggageServiceHealthC
 
 In `BaggageClientResource` you can find new method `readinessCheck` which should be used to check if the baggage service is ready.
 
-Check if the response `String` from `readinessCheck` contains `"DOWN"` and return `HealthCheckResponse.down` if it does. Otherwise, return `HealthCheckResponse.up`. 
+Check if the response `.getStatus()` from `readinessCheck` is `HealthCheckResponse.Status.UP` then return `HealthCheckResponse.up`. Otherwise, return `HealthCheckResponse.down`. 
 
 #### 1.3. Test it
 

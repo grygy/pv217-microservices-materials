@@ -19,7 +19,7 @@ public class BaggageServiceHealthCheck implements AsyncHealthCheck {
     public Uni<HealthCheckResponse> call() {
         return baggageClientResource.readinessCheck()
                 .onItem().transform(response -> {
-                    if (response.contains("DOWN")) {
+                    if (response.getStatus() == HealthCheckResponse.Status.DOWN) {
                         return HealthCheckResponse.down("Baggage service is not ready");
                     } else {
                         return HealthCheckResponse.up("Baggage service is ready");
