@@ -1,265 +1,168 @@
-# 04 - Async, Persistence
+# 04 - Testing
 
-## SmallRye Mutiny
+## Why are tests important?
 
-Since we will be using reactive approach it is a good thing to know something about Mutiny.
+Test are a crucial part of software development. Test ensure that the code you write is working as expected. They also help you to understand the code and how to compose it. Easily testable code is also easier to maintain and refactor.
 
-Mutiny is a reactive programming library for Java. It is based on Reactive Streams and MicroProfile Reactive Streams Operators. So when you see `Uni` or `Multi` in the code, it means that the method returns a reactive type and the method is asynchronous.
+Key benefits of testing:
+- Detecting bugs early
+- Ensuring code quality
+- Facilitating refactoring
+- Tests are a form of documentation
+- Simplifying collaboration
 
-**What are `Uni` and `Multi`?**
+### Best friends
 
-`Uni` is a type that emits either a single item or an error. `Multi` is a type that emits a stream of items or an error.
+AI tools are great for generating basic test and data. BE AWARE that they are not perfect, and you should always review the generated code and change it to actually fit your needs.
 
-**Pros of asynchronous programming:**
-- Non-blocking
-- Better resource utilization
-- Better scalability
+- ChatGPT
+- Copilot 
 
-**Cons of asynchronous programming:**
-- Complexity of callbacks, exceptions
-- Harder to debug
-- Harder to test
+## Unit tests
 
-For more in depth discussion about asynchronous programming and the difference with multithreading, see [this article](https://www.baeldung.com/cs/async-vs-multi-threading).
+The most common type of tests are unit tests. The key idea of unit tests is to test the smallest piece of code possible in isolation. Usually, this means testing a single method or function and checking if for given input it returns the expected output.
 
-### Mutiny's Fluent API
+Key attributes of unit tests:
+- Fast
+- Isolated
+- Simple
 
-Mutiny provides a fluent API for building reactive streams. It's a chain of operations in a readable and expressive manner. This approach simplifies complexity of asynchronous programming.
+### `QuarkusTest` annotation
 
-The design of the API is designed to be easy to read and understand what the code does. It's a chain of operations that are executed when the previous operation is done.
+Quarkus provides a `QuarkusTest` annotation that allows you to write tests for your Quarkus application. It starts the application in a test mode and provides you with a test client to interact with the application. It also allows you to inject beans and other resources into your tests.
 
-### `onItem` and `transform` methods
+### Mocking
 
-- `onItem` and `transform` methods are used to process the result of the asynchronous operation. It's event driven reaction to the result of the operation when it's done.
+But how to isolate the code from the rest of the system? The answer is mocking. Mocking is a technique used to isolate the code under test from the rest of the system. It is used to replace the real dependencies of the code with fake ones. This allows you to test the code in isolation.
 
-Example:
-```java
-Uni<String> processedUni = Uni.createFrom().item("Hello") // Creates an async uni that emits a single item
-        .onItem() // Reacts to the item
-        .transform(item -> item + " World"); // Transforms the item to antoher item that is synchronous
+## Integration tests
 
+Integration tests are used to test the interaction between different parts of the system. Usually it means testing flows in the system and checking if the system behaves as expected. In our case of `passenger-service` it could mean testing if the passenger can be created and then retrieved from the database using the REST API. This tests every layer of the system. 
 
-Uni<String> chainedUni = Uni.createFrom().item(123) // Creates an async uni that emits a single item
-        .onItem() // Reacts to the item
-        .transformToUni(id -> fetchNameById(id)); // Transforms the item to another item
-```
+They ensure that the system is set up correctly also in production environment.
 
-## Persistence with Panache
+### `@QuarkusIntegrationTest` annotation
 
-Panache is ORM (Object Relational Mapping) layer for Quarkus. It is based on Hibernate ORM and Hibernate Reactive.
+Quarkus provides a `@QuarkusIntegrationTest` annotation that allows you to write integration tests for your Quarkus application. The tests are run after the build using the prod configuration profile. 
 
-For both PanacheEntity and PanacheRepository, you can see examples bellow.
+It's a black box in terms of the actual execution but thanks to the dev services and the test containers it's possible to test the whole system in production-like environment.
 
-### What is ORM?
+## Technologies
 
-ORM is a technique that lets you query and manipulate data in a database using an object-oriented paradigm. Thus, instead of writing SQL queries, you can write Java code to perform the same operations.
+We will depend on the following technologies to write tests:
+- JUnit 5 -- Unit tests
+- RestAssured -- REST API testing
+- Mockito -- Mocking
+- Test vertx -- Testing asynchronous code
 
-It introduces abstraction between the database and the application. You can change more easily the database without changing the application code.
+### JUnit
 
-### PanacheEntity
+JUnit is a simple framework to write repeatable tests. 
 
-PanacheEntity is a base class for entities. It provides basic operations for entities such as persist, delete, find, etc. It's used for active record pattern.
+#### Examples
 
-#### What gives you PanacheEntity?
-
-Attributes:
-- `id` - Automatically adds the primary key of the entity.
-
-Methods:
-- `persist()` - Persists the entity to the database.
-- `delete()` - Deletes the entity from the database.
-- `isPersistent()` - Checks if the entity is persistent.
-- `findById()` - Finds an entity by its primary key.
-- `listAll()` - Returns a list of all entities.
-- `count()` - Returns the number of entities.
-- `find()` - Finds entities by a query.
-- ... and more
-
-### PanacheRepository
-
-PanacheRepository is a base class for repositories. It provides similar logic as PanacheEntity, but it's used for repository pattern.
-
-But you need to define the entity more explicitly. With id, getters and setters, etc. Then you will create a repository class that extends `PanacheRepository<Entity>`.
-
-### Entities with relations
-
-If you have entities with relations, you can use `@OneToMany`, `@ManyToOne`, `@OneToOne`, `@ManyToMany` annotations to define the relation between entities. Then with `@JoinColumn` you can define the column that will be used for the join.
-
-#### Example
+Basic
 
 ```java
-@Entity // JPA (Java Persistence API) entity 
-public class Post {
-
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    private String title;
-
-    @OneToMany(
-            mappedBy = "post", // The name of the field in PostComment that references back to this Post entity, indicating PostComment's ownership of the relationship.
-            cascade = CascadeType.ALL, // All operations on the child will be cascaded to the parent
-            orphanRemoval = true // If the child is removed from the collection, it will be removed from the database
-    )
-    @JoinColumn(name = "postId") // The name of the column that will be used for the join
-    private List<PostComment> comments = new ArrayList<>();
-
-    //Constructors, getters and setters removed for brevity
-
-    public void addComment(PostComment comment) {
-        comments.add(comment);
-        comment.setPost(this);
-    }
-
-    public void removeComment(PostComment comment) {
-        comments.remove(comment);
-        comment.setPost(null);
-    }
+@Test // Basic synchronous test
+public void testBasicFunctionality() {
+    SimpleService service = new SimpleService();
+    assertEquals("Expected output", service.doSomething()); // <expected>, <actual>
 }
 
-@Entity
-public class PostComment {
+@Test
+@RunOnVertxContext // Test running on vertx context (asynchronous)
+public void testSimpleUni(UniAsserter asserter) { // Gives us UniAsserter to assert the result from Uni
+    asserter.assertThat(
+        () -> Uni.createFrom().item("Hello"), // Asynchronous code or function
+        result -> assertEquals("Hello", result) // When the result is available, assert it
+    );
+}
 
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    private String review;
-
-    @ManyToOne
-    @JoinColumn(name = "postId") // postId is foreign key to the Post entity
-    private Post post; // This field references the Post entity
-
-    //Constructors, getters and setters removed for brevity
+@Test
+@TestReactiveTransaction // Similar to RunOnVertxContext, but for reactive transactions when we need to manipulate with the database
+public void testReactiveTransaction(UniAsserter asserter) {
+    asserter.assertThat(
+        () -> Uni.createFrom().item("Expected Result"),
+        result -> assertEquals("Expected Result", result)
+    );
 }
 ```
 
-## Active record vs repository
-
-Both active record and repository are patterns for accessing data in a database.
-
-### Active record
-
-The Active record pattern is an approach where the data access logic is part of the entity itself. Each entity (or record) is responsible for its own persistence and encapsulates both the data and the behavior that operates on the data.
-
-Pros:
-- It's easy to set up for simple operations
-- Less boilerplate
-
-Cons:
-- Logic not separated from data
-- Tight coupling between schema and code
-
-#### Example
+Mocked
 
 ```java
-@Entity
-public class Person extends PanacheEntity {
-    public String name;
-    public LocalDate birth;
-    public Status status;
+@QuarkusTest
+public class MockedServiceUniTest {
 
-    public static Uni<Person> findByName(String name){
-        return find("name", name).firstResult();
-    }
-}
-```
-Basic usage
-```java    
-// persist it
-Uni<Void> persistOperation = person.persist();
-
-// check if it is persistent
-if(person.isPersistent()){
-    // delete it
-    Uni<Void> deleteOperation = person.delete();
-}
-
-// getting a list of all Person entities
-Uni<List<Person>> allPersons = Person.listAll();
-
-// finding a specific person by ID
-Uni<Person> personById = Person.findById(23L);
-```
-
-### Repository
-
-Instead of having both schema and logic in the same class, the repository pattern separates schema from data access logic in a separate class. 
-
-Pros:
-- Logic separated from data
-- Cleaner and more testable code
-- DAL (Data Access Layer) is decoupled from the rest of the application
-
-Cons:
-- More boilerplate for simple operations
-- Takes more time to set up
-
-#### Example
-
-```java
-@Entity
-public class Person {
-    @Id
-    @GeneratedValue
-    private Long id;
-    private String name;
-    private LocalDate birth;
-    private Status status;
+    @InjectMock // Similar to Inject, but injects a mock instead of a real instance
+    DataService dataService;
     
-    // getters and setters
-}
+    @Inject
+    MyService myService; // My service is using DataService
 
-@ApplicationScoped
-public class PersonRepository implements PanacheRepository<Person> {
-
-    // put your custom logic here as instance methods
-
-    public Uni<Person> findByName(String name){
-        return find("name", name).firstResult();
+    @Test
+    public void testServiceWithMock() {
+        Mockito.when(dataService.getData()).thenReturn("Mocked Data");
+        assertEquals("Mocked Data", myService.retrieveData());
     }
 
-    public Uni<List<Person>> findAlive(){
-        return list("status", Status.Alive);
-    }
+    @Test
+    @RunOnVertxContext
+    public void testUniWithMockService(UniAsserter asserter) {
+        // Now mock the data service (asynchronous) to return a specific value
+        asserter.execute(() ->  Mockito.when(dataService.getDataAsUni()).thenReturn(Uni.createFrom().item("Mocked Data")));
 
-    public Uni<Long> deleteStefs(){
-        return delete("name", "Stef");
+        asserter.assertThat(
+            () -> dataService.getDataAsUni(),
+            result -> assertEquals("Mocked Data", result)
+        );
     }
 }
 ```
 
-#### `@WithTransaction` annotation
+### RestAssured
 
-- `@WithTransaction` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back. This annotation is used when accessing the database. Altering the database should be done in a transactional context, but also reading from the database. Example bellow.
-- Transactions follow unit of work pattern. It means that all operations in a transaction are treated as a single unit of work. If any operation fails, the whole transaction is rolled back.
+RestAssured is a Java library that provides a testing REST APIs. It's a great tool to implement integration tests but also unit tests for REST endpoints.
 
-Example of sql query that should run in a transactional context:
-```sql
-myRows = query(SELECT * FROM A); 
--- between these two queries, another transaction can delete the rows from table A, thus altering the result of the second query --> consistency problem
-moreRows = query(SELECT * FROM B WHERE a_id IN myRows[id]);
+#### Examples
+
+```java
+@QuarkusTest
+@TestHTTPEndpoint(GreetingResource.class) // Which endpoint to test
+public class GreetingResourceTest {
+    
+    // We can also mock underlying services if needed
+    
+    @Test
+    public void testHelloEndpoint() {
+        when() // When we call the endpoint
+            .get() // With GET method 
+            .then() // Then
+            .statusCode(200) // Expecting status code 200
+            .body(is("hello")); // And the body to be "hello"
+    }
+
+    @Test
+    public void testCreateEntityEndpoint() {
+        // Example entity
+        MyEntity entity = new MyEntity();
+        entity.name = "Sample Name";
+        entity.description = "Sample Description";
+
+        given()
+                .contentType("application/json") // Set content type
+                .body(entity) // Set the body
+                .when() // When we call the endpoint
+                .post("/entities") // Call the POST endpoint
+                .then()
+                .statusCode(201)
+                .body("id", notNullValue()) // Expecting the id to be not null
+                .body("name", equalTo("Sample Name")) // Further body checks
+                .body("description", equalTo("Sample Description")); // Further body checks
+    }
+}
 ```
-
-
-## How does dev services help us in development?
-
-Dev services gives us a way to make development easier. 
-
-What gives us dev services?
-- Automatic startup -- check configuration, download dependencies and start the service
-- Continuous testing -- automatic testing of the service
-- Configuration management -- automatic configuration of the service and database connection
-
-For this week's lecture the main benefit is a way to run a database in a docker container without any configuration from developer side. Of course, it's only for development purposes. But during the initial development phase, it's very useful. Before we will create a configuration to dockerized database.
-
-## State of the project
-
-- The `flight-service` has implemented the repository pattern with panache.
-- REST APIs and services are now asynchronous. 
-- Objects DTOs are created where needed. Eg. `NotificationDto` in `passenger-service`.
-- Panache extension and 
 
 ## Tasks
 
@@ -267,39 +170,35 @@ For this week's lecture the main benefit is a way to run a database in a docker 
 
 Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker container.
 
-### 1. Make `Notification` active record entity
+### 1. Implement unit tests for `PassengerRepository`
 
-In `passenger-service` make Notification entity as active record using PanacheEntity.
+Go to `PassengerRepositoryTest` and implement the todo's. You don't need to mock anything because Quarkus provides a test database for you.
 
-Implement `deleteAll` in `NotificationService` with the usage of  `Notification` active record. The `listAll` method will be implemented in the next task.
+Don't forget to add at least two of your own tests.
 
-Check if the tests for Notification entity deletion are passing. Run in the passenger-service directory:
+### 2. Implement unit tests for `PassengerService`
+
+Go to `PassengerServiceTest` and implement the todo's. You will need to mock the `PassengerRepository` to isolate the service from the database.
+
+Don't forget to add at least two of your own tests.
+
+### 3. Implement unit tests for `PassengerResource`
+
+Go to `PassengerResourceTest` and implement the todo's. You will need to mock the `PassengerService` to isolate the resource from the service.
+
+### 4. Implement integration tests for `PassengerResource`
+
+Go to `PassengerResourceIT` and implement the todo's. There is one test already implemented, use it as an example. In this test you don't need to mock anything, you will test the whole system.
+
+### 5. Verify if everything is working
+
+Run the following command in the root of the project:
 
 ```bash
-./mvnw clean test
+mvn verify -DskipITs=false
 ```
 
-### 2. Make `Passenger` entity
-
-In `Passenger` entity add correct annotations with getters and setters to make it persistence entity that will be used in `PassengerRepository`.
-
-Hmm, but what about the relation with notifications? Passenger can have multiple notifications. Add the relation between `Passenger` and `Notification` entities.
-
-### 3. Implement `PassengerRepository`
-
-Implement methods in `PassengerRepository` to make it a repository for `Passenger` entity.
-
-Don't forget to implement `NotificationService#listAll` method using `PassengerRepository`.
-
-#### 3.1. How to test if everything is working?
-
-- Tests are passing
-
-Test scenario
-- Create a flight using swagger ui
-- Create a passenger using swagger ui with appropriate flight id
-- Call cancel flight endpoint
-- Check if the GET notification endpoint returns the notification for the passenger with his email.
+If everything is working, all tests should pass and you are ready to submit the solution.
 
 ### X. Submit the solution
 
@@ -307,8 +206,8 @@ Test scenario
 
 ## Hints
 
-- In `flight-service` you can find implemented repository pattern with panache.
-- If something is not working, and it should (Developers aren't doing mistakes right?) run maven clean and compile commands.
+- You can inspire yourself from tests in `flilght-service`.
+- Create helper methods in tests for create example object.
 
 ## Troubleshooting
 
@@ -316,9 +215,4 @@ Test scenario
 
 ## Further reading
 
-- https://quarkus.io
-- https://quarkus.io/guides/hibernate-reactive-panache
-- https://medium.com/@shiiyan/active-record-pattern-vs-repository-pattern-making-the-right-choice-f36d8deece94
-- https://quarkus.io/guides/mutiny-primer
-- https://medium.com/@rajibrath20/the-best-way-to-map-a-onetomany-relationship-with-jpa-and-hibernate-dbbf6dba00d3
-- https://quarkus.io/guides/dev-services
+- https://quarkus.io/guides/getting-started-testing

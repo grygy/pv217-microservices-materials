@@ -13,8 +13,8 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import java.time.Duration;
+
 import java.util.Date;
 import java.util.List;
 
@@ -48,9 +48,8 @@ class FlightServiceTest {
 
 
     @Test
-    @RunOnVertxContext
-        // Make sure the test method is run on the Vert.x event loop. aka support async
-        // Gives us UniAsserter
+    @RunOnVertxContext  // Make sure the test method is run on the Vert.x event loop. aka support async
+    // Gives us UniAsserter
     void shouldGetListOfFlights(UniAsserter asserter) {
         var flight = createOngoingFlight();
         asserter.execute(() -> Mockito.when(flightRepository.listAll()).thenReturn(Uni.createFrom().item(List.of(flight))));
