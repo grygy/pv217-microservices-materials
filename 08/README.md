@@ -4,7 +4,7 @@
 
 Health checks are critical for cloud application to monitor the state of the application. They are used for the verification of the application's state. This usually means if the application is running, if it is ready to serve requests, or if it is connected to the database, kafka, or other dependent services.
 
-For example Kubernetes uses health checks to determine if a container is running and ready to serve requests, if should be restarted, or if it should be removed and replaced with a new one.
+For example, Kubernetes uses health checks to determine if a container is running and ready to serve requests or if it should be restarted.
 
 It's also useful for monitoring tools to check the state of the application and send alerts if something is wrong and you need to take action.
 
