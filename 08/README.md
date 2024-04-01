@@ -2,9 +2,9 @@
 
 ## Health checks
 
-Health checks are critical for cloud application to monitor the state of the application. They are used for the verification of the application's state. This usually means if the application is running, if it is ready to serve requests, or if it is connected to the database, kafka, or other dependent services.
+Health checks are critical for cloud applications to monitor the state of the application. They are used to verify the application's state. This usually means if the application is running, if it is ready to serve requests, or if it is connected to the database, kafka, or other dependent services.
 
-For example, Kubernetes uses health checks to determine if a container is running and ready to serve requests or if it should be restarted.
+For example, Kubernetes uses health checks to determine if a container is running and if it is ready to serve requests or if it should be restarted.
 
 It's also useful for monitoring tools to check the state of the application and send alerts if something is wrong and you need to take action.
 
@@ -14,21 +14,22 @@ It's also useful for monitoring tools to check the state of the application and 
 - If the database is connected.
 - If other dependencies are connected.
 - Check if external services are available.
+- Resource usage (CPU, memory, network,...).
 
 #### Types
 
-1. Startup -- If all necessary configurations are loaded.
-2. Liveness -- If the liveness probe fails that means the service is not running, cannot be recovered, and should be restarted.
-3. Readiness -- If the application is ready to serve requests. Dependencies, database, external services are connected. If the readiness probe fails, the service is not yet ready to serve traffic.
+1. Liveness -- The liveness probe checks if the service is healthy. If the probe fails, the service is not running, cannot be recovered, and should be restarted.
+2. Readiness -- If the application is ready to serve traffic, requests are not prohibited. Dependencies, databases, and external services are connected. If the readiness probe fails, the service is not yet ready to serve traffic, but it's not considered as a failure and the service is not restarted. This probe prevents routing to instance which is warming up or loading data.
+3. Startup -- This probe determinates if the application consider itself successfully initialized. That doesn't mean it's ready so serve traffic, but rather that all core components and configurations are loaded and initialized. 
 
 ### SmallRye Health
 
 SmallRye Health is an implementation of MicroProfile Health. It simplifies the process of creating health checks and provides a way to check the state of the application. Due to the built-in health checks it also exposes some of this information out-of-the-box.
 
 1. `HealthCheck` interface -- Health checks are implemented as classes that implement the `HealthCheck` interface.
-2. `@Startup` annotations -- Option for slow starting containers to delay an invocation of the liveness check.
-3. `@Liveness` annotations -- Checks if the service is running.
-4. `@Readiness` annotations -- Checks if the service is connected to the database/kafka,... without any additional code and is ready to serve requests.
+2. `@Liveness` annotations -- Checks if the service is running.
+3. `@Readiness` annotations -- Checks if the service is connected to the database/kafka,... without any additional code and is ready to serve requests.
+4. `@Startup` annotations -- Option for slow starting containers to delay an invocation of the liveness check.
 
 ## Monitoring and Metrics
 
@@ -146,7 +147,7 @@ Run the service and go to http://localhost:8078/q/health/ready. You should see t
 
 #### 2.1. Add custom counter metric to `FlightResource`
 
-In `FlightResource` class, inject `MeterRegistry` and add a counter metric to count the number of flights created.
+In `FlightResource` class, add a counter metric to count the number of flights created.
 
 #### 2.2. Add custom timer metric to `FlightResource`
 
@@ -207,7 +208,7 @@ Now you should be able to see the number of flights created in the dashboard as 
 
 - Build and run docker 
   ```bash
-  cd passenger-service && mvn package && cd .. && cd baggage-service && mvn package && cd .. && cd flight-service && mvn package && cd .. && docker compose build && docker compose up
+  cd passenger-service && mvn package && cd ../baggage-service && mvn package && cd ../flight-service && mvn package && cd .. && docker compose up --build
    ```
 
 ## Troubleshooting
