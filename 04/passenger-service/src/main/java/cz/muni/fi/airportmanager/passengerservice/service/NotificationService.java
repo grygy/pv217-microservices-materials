@@ -36,7 +36,7 @@ public class NotificationService {
     @WithTransaction
     public Uni<List<NotificationDto>> listAll() {
 //        TODO implement this method after NotificationRepository is implemented
-        return passengerRepository.findHydratedNotifications();
+        return passengerRepository.findNotificationsWithEmail();
     }
 
 }

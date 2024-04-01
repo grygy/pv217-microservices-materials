@@ -5,7 +5,7 @@ services:
       context: ./flight-service
       dockerfile: src/main/docker/Dockerfile.jvm
     ports:
-      - "8079:8080"
+      - "8079:8079"
     environment:
       QUARKUS_DATASOURCE_DB_KIND: postgresql
       QUARKUS_DATASOURCE_USERNAME: user
@@ -22,7 +22,7 @@ services:
       context: ./passenger-service
       dockerfile: src/main/docker/Dockerfile.jvm
     ports:
-      - "8078:8080"
+      - "8078:8078"
       - "9000:9000"
     environment:
       QUARKUS_DATASOURCE_DB_KIND: postgresql
@@ -30,7 +30,7 @@ services:
       QUARKUS_DATASOURCE_PASSWORD: password
       QUARKUS_DATASOURCE_REACTIVE_URL: vertx-reactive:postgresql://passenger-db:5432/passenger-database
 #      It communicates on the internal port not exposed one
-      QUARKUS_BAGGAGE_RESOURCE_URL: http://baggage-service:8080
+      QUARKUS_BAGGAGE_RESOURCE_URL: http://baggage-service:8077
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - passenger-db
@@ -42,7 +42,7 @@ services:
       context: ./baggage-service
       dockerfile: src/main/docker/Dockerfile.jvm
     ports:
-      - "8077:8080"
+      - "8077:8077"
     environment:
       QUARKUS_DATASOURCE_DB_KIND: postgresql
       QUARKUS_DATASOURCE_USERNAME: user
@@ -55,7 +55,7 @@ services:
       - app-network
 
   flight-db:
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       POSTGRES_DB: flight-database
       POSTGRES_USER: user
@@ -66,7 +66,7 @@ services:
       - app-network
 
   passenger-db:
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       POSTGRES_DB: passenger-database
       POSTGRES_USER: user
@@ -77,7 +77,7 @@ services:
       - app-network
 
   baggage-db:
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       POSTGRES_DB: baggage-database
       POSTGRES_USER: user

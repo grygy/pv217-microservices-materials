@@ -68,11 +68,11 @@ public class PassengerRepository implements PanacheRepository<Passenger> {
     }
 
     /**
-     * Get list of hydrated notifications
+     * Get list of notifications with passenger's email
      *
-     * @return list of hydrated notifications with passenger email
+     * @return list of notifications with passenger email
      */
-    public Uni<List<NotificationDto>> findHydratedNotifications() {
+    public Uni<List<NotificationDto>> findNotificationsWithEmail() {
         // TODO implement this method
         return listAll()
                 .onItem().transform(passengers -> passengers.stream()

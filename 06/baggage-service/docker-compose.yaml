@@ -2,12 +2,12 @@ version: '3.8'
 services:
   baggage-service:
     # TODO Add baggage-service service
-    # TODO Don't forget to add envirnonment variables for the database connection settings
+    # TODO Don't forget to add environment variables for the database connection settings
       build:
         context: .
         dockerfile: src/main/docker/Dockerfile.jvm
       ports:
-      - "8077:8080" # Expose app on port 8077 to the outside world
+      - "8077:8077" # Expose app on port 8077 to the outside world
       environment:
         # Database connection settings for the application
         QUARKUS_DATASOURCE_DB_KIND: postgresql
@@ -23,7 +23,7 @@ services:
   db:
     # TODO Add baggage-service database from postgres image
     # TODO Don't forget to add environment variables for the database connection settings
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       POSTGRES_DB: baggage-database
       POSTGRES_USER: user

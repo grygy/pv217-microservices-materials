@@ -258,7 +258,7 @@ the `passenger-service` and `baggage-service`:
 #### 5.4. Build and run the application
 
 ```bash
-cd passenger-service && mvn package && cd .. && cd baggage-service && mvn package && cd .. && cd flight-service && mvn package && cd .. && docker compose build && docker compose up
+cd passenger-service && mvn clean install && cd ../baggage-service && mvn clean install && cd ../flight-service && mvn clean install && cd .. && docker compose up --build
 ```
 
 #### 5.5. Test the application

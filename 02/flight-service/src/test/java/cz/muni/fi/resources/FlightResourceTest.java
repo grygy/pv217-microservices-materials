@@ -53,7 +53,7 @@ class FlightResourceTest {
                 .then()
                 .statusCode(200)
                 .body("size()", is(1))
-                .body("[0].id", equalTo(testFlight.id))
+                .body("[0].id", equalTo(testFlight.id));
     }
 
     @Test

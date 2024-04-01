@@ -104,7 +104,7 @@ class PassengerRepositoryTest {
         asserter.execute(() -> passengerRepository.deleteAll())
                 .execute(() -> passengerRepository.persist(passenger))
                 .assertThat(
-                        passengerRepository::findHydratedNotifications,
+                        passengerRepository::findNotificationsWithEmail,
                         notificationDtos -> {
                             assertEquals(1, notificationDtos.size());
                             NotificationDto dto = notificationDtos.get(0);
@@ -147,7 +147,7 @@ class PassengerRepositoryTest {
         asserter.execute(() -> passengerRepository.deleteAll())
                 .execute(() -> passengerRepository.addNotificationByFlightId(-1L, notification))
                 .assertThat(
-                        () -> passengerRepository.findHydratedNotifications(),
+                        () -> passengerRepository.findNotificationsWithEmail(),
                         notifications -> assertEquals(0, notifications.size())
                 );
     }
@@ -169,7 +169,7 @@ class PassengerRepositoryTest {
         // TODO implement this test
         asserter.execute(() -> passengerRepository.deleteAll())
                 .assertThat(
-                        passengerRepository::findHydratedNotifications,
+                        passengerRepository::findNotificationsWithEmail,
                         notifications -> assertEquals(0, notifications.size())
                 );
     }

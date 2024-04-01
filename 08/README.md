@@ -137,7 +137,7 @@ Go to health package in `passenger-service` and implement `BaggageServiceHealthC
 
 In `BaggageClientResource` you can find new method `readinessCheck` which should be used to check if the baggage service is ready.
 
-Check if the response `String` from `readinessCheck` contains `"DOWN"` and return `HealthCheckResponse.down` if it does. Otherwise, return `HealthCheckResponse.up`. 
+Check if the response `.getStatus()` from `readinessCheck` is `HealthCheckResponse.Status.UP` then return `HealthCheckResponse.up`. Otherwise, return `HealthCheckResponse.down`. 
 
 #### 1.3. Test it
 
@@ -208,8 +208,8 @@ Now you should be able to see the number of flights created in the dashboard as 
 
 - Build and run docker 
   ```bash
-  cd passenger-service && mvn package && cd ../baggage-service && mvn package && cd ../flight-service && mvn package && cd .. && docker compose up --build
-   ```
+  cd passenger-service && mvn clean install && cd ../baggage-service && mvn clean install && cd ../flight-service && mvn clean install && cd .. && docker compose up --build
+  ```
 
 ## Troubleshooting
 

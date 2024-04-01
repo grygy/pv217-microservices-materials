@@ -45,11 +45,6 @@ public class BaggageResource {
     BaggageService baggageService;
 
 
-    /**
-     * Get list of all baggage
-     *
-     * @return list of all baggage
-     */
     @GET
     @Produces(APPLICATION_JSON)
     @Operation(summary = "Get list of all baggage")
@@ -70,12 +65,7 @@ public class BaggageResource {
                 .onItem().transform(baggage -> RestResponse.status(Response.Status.OK, baggage));
     }
 
-    /**
-     * Create a new baggage
-     *
-     * @param baggage baggage to create.
-     * @return created baggage
-     */
+
     @POST
     @Produces(APPLICATION_JSON)
     @Consumes(APPLICATION_JSON)
@@ -104,12 +94,6 @@ public class BaggageResource {
     }
 
 
-    /**
-     * Get baggage by id
-     *
-     * @param id id of baggage
-     * @return baggage with given id
-     */
     @GET
     @Path("/{id}")
     @Produces(APPLICATION_JSON)
@@ -136,9 +120,6 @@ public class BaggageResource {
     }
 
 
-    /**
-     * Helper method for to delete all baggage
-     */
     @DELETE
     @Operation(summary = "Delete all baggage")
     @APIResponse(

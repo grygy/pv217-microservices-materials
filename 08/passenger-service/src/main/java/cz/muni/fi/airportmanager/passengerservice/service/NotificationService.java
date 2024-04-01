@@ -34,6 +34,6 @@ public class NotificationService {
      */
     @WithTransaction
     public Uni<List<NotificationDto>> listAll() {
-        return passengerRepository.findHydratedNotifications();
+        return passengerRepository.findNotificationsWithEmail();
     }
 }

@@ -177,8 +177,8 @@ In `docker-compose.yaml` set `QUARKUS_OTEL_ENDPOINT` environment variable to mar
 
 - Build and run docker
   ```bash
-  cd passenger-service && mvn package && cd .. && cd baggage-service && mvn package && cd .. && cd flight-service && mvn package && cd .. && docker compose build && docker compose up
-   ```
+  cd passenger-service && mvn clean install && cd ../baggage-service && mvn clean install && cd ../flight-service && mvn clean install && cd .. && docker compose up --build
+  ```
 
 ## Troubleshooting
 
