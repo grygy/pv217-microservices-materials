@@ -23,7 +23,7 @@ It's also useful for monitoring tools to check the state of the application and 
 
 ### SmallRye Health
 
-SmallRye Health is an implementation of MicroProfile Health. It provides a way to check the state of the application. It provides a way to check the state of the application. It simplifies the process of creating health checks and provides a way to check the state of the application due to the built-in health checks.
+SmallRye Health is an implementation of MicroProfile Health. It simplifies the process of creating health checks and provides a way to check the state of the application. Due to the built-in health checks it also exposes some of this information out-of-the-box.
 
 1. `HealthCheck` interface -- Health checks are implemented as classes that implement the `HealthCheck` interface.
 2. `@Startup` annotations -- Option for slow starting containers to delay an invocation of the liveness check.
