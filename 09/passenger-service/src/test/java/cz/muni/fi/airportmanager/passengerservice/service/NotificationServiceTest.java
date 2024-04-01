@@ -36,7 +36,7 @@ class NotificationServiceTest {
 //        Mock active record class
         asserter.execute(() -> PanacheMock.mock(Notification.class));
         asserter.execute(() -> Mockito.when(Notification.listAll()).thenReturn(Uni.createFrom().item(List.of(notification))));
-        asserter.execute(() -> Mockito.when(passengerRepository.findHydratedNotifications()).thenReturn(Uni.createFrom().item(List.of(notificationDto))));
+        asserter.execute(() -> Mockito.when(passengerRepository.findNotificationsWithEmail()).thenReturn(Uni.createFrom().item(List.of(notificationDto))));
 
         asserter.assertThat(() -> notificationService.listAll(),
                 notificationList -> {
