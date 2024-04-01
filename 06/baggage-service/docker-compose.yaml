@@ -23,7 +23,7 @@ services:
   db:
     # TODO Add baggage-service database from postgres image
     # TODO Don't forget to add environment variables for the database connection settings
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       POSTGRES_DB: baggage-database
       POSTGRES_USER: user

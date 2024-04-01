@@ -149,7 +149,7 @@ services: # List of services that will be run
       - app-network # Name of the network
 
   baggage-db: # Name of the database service
-    image: postgres:latest # Image that will be used for the database
+    image: postgres:16.2 # Image that will be used for the database
     environment: # Environment variables that will be used in the service
       POSTGRES_DB: baggage-database
       POSTGRES_USER: user

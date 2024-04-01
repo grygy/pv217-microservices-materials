@@ -14,11 +14,6 @@ import java.util.List;
 public class BaggageService {
 
 
-    /**
-     * Get list of all baggage
-     *
-     * @return list of all baggage
-     */
     @WithTransaction
     public Uni<List<Baggage>> listAll() {
         return Baggage.listAll();
@@ -41,12 +36,7 @@ public class BaggageService {
         }));
     }
 
-    /**
-     * Create a new baggage
-     *
-     * @param createBaggageDto baggage to create.
-     * @return created baggage
-     */
+
     @WithTransaction
     public Uni<Baggage> createBaggage(CreateBaggageDto createBaggageDto) {
         var baggage = Baggage.fromDto(createBaggageDto);

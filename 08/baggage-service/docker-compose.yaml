@@ -19,7 +19,7 @@ services:
         - app-network
 
   db:
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       POSTGRES_DB: baggage-database
       POSTGRES_USER: user

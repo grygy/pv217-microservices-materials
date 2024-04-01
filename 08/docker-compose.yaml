@@ -55,7 +55,7 @@ services:
       - app-network
 
   flight-db:
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       POSTGRES_DB: flight-database
       POSTGRES_USER: user
@@ -66,7 +66,7 @@ services:
       - app-network
 
   passenger-db:
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       POSTGRES_DB: passenger-database
       POSTGRES_USER: user
@@ -77,7 +77,7 @@ services:
       - app-network
 
   baggage-db:
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       POSTGRES_DB: baggage-database
       POSTGRES_USER: user
