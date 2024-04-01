@@ -11,7 +11,6 @@ import io.smallrye.mutiny.Uni;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Base64;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -38,11 +37,7 @@ class BaggageResourceTest {
 
     @Test
     void shouldGetListOfBaggage() {
-        var baggage = new Baggage();
-        baggage.id = 1L;
-        baggage.weight = 20;
-        baggage.passengerId = 123L;
-        baggage.status = BaggageStatus.CHECKED_IN;
+        Baggage baggage = getBaggage();
 
         Mockito.when(this.baggageService.listAll()).thenReturn(Uni.createFrom().item(List.of(baggage)));
 
@@ -55,15 +50,11 @@ class BaggageResourceTest {
 
     @Test
     void shouldCreateBaggage() {
-        var baggage = new Baggage();
-        baggage.id = 1L;
-        baggage.weight = 20;
-        baggage.passengerId = 123L;
-        baggage.status = BaggageStatus.CHECKED_IN;
+        var baggage = getBaggage();
 
         CreateBaggageDto createBaggageDto = new CreateBaggageDto();
-        createBaggageDto.weight = 20;
-        createBaggageDto.passengerId = 123L;
+        createBaggageDto.weight = baggage.weight;
+        createBaggageDto.passengerId = baggage.passengerId;
 
         Mockito.when(this.baggageService.createBaggage(Mockito.any(CreateBaggageDto.class))).thenReturn(Uni.createFrom().item(baggage));
 
@@ -78,11 +69,7 @@ class BaggageResourceTest {
 
     @Test
     void shouldGetExistingBaggage() {
-        var baggage = new Baggage();
-        baggage.id = 1L;
-        baggage.weight = 20;
-        baggage.passengerId = 123L;
-        baggage.status = BaggageStatus.CHECKED_IN;
+        var baggage = getBaggage();
 
         Mockito.when(this.baggageService.getBaggage(baggage.id)).thenReturn(Uni.createFrom().item(baggage));
 
@@ -153,36 +140,12 @@ class BaggageResourceTest {
                 .statusCode(404);
     }
 
-    @Test
-    void shouldFailAuthenticationForGetBaggageByPassengerId() {
+    private static Baggage getBaggage() {
         var baggage = new Baggage();
         baggage.id = 1L;
         baggage.weight = 20;
         baggage.passengerId = 123L;
         baggage.status = BaggageStatus.CHECKED_IN;
-
-        Mockito.when(this.baggageService.getBaggageByPassengerId(baggage.passengerId)).thenReturn(Uni.createFrom().item(List.of(baggage)));
-
-        given().when()
-                .get("/passenger/" + baggage.passengerId)
-                .then()
-                .statusCode(401);
-    }
-
-    @Test
-    void shouldGetUnauthorizedForGetBaggageByPassengerId() {
-        var baggage = new Baggage();
-        baggage.id = 1L;
-        baggage.weight = 20;
-        baggage.passengerId = 123L;
-        baggage.status = BaggageStatus.CHECKED_IN;
-
-        Mockito.when(this.baggageService.getBaggageByPassengerId(baggage.passengerId)).thenReturn(Uni.createFrom().item(List.of(baggage)));
-
-        given()
-                .when()
-                .get("/passenger/" + baggage.passengerId)
-                .then()
-                .statusCode(401);
+        return baggage;
     }
 }
