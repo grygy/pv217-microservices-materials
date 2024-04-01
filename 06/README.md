@@ -72,7 +72,7 @@ COPY --chown=185 target/quarkus-app/app/ /deployments/app/
 COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
 
 # Expose the port that the application will run on
-EXPOSE 8080
+EXPOSE 8077
 # Set the user that will run the application
 USER 185
 # Set up more environment variables that will be used to run the application
@@ -106,8 +106,8 @@ docker build -f src/main/docker/Dockerfile.jvm -t quarkus/baggage-service-jvm .
 After building the image, we can run the container using the `docker run` command.
 
 ```bash
-# Maps the port 8080 from the container to the port 8077 on the host
-docker run -i --rm -p 8077:8080 quarkus/baggage-service-jvm
+# Maps the port 8077 from the container to the port 8077 on the host
+docker run -i --rm -p 8077:8077 quarkus/baggage-service-jvm
 ```
 
 This was a brief introduction to docker and containerization. For more information, check the [official documentation](https://docs.docker.com/).
@@ -137,7 +137,7 @@ services: # List of services that will be run
       context: ./baggage-service # Path to the service
       dockerfile: src/main/docker/Dockerfile.jvm # Path to the Dockerfile
     ports: # Ports that will be mapped and exposed to the host
-      - "8077:8080" # Maps the port 8080 from the container to the port 8077 on the host
+      - "8077:8077" # Maps the port 8077 from the container to the port 8077 on the host
     environment: # Environment variables that will be used in the service
       QUARKUS_DATASOURCE_DB_KIND: postgresql # Variables used in our case in application.properties
       QUARKUS_DATASOURCE_USERNAME: user 
@@ -209,13 +209,7 @@ Now we want to use the `BaggageClientResource` in `PassengerService` to retrieve
 
 Quarkus already created a Dockerfiles for us, so we can easily use them in docker compose and run the services in containers.
 
-#### 2.1. Set application properties
-
-Right now the `baggage-service` REST service is running on port 8077. Let's override it with `%prod.` prefix for
-production profile to run it on port 8080. Dockerfile.jvm is expecting the application to run on port 8080. We will then
-let `docker-compose` to handle the port back to 8077.
-
-#### 2.2. Package the application
+#### 2.1. Package the application
 
 We need to create a jar file for the `baggage-service` to be able to run it in a docker container. Run the following
 command in `baggage-service` directory:
@@ -226,7 +220,7 @@ command in `baggage-service` directory:
 
 It should create a `target/quarkus-app` directory with the jar file.
 
-#### 2.3. Run pure docker container
+#### 2.2. Run pure docker container
 
 Now try to run the `baggage-service` in a docker container. We already have Dockerfile.jvm created for us by quarkus
 in `./src/main/docker` directory.
@@ -241,19 +235,19 @@ in `./src/main/docker` directory.
     - Don't forget to kill the running `baggage-service` otherwise the port 8077 will be already in use.
 
    ```bash
-   # Maps the port 8080 from the container to the port 8077 on the host
-   docker run -i --rm -p 8077:8080 quarkus/baggage-service-jvm
+   # Maps the port 8077 from the container to the port 8077 on the host
+   docker run -i --rm -p 8077:8077 quarkus/baggage-service-jvm
    ```
 
 3. Go to http://localhost:8077/q/swagger-ui and check if the service is running. (database is not running, so we can't create baggage yet)
 
-#### 2.4. Create docker compose configuration
+#### 2.3. Create docker compose configuration
 
 Now, we have a working docker container for `baggage-service`. Let's make a docker-compose configuration with db connection as well.
 
 In `baggage-service` go to `docker-compose.yml` file and create a configuration for baggage-service. See TODOs in the file.
 
-#### 2.5. Run the docker-compose
+#### 2.4. Run the docker-compose
 
 First, we need to build the docker image for the `baggage-service`:
 

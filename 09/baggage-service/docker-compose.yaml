@@ -5,7 +5,7 @@ services:
         context: .
         dockerfile: src/main/docker/Dockerfile.jvm
       ports:
-      - "8077:8080" # Expose app on port 8077 to the outside world
+      - "8077:8077" # Expose app on port 8077 to the outside world
       environment:
         # Database connection settings for the application
         QUARKUS_DATASOURCE_DB_KIND: postgresql
