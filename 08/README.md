@@ -18,7 +18,7 @@ It's also useful for monitoring tools to check the state of the application and 
 #### Types
 
 1. Startup -- If all necessary configurations are loaded.
-2. Liveness -- If live probe fails that means the service is not running, cannot be recovered, and should be restarted.
+2. Liveness -- If the liveness probe fails that means the service is not running, cannot be recovered, and should be restarted.
 3. Readiness -- If the application is ready to serve requests. Dependencies, database, external services are connected. If the readiness probe fails, the service is not yet ready to serve traffic.
 
 ### SmallRye Health
