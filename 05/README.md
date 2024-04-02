@@ -174,23 +174,23 @@ Install [Docker desktop](https://docs.docker.com/desktop/) or other docker clien
 
 ### 1. Implement unit tests for `PassengerRepository`
 
-Go to `PassengerRepositoryTest` and implement the todo's. You don't need to mock anything because Quarkus provides a test database for you.
+Go to `PassengerRepositoryTest` and implement the todos. You don't need to mock anything because Quarkus provides a test database for you.
 
 Don't forget to add at least two of your own tests.
 
 ### 2. Implement unit tests for `PassengerService`
 
-Go to `PassengerServiceTest` and implement the todo's. You will need to mock the `PassengerRepository` to isolate the service from the database.
+Go to `PassengerServiceTest` and implement the todos. You will need to mock the `PassengerRepository` to isolate the service from the database.
 
 Don't forget to add at least two of your own tests.
 
 ### 3. Implement unit tests for `PassengerResource`
 
-Go to `PassengerResourceTest` and implement the todo's. You will need to mock the `PassengerService` to isolate the resource from the service.
+Go to `PassengerResourceTest` and implement the todos. You will need to mock the `PassengerService` to isolate the resource from the service.
 
 ### 4. Implement integration tests for `PassengerResource`
 
-Go to `PassengerResourceIT` and implement the todo's. There is one test already implemented, use it as an example. In this test you don't need to mock anything, you will test the whole system.
+Go to `PassengerResourceIT` and implement the todos. There is one test already implemented, use it as an example. In this test you don't need to mock anything, you will test the whole system.
 
 ### 5. Verify if everything is working
 
