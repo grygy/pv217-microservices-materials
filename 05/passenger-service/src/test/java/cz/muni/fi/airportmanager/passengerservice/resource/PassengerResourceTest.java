@@ -28,6 +28,7 @@ class PassengerResourceTest {
     @Test
     void shouldGetEmptyListOfPassengers() {
         // TODO implement this test
+        // mock the passengerService.listAll() method to return an empty list
         Mockito.when(this.passengerService.listAll()).thenReturn(Uni.createFrom().item(List.of()));
 
         given().when()
@@ -40,6 +41,7 @@ class PassengerResourceTest {
     @Test
     void shouldGetListOfPassengers() {
         // TODO implement this test
+        // mock the passengerService.listAll() method to return a list with one passenger
         Mockito.when(this.passengerService.listAll()).thenReturn(Uni.createFrom().item(List.of(createPassenger())));
 
         given().when()
@@ -52,6 +54,7 @@ class PassengerResourceTest {
     @Test
     void shouldCreatePassenger() {
         // TODO implement this test
+        // mock the passengerService.createPassenger() method to return a passenger with ID 1
         CreatePassengerDto testPassenger = createTestPassengerDto();
         Passenger responsePassenger = Passenger.fromDto(testPassenger);
         responsePassenger.setId(1L);
@@ -71,6 +74,7 @@ class PassengerResourceTest {
     @Test
     void shouldGetExistingPassenger() {
         // TODO implement this test
+        // mock the passengerService.getPassenger() method to return a passenger with ID 1
         Passenger testPassenger = createPassenger();
         Mockito.when(this.passengerService.getPassenger(testPassenger.getId())).thenReturn(Uni.createFrom().item(testPassenger));
 
@@ -84,6 +88,7 @@ class PassengerResourceTest {
     @Test
     void shouldNotGetNonexistingPassenger() {
         // TODO implement this test
+        // mock the passengerService.getPassenger() method to return null
         Mockito.when(this.passengerService.getPassenger(Mockito.anyLong())).thenReturn(Uni.createFrom().nullItem());
 
         given().when()
@@ -95,6 +100,7 @@ class PassengerResourceTest {
     @Test
     void shouldDeleteExistingPassenger() {
         // TODO implement this test
+        // mock the passengerService.deletePassenger() method to return true
         Passenger testPassenger = createPassenger();
         Mockito.when(this.passengerService.deletePassenger(testPassenger.getId())).thenReturn(Uni.createFrom().item(true));
 
@@ -107,6 +113,7 @@ class PassengerResourceTest {
     @Test
     void shouldNotDeleteNonexistingPassenger() {
         // TODO implement this test
+        // mock the passengerService.deletePassenger() method to return false
         Mockito.when(this.passengerService.deletePassenger(Mockito.anyLong())).thenReturn(Uni.createFrom().item(false));
 
         given().when()
@@ -119,6 +126,7 @@ class PassengerResourceTest {
     @Test
     void shouldDeleteAllPassengers() {
         // TODO implement this test
+        // mock the passengerService.deleteAllPassengers() method to return 0
         Mockito.when(this.passengerService.deleteAllPassengers()).thenReturn(Uni.createFrom().item(0L));
 
         given().when()
@@ -130,6 +138,7 @@ class PassengerResourceTest {
     @Test
     void shouldNotFindPassengersForNonexistentFlight() {
         // TODO implement this test
+        // mock the passengerService.getPassengersForFlight() method to return an empty list
         Mockito.when(this.passengerService.getPassengersForFlight(Mockito.anyLong())).thenReturn(Uni.createFrom().item(List.of()));
 
         given().when()
@@ -143,6 +152,7 @@ class PassengerResourceTest {
     @Test
     void shouldGetPassengersForFlight() {
         // TODO implement this test
+        // mock the passengerService.getPassengersForFlight() method to return a list with one passenger
         Long flightId = 1L;
         List<Passenger> passengers = List.of(createPassenger());
         Mockito.when(passengerService.getPassengersForFlight(flightId)).thenReturn(Uni.createFrom().item(passengers));
@@ -159,6 +169,7 @@ class PassengerResourceTest {
     @Test
     void shouldGetEmptyListOfPassengersForFlightWhenNoPassengers() {
         // TODO implement this test
+        // mock the passengerService.getPassengersForFlight() method to return an empty list
         Long flightId = 1L;
         Mockito.when(passengerService.getPassengersForFlight(flightId)).thenReturn(Uni.createFrom().item(List.of()));
 
@@ -172,6 +183,7 @@ class PassengerResourceTest {
     @Test
     void shouldGetNotificationsForPassenger() {
         // TODO implement this test
+        // mock the passengerService.findNotificationsForPassenger() method to return a list with one notification
         Long passengerId = 1L;
         List<Notification> notifications = List.of(createNotification());
         Mockito.when(passengerService.findNotificationsForPassenger(passengerId)).thenReturn(Uni.createFrom().item(notifications));
@@ -187,6 +199,7 @@ class PassengerResourceTest {
     @Test
     void shouldGetEmptyListOfNotificationsForPassengerWhenNoNotifications() {
         // TODO implement this test
+        // mock the passengerService.findNotificationsForPassenger() method to return an empty list
         Long passengerId = 1L;
         Mockito.when(passengerService.findNotificationsForPassenger(passengerId)).thenReturn(Uni.createFrom().item(List.of()));
 
@@ -200,6 +213,7 @@ class PassengerResourceTest {
     @Test
     void shouldNotFindNotificationsForNonexistentPassenger() {
         // TODO implement this test
+        // mock the passengerService.findNotificationsForPassenger() method to return an empty list
         Long invalidPassengerId = 99L;
         Mockito.when(passengerService.findNotificationsForPassenger(invalidPassengerId)).thenReturn(Uni.createFrom().item(List.of()));
 

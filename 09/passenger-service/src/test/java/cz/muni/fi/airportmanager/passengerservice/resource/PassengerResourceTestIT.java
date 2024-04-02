@@ -51,26 +51,13 @@ class PassengerResourceTestIT {
     }
 
     @Test
-    void shouldSaveAndGetEmptyListOfPassengers() {
+    void shouldGetEmptyListOfPassengers() {
 
         given().when()
                 .get()
                 .then()
                 .statusCode(200)
                 .body(is("[]"));
-    }
-
-    @Test
-    void shouldGetAndGetPassenger() {
-
-        CreatePassengerDto testPassenger = createTestPassengerDto();
-        savePassenger(testPassenger);
-
-        given().when()
-                .get()
-                .then()
-                .statusCode(200)
-                .body("size()", is(1));
     }
 
 

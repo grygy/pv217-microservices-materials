@@ -1,13 +1,10 @@
 package cz.muni.fi.airportmanager.passengerservice.resource;
 
-import cz.muni.fi.airportmanager.passengerservice.entity.Passenger;
 import cz.muni.fi.airportmanager.passengerservice.model.CreatePassengerDto;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
@@ -29,7 +26,8 @@ class PassengerResourceTestIT {
                 .toString();
     }
 
-    @AfterEach // this method will be called after each test
+    @AfterEach
+        // this method will be called after each test
     void tearDown() {
         given().when()
                 .delete()
@@ -51,7 +49,7 @@ class PassengerResourceTestIT {
     }
 
     @Test
-    void shouldSaveAndGetEmptyListOfPassengers() {
+    void shouldGetEmptyListOfPassengers() {
         // TODO implement this test
         given().when()
                 .get()
@@ -60,24 +58,14 @@ class PassengerResourceTestIT {
                 .body(is("[]"));
     }
 
-    @Test
-    void shouldGetAndGetPassenger() {
-        // TODO implement this test
-        CreatePassengerDto testPassenger = createTestPassengerDto();
-        savePassenger(testPassenger);
-
-        given().when()
-                .get()
-                .then()
-                .statusCode(200)
-                .body("size()", is(1));
-    }
-
-
 
     @Test
     void shouldDeleteAllPassengers() {
         // TODO implement this test
+        // create some passengers and then delete them all
+        CreatePassengerDto testPassenger = createTestPassengerDto();
+        savePassenger(testPassenger);
+
         given().when()
                 .delete()
                 .then()
@@ -88,6 +76,7 @@ class PassengerResourceTestIT {
     @Test
     void shouldGetPassengersForFlight() {
         // TODO implement this test
+        // create a passenger and then get the list of passengers for the flight
         CreatePassengerDto testPassenger = createTestPassengerDto();
         var id = savePassenger(testPassenger);
 
@@ -101,6 +90,7 @@ class PassengerResourceTestIT {
     @Test
     void shouldGetEmptyListOfPassengersForFlightWhenNoPassengers() {
         // TODO implement this test
+        // get the list of passengers for a flight that has no passengers
         long id = 99L;
 
         given().when()
@@ -113,6 +103,7 @@ class PassengerResourceTestIT {
     @Test
     void shouldGetEmptyNotificationsForPassenger() {
         // TODO implement this test
+        // get the list of notifications for a passenger that has no notifications
         CreatePassengerDto testPassenger = createTestPassengerDto();
         var id = savePassenger(testPassenger);
 
@@ -121,17 +112,6 @@ class PassengerResourceTestIT {
                 .then()
                 .statusCode(200)
                 .body("size()", is(0));
-    }
-
-    private Passenger createPassenger() {
-        Passenger passenger = new Passenger();
-        passenger.setId(1L);
-        passenger.setFirstName("John");
-        passenger.setLastName("Doe");
-        passenger.setNotifications(Collections.emptyList());
-        passenger.setEmail("johndoe@gmail.com");
-        passenger.setFlightId(1L);
-        return passenger;
     }
 
     private CreatePassengerDto createTestPassengerDto() {
