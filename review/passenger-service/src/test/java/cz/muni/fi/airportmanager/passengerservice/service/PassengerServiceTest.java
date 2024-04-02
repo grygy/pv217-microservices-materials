@@ -33,9 +33,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldGetListOfPassengers(UniAsserter asserter) {
-        // TODO implement this test
-        // mock the passengerRepository.listAll() method to return a list with one passenger
-        // use createTestPassenger helper method
+
         var passenger = createTestPassenger();
         asserter.execute(() -> Mockito.when(passengerRepository.listAll()).thenReturn(Uni.createFrom().item(List.of(passenger))));
 
@@ -53,8 +51,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldGetExistingPassenger(UniAsserter asserter) {
-        // TODO implement this test
-        // mock the passengerRepository.findById() method to return a passenger
+
         var passenger = createTestPassenger();
         asserter.execute(() -> Mockito.when(passengerRepository.findById(passenger.getId())).thenReturn(Uni.createFrom().item(passenger)));
 
@@ -70,8 +67,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldGetPassengersForFlight(UniAsserter asserter) {
-        // TODO implement this test
-        // mock the passengerRepository.findPassengersForFlight() method to return a list with one passenger
+
         var passenger = createTestPassenger();
         Long flightId = 123L;
         asserter.execute(() -> Mockito.when(passengerRepository.findPassengersForFlight(flightId)).thenReturn(Uni.createFrom().item(List.of(passenger))));
@@ -90,8 +86,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldCreatePassenger(UniAsserter asserter) {
-        // TODO implement this test
-        // mock the passengerRepository.persist() method to return the passenger
+
         var passengerDto = createTestPassengerDto();
         var passenger = Passenger.fromDto(passengerDto);
         asserter.execute(() -> Mockito.when(passengerRepository.persist(passenger)).thenReturn(Uni.createFrom().item(passenger)));
@@ -108,8 +103,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldDeleteExistingPassenger(UniAsserter asserter) {
-        // TODO implement this test
-        // mock the passengerRepository.deleteById() method to return true
+
         Long passengerId = 1L;
         asserter.execute(() -> Mockito.when(passengerRepository.deleteById(passengerId)).thenReturn(Uni.createFrom().item(true)));
 
@@ -121,8 +115,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldDeleteAllPassengers(UniAsserter asserter) {
-        // TODO implement this test
-        // mock the passengerRepository.deleteAll() method to return 1
+
         asserter.execute(() -> Mockito.when(passengerRepository.deleteAll()).thenReturn(Uni.createFrom().item(1L)));
 
         asserter.assertThat(
@@ -137,8 +130,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldAddNotificationByFlightId(UniAsserter asserter) {
-        // TODO implement this test
-        // mock the passengerRepository.addNotificationByFlightId() method to return void
+
         Long flightId = 123L;
         Long passengerId = 1L;
         var notification = createNotification();
@@ -149,16 +141,15 @@ class PassengerServiceTest {
 
         asserter.execute(() -> passengerService.addNotificationByFlightId(flightId, notification))
                 .assertThat(
-                        () -> passengerService.findNotificationsForPassenger(passengerId),
-                        notifications -> assertTrue(notifications.stream().anyMatch(n -> n.message.equals(notification.message)))
-                );
+                () -> passengerService.findNotificationsForPassenger(passengerId),
+                notifications -> assertTrue(notifications.stream().anyMatch(n -> n.message.equals(notification.message)))
+        );
     }
 
     @Test
     @RunOnVertxContext
     void shouldFindNotificationsForPassenger(UniAsserter asserter) {
-        // TODO implement this test
-        // create a passenger and a notification, add the notification to the passenger and test if the notification is found
+
         Long passengerId = 1L;
         var notification = createNotification();
         List<Notification> testNotifications = List.of(notification);
@@ -179,8 +170,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldHandleNoPassengerFound(UniAsserter asserter) {
-        // TODO implement this test
-        // mock the passengerRepository.findById() method to return null
+
         Long invalidId = -1L;
         asserter.execute(() -> Mockito.when(passengerRepository.findById(invalidId)).thenReturn(Uni.createFrom().nullItem()));
 
@@ -193,8 +183,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldNotDeleteNonExistentPassenger(UniAsserter asserter) {
-        // TODO implement this test
-        // mock the passengerRepository.deleteById() method to return false
+
         Long invalidId = -1L;
         asserter.execute(() -> Mockito.when(passengerRepository.deleteById(invalidId)).thenReturn(Uni.createFrom().item(false)));
 
@@ -206,8 +195,7 @@ class PassengerServiceTest {
     @Test
     @RunOnVertxContext
     void shouldHandleEmptyListOfPassengers(UniAsserter asserter) {
-        // TODO implement this test
-        // mock the passengerRepository.listAll() method to return an empty list
+
         asserter.execute(() -> Mockito.when(passengerRepository.listAll()).thenReturn(Uni.createFrom().item(List.of())));
 
         asserter.assertThat(
@@ -240,5 +228,6 @@ class PassengerServiceTest {
         notification.message = "Test message";
         return notification;
     }
+
 
 }

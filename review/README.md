@@ -1,206 +1,300 @@
-# 04 - Testing
+# 06 - RestClient, Containerization
 
-## Why are tests important?
+## RestClient
 
-Test are a crucial part of software development. Test ensure that the code you write is working as expected. They also help you to understand the code and how to compose it. Easily testable code is also easier to maintain and refactor.
+Quarkus provides a simple way to create a REST client for other services. Using the REST Client Reactive is as simple as creating an interface using the proper Jakarta REST and MicroProfile annotations.
 
-Key benefits of testing:
-- Detecting bugs early
-- Ensuring code quality
-- Facilitating refactoring
-- Tests are a form of documentation
-- Simplifying collaboration
+The method in the interface gives us access to HTTP communication with other services. Thus, we can use this interface in other parts of our application.
 
-### Best friends
-
-AI tools are great for generating basic tests and data. BE AWARE that they are not perfect, and you should always review the generated code and change it to actually fit your needs.
-
-- ChatGPT
-- Copilot
-- Intellij IDEA assistant
-
-## Unit tests
-
-The most common type of tests are unit tests. The key idea of unit tests is to test the smallest piece of code possible in isolation. Usually, this means testing a single method or function and checking if for given input it returns the expected output.
-
-Key attributes of unit tests:
-- Fast
-- Isolated
-- Simple
-
-### `QuarkusTest` annotation
-
-Quarkus provides a `QuarkusTest` annotation that allows you to write tests for your Quarkus application. It starts the application in a test mode and provides you with a test client to interact with the application. It also allows you to inject beans and other resources into your tests.
-
-### Mocking
-
-But how to isolate the code from the rest of the system? The answer is mocking. Mocking is a technique used to isolate the code under test from the rest of the system. It is used to replace the real dependencies of the code with fake ones. This allows you to test the code in isolation.
-
-## Integration tests
-
-Integration tests are used to test the interaction between different parts of the system. Usually it means testing flows in the system and checking if the system behaves as expected. In our case of `passenger-service` it could mean testing if the passenger can be created and then retrieved from the database using the REST API. This tests every layer of the system.
-
-They ensure that the system is set up correctly also in production environment.
-
-### `@QuarkusIntegrationTest` annotation
-
-Quarkus provides a `@QuarkusIntegrationTest` annotation that allows you to write integration tests for your Quarkus application. These tests are executed against the build artifact -- whether it's a JAR file, a native executable, or a container image -- using the production configuration profile.
-
-It's a black box in terms of the actual execution but thanks to the dev services and the test containers it's possible to test the whole system in production-like environment.
-
-## Technologies
-
-We will depend on the following technologies to write tests:
-- JUnit 5 -- Unit tests
-- RestAssured -- REST API testing
-- Mockito -- Mocking
-- Test vertx -- Testing asynchronous code
-
-### JUnit
-
-JUnit is a simple framework to write repeatable tests.
-
-#### Examples
-
-Basic
+#### Example
 
 ```java
-@Test // Basic synchronous test
-public void testBasicFunctionality() {
-    SimpleService service = new SimpleService();
-    // <expected>, <actual>, <message>
-    assertEquals("Expected output", service.doSomething(), "Service did not return the expected output."); 
-}
+@Path("/extensions") // Base path for the REST service
+@RegisterRestClient(configKey = "extensions-api") // Config key for the REST client that will be used in the application.properties
+public interface ExtensionsService {
 
-@Test
-@RunOnVertxContext // Test running on vertx context (asynchronous)
-public void testSimpleUni(UniAsserter asserter) { // Gives us UniAsserter to assert the result from Uni
-    asserter.assertThat(
-        () -> Uni.createFrom().item("Hello"), // Asynchronous code or function
-        result -> assertEquals("Hello", result, "Did not return hello") // When the result is available, assert it
-    );
-}
-
-@Test
-@TestReactiveTransaction // Similar to RunOnVertxContext, but for reactive transactions when we need to manipulate with the database
-public void testReactiveTransaction(UniAsserter asserter) {
-    asserter.assertThat(
-        () -> Uni.createFrom().item("Expected Result"),
-        result -> assertEquals("Expected Result", result, "Did not return expected result.")
-    );
+    @GET // HTTP method
+    @Path("/{id}") // Path for the method
+    Uni<Set<Extension>> getById(@PathParam("id") String id); // Method for getting extensions by id. Translates to HTTP GET /extensions/{id}
 }
 ```
 
-Mocked
+## Containerization
 
-```java
-@QuarkusTest
-public class MockedServiceUniTest {
+Containerization is a lightweight alternative to full machine virtualization that involves encapsulating an application in a container with its own operating environment. Containers are isolated from one another and bundle their own software, libraries and configuration files.
 
-    @InjectMock // Similar to Inject, but injects a mock instead of a real instance
-    DataService dataService;
-    
-    @Inject
-    MyService myService; // My service is using DataService
+### Why is containerization important?
 
-    @Test
-    public void testServiceWithMock() {
-        Mockito.when(dataService.getData()).thenReturn("Mocked Data");
-        assertEquals("Mocked Data", myService.retrieveData(), "Did not return mocked data");
-    }
+- **Consistency** - Containers ensure that the software runs in the same environment, regardless of where it is deployed.
+- **Isolation** - Containers are isolated from each other and the host system.
+- **Scalability** - Containers can be easily scaled up or down.
 
-    @Test
-    @RunOnVertxContext
-    public void testUniWithMockService(UniAsserter asserter) {
-        // Now mock the data service (asynchronous) to return a specific value
-        asserter.execute(() ->  Mockito.when(dataService.getDataAsUni()).thenReturn(Uni.createFrom().item("Mocked Data")));
+### Docker
 
-        asserter.assertThat(
-            () -> myService.getDataAsUni(),
-            result -> assertEquals("Mocked Data", result, "Did not return mocked data")
-        );
-    }
-}
+Docker is a platform for developing, shipping, and running applications using containerization. It allows you to package your application and its dependencies into a container that can run on any environment.
+
+#### Docker image
+
+A Docker image is a file that contains all the necessary dependencies and configuration to run a container. It is a lightweight, standalone, executable package that includes everything needed to run a piece of software, including the code, a runtime, libraries, environment variables, and configuration files.
+
+#### Docker container
+
+A container is a runtime instance of a Docker image. Meaning, it is a running instance of the containerized application. Containers can be run, started, stopped, moved, and deleted. When containers are deleted, any data that is not in a volume is lost.
+
+#### Docker volume
+
+A Docker volume is a directory that is outside the lifecycle of the container. It is used to persist data generated by and used by Docker containers.
+
+#### Docker engine
+
+Docker engine is core of the Docker. It is a client-server application that builds and runs containers.
+
+#### Dockerhub
+
+Dockerhub is a cloud-based registry service which allows you to select images from a wide range of applications and base images. You can also upload your own images to the registry.
+
+#### Dockerfile
+
+Dockerfile is a text document that contains all the commands and application configuration to assemble an image. Docker reads the Dockerfile and executes the commands in the file to build the image.
+
+```Dockerfile
+# Use the official image as a base image that our application will run on
+FROM registry.access.redhat.com/ubi8/openjdk-17:1.18
+
+# Set environment variables
+ENV LANGUAGE='en_US:en'
+
+
+# Copy the application jar file to the container
+COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
+COPY --chown=185 target/quarkus-app/*.jar /deployments/
+COPY --chown=185 target/quarkus-app/app/ /deployments/app/
+COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
+
+# Expose the port that the application will run on
+EXPOSE 8077
+# Set the user that will run the application
+USER 185
+# Set up more environment variables that will be used to run the application
+ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
+
+# Run the application
+ENTRYPOINT [ "/opt/jboss/container/java/run/run-java.sh" ]
 ```
 
-### RestAssured
+#### What does the Dockerfile do?
 
-RestAssured is a Java library for testing REST APIs. It's a great tool to implement integration tests but also unit tests for REST endpoints.
+- It uses the official image as a base image that our application will run on.
+- It can build the application from the source code.
+- It copies the application jar file to the container.
+- It exposes the port that the application will run on.
+- It sets up environment variables that will be used to run the application.
+- It runs the application.
 
-#### Examples
+#### How to build docker image?
 
-```java
-@QuarkusTest
-@TestHTTPEndpoint(GreetingResource.class) // (Optional) Which endpoint to test
-public class GreetingResourceTest {
-    
-    // We can also mock underlying services if needed
-    
-    @Test
-    public void testHelloEndpoint() {
-        when() // When we call the endpoint
-            .get() // With GET method 
-            .then() // Then
-            .statusCode(200) // Expecting status code 200
-            .body(is("hello")); // And the body to be "hello"
-    }
+First, we need to build the docker image for the application. We can do it using the `docker build` command.
 
-    @Test
-    public void testCreateEntityEndpoint() {
-        // Example entity
-        MyEntity entity = new MyEntity();
-        entity.name = "Sample Name";
-        entity.description = "Sample Description";
-
-        given()
-                .contentType("application/json") // Set content type
-                .body(entity) // Set the body
-                .when() // When we call the endpoint
-                .post("/entities") // Call the POST endpoint
-                .then()
-                .statusCode(201)
-                .body("id", notNullValue()) // Expecting the id to be not null
-                .body("name", equalTo("Sample Name")) // Further body checks
-                .body("description", equalTo("Sample Description")); // Further body checks
-    }
-}
+```bash
+# Choose the Dockerfile to use and tag the image with a name
+docker build -f src/main/docker/Dockerfile.jvm -t quarkus/baggage-service-jvm .
 ```
+
+#### How to run the docker container?
+
+After building the image, we can run the container using the `docker run` command.
+
+```bash
+# Maps the port 8077 from the container to the port 8077 on the host
+docker run -i --rm -p 8077:8077 quarkus/baggage-service-jvm
+```
+
+This was a brief introduction to docker and containerization. For more information, check the [official documentation](https://docs.docker.com/).
+
+### Docker compose
+
+Docker compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application's services. Then, with a single command, you create and start all the services from your configuration.
+
+#### What can docker compose do?
+
+- Define and run multi-container applications with Docker. Eg. run a database and a web application in separate containers.
+- Set up networking between containers.
+- Set up volumes for persistent data.
+- Run a multi-container application on a host.
+
+#### Docker compose file
+
+Docker compose file is a YAML file that defines the services, networks, and volumes for a multi-container Docker application. The default name for the file is `docker-compose.yml`.
+
+#### Example
+
+```yaml
+version: '3.8'
+services: # List of services that will be run
+  baggage-service: # Name of the service
+    build: # Build the service from the Dockerfile
+      context: ./baggage-service # Path to the service
+      dockerfile: src/main/docker/Dockerfile.jvm # Path to the Dockerfile
+    ports: # Ports that will be mapped and exposed to the host
+      - "8077:8077" # Maps the port 8077 from the container to the port 8077 on the host
+    environment: # Environment variables that will be used in the service
+      QUARKUS_DATASOURCE_DB_KIND: postgresql # Variables used in our case in application.properties
+      QUARKUS_DATASOURCE_USERNAME: user 
+      QUARKUS_DATASOURCE_PASSWORD: password
+      QUARKUS_DATASOURCE_REACTIVE_URL: vertx-reactive:postgresql://baggage-db:5432/baggage-database # URL for the database using docker network alias
+    depends_on: # Services that this service depends on
+      - baggage-db # Name of the database service
+    networks: # Networks that the service will be connected to
+      - app-network # Name of the network
+
+  baggage-db: # Name of the database service
+    image: postgres:16.2 # Image that will be used for the database
+    environment: # Environment variables that will be used in the service
+      POSTGRES_DB: baggage-database
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes: # Volumes that will be used in the service
+      - baggage-db-data:/var/lib/postgresql/data # Volume for the database data with path to the data
+    networks:
+      - app-network
+
+networks: # Networks that will be used in the services
+  app-network: # Name of the network
+    driver: bridge # Type of the network
+
+volumes: # Volumes that will be used in the services
+  baggage-db-data: # Name of the volume
+```
+
+## State of the project
+
+- There is a new `baggage-service` is a REST service for tracking baggage running on port 8077.
+  - It supports CRUD operations for baggage along with claiming and marking baggage as lost.
+  - You can also retrieve baggage for a passenger based on passenger id.
+  - Check `BaggageResource` for more details.
 
 ## Tasks
 
 ### 0. Running docker
 
-Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker container.
+Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker
+container.
 
-### 1. Implement unit tests for `PassengerRepository`
+### 1. Define `BaggageClientResource` in `passenger-service`
 
-Go to `PassengerRepositoryTest` and implement the todo's. You don't need to mock anything because Quarkus provides a test database for you.
+#### 1.1. Run `baggage-service` 
 
-Don't forget to add at least two of your own tests.
+Run the `baggage-service` in dev mode. Then check the swagger UI at http://localhost:8077/q/swagger-ui.
 
-### 2. Implement unit tests for `PassengerService`
+Examine the *Get baggage by passenger id* endpoint. We will use it in `passenger-service`.
 
-Go to `PassengerServiceTest` and implement the todo's. You will need to mock the `PassengerRepository` to isolate the service from the database.
+#### 1.2. Define `BaggageClientResource` interface
 
-Don't forget to add at least two of your own tests.
+In `passenger-service` define a new interface `BaggageClientResource`. This interface will represent REST client for the Baggage service.
 
-### 3. Implement unit tests for `PassengerResource`
+1. Create a config key for the baggage service URL in `application.properties` file. See todo in `application.properties` file.
+2. Follow the TODOs in `BaggageClientResource` interface. 
 
-Go to `PassengerResourceTest` and implement the todo's. You will need to mock the `PassengerService` to isolate the resource from the service.
+#### 1.3. 
 
-### 4. Implement integration tests for `PassengerResource`
+Now we want to use the `BaggageClientResource` in `PassengerService` to retrieve baggage for a passenger. Go to `PassengerService` and implement the `getBaggageForPassenger` method.
 
-Go to `PassengerResourceIT` and implement the todo's. There is one test already implemented, use it as an example. In this test you don't need to mock anything, you will test the whole system.
+#### 1.4. Test it
 
-### 5. Verify if everything is working
+1. In Swagger create a passenger in `passenger-service` and then create a baggage for the passenger in `baggage-service`.
+2. Try to get the baggage fot his passenger using `GET /passenger/{passengerId}/baggage` endpoint.
 
-Run the following command in the root of the project:
+### 2. Create docker-compose file for baggage-service
+
+Quarkus already created a Dockerfiles for us, so we can easily use them in docker compose and run the services in containers.
+
+#### 2.1. Package the application
+
+We need to create a jar file for the `baggage-service` to be able to run it in a docker container. Run the following
+command in `baggage-service` directory:
 
 ```bash
-mvn verify -DskipITs=false
+./mvnw package
 ```
 
-If everything is working, all tests should pass and you are ready to submit the solution.
+It should create a `target/quarkus-app` directory with the jar file.
+
+#### 2.2. Run pure docker container
+
+Now try to run the `baggage-service` in a docker container. We already have Dockerfile.jvm created for us by quarkus
+in `./src/main/docker` directory.
+
+1. Build the docker image:
+
+   ```bash
+   docker build -f src/main/docker/Dockerfile.jvm -t quarkus/baggage-service-jvm .
+   ```
+
+2. Run the docker container:
+    - Don't forget to kill the running `baggage-service` otherwise the port 8077 will be already in use.
+
+   ```bash
+   # Maps the port 8077 from the container to the port 8077 on the host
+   docker run -i --rm -p 8077:8077 quarkus/baggage-service-jvm
+   ```
+
+3. Go to http://localhost:8077/q/swagger-ui and check if the service is running. (database is not running, so we can't create baggage yet)
+
+#### 2.3. Create docker compose configuration
+
+Now, we have a working docker container for `baggage-service`. Let's make a docker-compose configuration with db connection as well.
+
+In `baggage-service` go to `docker-compose.yml` file and create a configuration for baggage-service. See TODOs in the file.
+
+#### 2.4. Run the docker-compose
+
+First, we need to build the docker image for the `baggage-service`:
+
+```bash
+docker compose build
+```
+
+Now, let's run use the docker compose to run both `baggage-service` and `database` in a single command.
+
+```bash
+docker compose up
+```
+
+Check if the `baggage-service` is running on http://localhost:8077/q/swagger-ui and try to create and retrieve baggage.
+
+
+### 3. Create docker-compose file for the whole project
+
+#### 3.1. Build other services
+
+Go to `flight-service` and `passenger-service` and make a production build of the application.
+```bash
+# Run in both directories
+./mvnw package
+```
+
+#### 3.2. Add missing configuration to `docker-compose.yml`
+
+In the root of the project you can find `docker-compose.yml` file. It already contains configuration baggage service and database. Now, we need to add configuration for `flight-service` and `passenger-service`.
+
+Follow the TODOs in the file. Don't forget to set up environment variables for the services. Examine `application.properties` files in the passenger and flight services to see what environment variables are needed.
+
+#### 3.3. Run the docker-compose
+
+Now, we have a docker-compose configuration for the whole project. Let's run it.
+
+```bash
+docker compose up
+```
+
+Check if everything is running.
+
+### 4. Verify if everything is working
+
+1. With every service running in docker containers, try to create a flight, create a passenger, create baggage.
+2. Cancel the flight and see if grpc communication is working.
+3. Try to retrieve baggage for a passenger in passenger service.
 
 ### X. Submit the solution
 
@@ -208,8 +302,7 @@ If everything is working, all tests should pass and you are ready to submit the 
 
 ## Hints
 
-- You can get some inspiration from tests in `flight-service`.
-- Create helper methods in tests to create example objects.
+- Check docker-compose in flight-service for inspiration.
 
 ## Troubleshooting
 
@@ -217,4 +310,4 @@ If everything is working, all tests should pass and you are ready to submit the 
 
 ## Further reading
 
-- https://quarkus.io/guides/getting-started-testing
+- https://quarkus.io/guides/rest-client-reactive
