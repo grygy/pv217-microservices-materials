@@ -13,10 +13,11 @@ Key benefits of testing:
 
 ### Best friends
 
-AI tools are great for generating basic test and data. BE AWARE that they are not perfect, and you should always review the generated code and change it to actually fit your needs.
+AI tools are great for generating basic tests and data. BE AWARE that they are not perfect, and you should always review the generated code and change it to actually fit your needs.
 
 - ChatGPT
-- Copilot 
+- Copilot
+- Intellij IDEA assistant
 
 ## Unit tests
 
@@ -37,13 +38,13 @@ But how to isolate the code from the rest of the system? The answer is mocking. 
 
 ## Integration tests
 
-Integration tests are used to test the interaction between different parts of the system. Usually it means testing flows in the system and checking if the system behaves as expected. In our case of `passenger-service` it could mean testing if the passenger can be created and then retrieved from the database using the REST API. This tests every layer of the system. 
+Integration tests are used to test the interaction between different parts of the system. Usually it means testing flows in the system and checking if the system behaves as expected. In our case of `passenger-service` it could mean testing if the passenger can be created and then retrieved from the database using the REST API. This tests every layer of the system.
 
 They ensure that the system is set up correctly also in production environment.
 
 ### `@QuarkusIntegrationTest` annotation
 
-Quarkus provides a `@QuarkusIntegrationTest` annotation that allows you to write integration tests for your Quarkus application. The tests are run after the build using the prod configuration profile. 
+Quarkus provides a `@QuarkusIntegrationTest` annotation that allows you to write integration tests for your Quarkus application. These tests are executed against the build artifact -- whether it's a JAR file, a native executable, or a container image -- using the production configuration profile.
 
 It's a black box in terms of the actual execution but thanks to the dev services and the test containers it's possible to test the whole system in production-like environment.
 
@@ -57,7 +58,7 @@ We will depend on the following technologies to write tests:
 
 ### JUnit
 
-JUnit is a simple framework to write repeatable tests. 
+JUnit is a simple framework to write repeatable tests.
 
 #### Examples
 
@@ -67,7 +68,8 @@ Basic
 @Test // Basic synchronous test
 public void testBasicFunctionality() {
     SimpleService service = new SimpleService();
-    assertEquals("Expected output", service.doSomething()); // <expected>, <actual>
+    // <expected>, <actual>, <message>
+    assertEquals("Expected output", service.doSomething(), "Service did not return the expected output."); 
 }
 
 @Test
@@ -75,7 +77,7 @@ public void testBasicFunctionality() {
 public void testSimpleUni(UniAsserter asserter) { // Gives us UniAsserter to assert the result from Uni
     asserter.assertThat(
         () -> Uni.createFrom().item("Hello"), // Asynchronous code or function
-        result -> assertEquals("Hello", result) // When the result is available, assert it
+        result -> assertEquals("Hello", result, "Did not return hello") // When the result is available, assert it
     );
 }
 
@@ -84,7 +86,7 @@ public void testSimpleUni(UniAsserter asserter) { // Gives us UniAsserter to ass
 public void testReactiveTransaction(UniAsserter asserter) {
     asserter.assertThat(
         () -> Uni.createFrom().item("Expected Result"),
-        result -> assertEquals("Expected Result", result)
+        result -> assertEquals("Expected Result", result, "Did not return expected result.")
     );
 }
 ```
@@ -104,7 +106,7 @@ public class MockedServiceUniTest {
     @Test
     public void testServiceWithMock() {
         Mockito.when(dataService.getData()).thenReturn("Mocked Data");
-        assertEquals("Mocked Data", myService.retrieveData());
+        assertEquals("Mocked Data", myService.retrieveData(), "Did not return mocked data");
     }
 
     @Test
@@ -114,8 +116,8 @@ public class MockedServiceUniTest {
         asserter.execute(() ->  Mockito.when(dataService.getDataAsUni()).thenReturn(Uni.createFrom().item("Mocked Data")));
 
         asserter.assertThat(
-            () -> dataService.getDataAsUni(),
-            result -> assertEquals("Mocked Data", result)
+            () -> myService.getDataAsUni(),
+            result -> assertEquals("Mocked Data", result, "Did not return mocked data")
         );
     }
 }
@@ -123,13 +125,13 @@ public class MockedServiceUniTest {
 
 ### RestAssured
 
-RestAssured is a Java library that provides a testing REST APIs. It's a great tool to implement integration tests but also unit tests for REST endpoints.
+RestAssured is a Java library for testing REST APIs. It's a great tool to implement integration tests but also unit tests for REST endpoints.
 
 #### Examples
 
 ```java
 @QuarkusTest
-@TestHTTPEndpoint(GreetingResource.class) // Which endpoint to test
+@TestHTTPEndpoint(GreetingResource.class) // (Optional) Which endpoint to test
 public class GreetingResourceTest {
     
     // We can also mock underlying services if needed
@@ -206,8 +208,8 @@ If everything is working, all tests should pass and you are ready to submit the 
 
 ## Hints
 
-- You can inspire yourself from tests in `flilght-service`.
-- Create helper methods in tests for create example object.
+- You can get some inspiration from tests in `flight-service`.
+- Create helper methods in tests to create example objects.
 
 ## Troubleshooting
 
