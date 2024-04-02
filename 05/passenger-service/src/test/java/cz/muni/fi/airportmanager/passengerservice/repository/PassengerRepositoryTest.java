@@ -38,6 +38,7 @@ class PassengerRepositoryTest {
     @TestReactiveTransaction
     void shouldFindNotificationsForPassenger(UniAsserter asserter) {
         // TODO implement this test
+        // create a passenger and a notification, add the notification to the passenger and test if the notification is found
         Passenger passenger = createTestPassenger();
         Notification notification = createTestNotification();
 
@@ -61,6 +62,8 @@ class PassengerRepositoryTest {
     void shouldAddNotificationByFlightId(UniAsserter asserter) {
         // TODO implement this test
         // It should test that the notification is added to the appropriate passengers
+        // call addNotificationByFlightId and then check if the notification is present in the passenger's notifications
+        // using findNotificationsForPassenger method
         Passenger passenger = createTestPassenger();
         Notification notification = createTestNotification();
 
@@ -77,7 +80,8 @@ class PassengerRepositoryTest {
     @TestReactiveTransaction
     void shouldFindPassengersForFlight(UniAsserter asserter) {
         // TODO implement this test
-        // Persist a passengers and then get them by flight id
+        // Persist a passenger and then get the its record by flight id
+        // test findPassengersForFlight method
 
         Passenger passenger = createTestPassenger();
 
@@ -97,6 +101,7 @@ class PassengerRepositoryTest {
     void shouldFindHydratedNotifications(UniAsserter asserter) {
         // TODO implement this test
         // this test should find all notifications with the email of the passenger
+        // test findNotificationsWithEmail method
         Passenger passenger = createTestPassenger();
         Notification notification = createTestNotification();
         passenger.addNotification(notification);
@@ -118,6 +123,7 @@ class PassengerRepositoryTest {
     @TestReactiveTransaction
     void shouldHandleNoNotificationsForPassenger(UniAsserter asserter) {
         // TODO implement this test
+        // test findNotificationsForPassenger method
         Passenger passenger = createTestPassenger();
 
         asserter.execute(() -> passengerRepository.deleteAll())
@@ -132,6 +138,7 @@ class PassengerRepositoryTest {
     @TestReactiveTransaction
     void shouldHandleInvalidPassengerIdForNotifications(UniAsserter asserter) {
         // TODO implement this test
+        // test findNotificationsForPassenger method
         asserter.assertThat(
                 () -> passengerRepository.findNotificationsForPassenger(-1L),
                 notifications -> assertEquals(0, notifications.size())
@@ -142,6 +149,7 @@ class PassengerRepositoryTest {
     @TestReactiveTransaction
     void shouldNotAddNotificationToNonExistentFlight(UniAsserter asserter) {
         // TODO implement this test
+        // test addNotificationByFlightId method
         Notification notification = createTestNotification();
 
         asserter.execute(() -> passengerRepository.deleteAll())
@@ -156,6 +164,7 @@ class PassengerRepositoryTest {
     @TestReactiveTransaction
     void shouldHandleNoPassengersForFlight(UniAsserter asserter) {
         // TODO implement this test
+        // test findPassengersForFlight method
         asserter.execute(() -> passengerRepository.deleteAll())
                 .assertThat(
                         () -> passengerRepository.findPassengersForFlight(-1L),
@@ -165,8 +174,9 @@ class PassengerRepositoryTest {
 
     @Test
     @TestReactiveTransaction
-    void shouldHandleEmptyPassengerRepositoryForHydratedNotifications(UniAsserter asserter) {
+    void shouldHandleEmptyPassengerRepositoryForNotificationsWithEmail(UniAsserter asserter) {
         // TODO implement this test
+        // test findNotificationsWithEmail method
         asserter.execute(() -> passengerRepository.deleteAll())
                 .assertThat(
                         passengerRepository::findNotificationsWithEmail,
@@ -179,6 +189,7 @@ class PassengerRepositoryTest {
     @TestReactiveTransaction
     void shouldNotFindNonExistentPassenger(UniAsserter asserter) {
         // TODO implement this test
+        // test findById method
         asserter.execute(() -> passengerRepository.deleteAll())
                 .assertThat(
                         () -> passengerRepository.findById(-1L),
@@ -190,6 +201,7 @@ class PassengerRepositoryTest {
     @TestReactiveTransaction
     void shouldDeletePassenger(UniAsserter asserter) {
         // TODO implement this test
+        // test deleteById method
         Passenger passenger = createTestPassenger();
 
         asserter.execute(() -> passengerRepository.deleteAll())
@@ -200,6 +212,4 @@ class PassengerRepositoryTest {
                         Assertions::assertNull
                 );
     }
-
-    // TODO add at least 2 more tests
 }

@@ -63,7 +63,7 @@ class PassengerRepositoryTest {
     @TestReactiveTransaction
     void shouldFindPassengersForFlight(UniAsserter asserter) {
 
-        // Persist a passengers and then get them by flight id
+        // Persist a passenger and then get the its record by flight id
 
         Passenger passenger = createTestPassenger();
 
@@ -151,7 +151,7 @@ class PassengerRepositoryTest {
 
     @Test
     @TestReactiveTransaction
-    void shouldHandleEmptyPassengerRepositoryForHydratedNotifications(UniAsserter asserter) {
+    void shouldHandleEmptyPassengerRepositoryForNotificationsWithEmail(UniAsserter asserter) {
 
         asserter.execute(() -> passengerRepository.deleteAll())
                 .assertThat(

@@ -138,7 +138,7 @@ class PassengerRepositoryTest {
 
     @Test
     @TestReactiveTransaction
-    void shouldHandleEmptyPassengerRepositoryForHydratedNotifications(UniAsserter asserter) {
+    void shouldHandleEmptyPassengerRepositoryForNotificationsWithEmail(UniAsserter asserter) {
         asserter.execute(() -> passengerRepository.deleteAll())
                 .assertThat(
                         passengerRepository::findNotificationsWithEmail,

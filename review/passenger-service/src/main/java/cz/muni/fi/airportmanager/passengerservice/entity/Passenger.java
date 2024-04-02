@@ -14,10 +14,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-// TODO Add entity annotation
-// TODO Add id field with generated value and it is a primary key
-// TODO Add getters and setters
-// TODO add relation to Notification entity (you will need to change the Notification entity as well)
 public class Passenger {
     @Id
     @GeneratedValue
