@@ -1,8 +1,10 @@
 package cz.muni.fi.airportmanager.passengerservice.resource;
 
-import cz.muni.fi.airportmanager.passengerservice.model.Notification;
+import cz.muni.fi.airportmanager.passengerservice.entity.Notification;
+import cz.muni.fi.airportmanager.passengerservice.model.NotificationDto;
 import cz.muni.fi.airportmanager.passengerservice.model.examples.Examples;
 import cz.muni.fi.airportmanager.passengerservice.service.NotificationService;
+import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -46,8 +48,8 @@ public class NotificationResource {
                     examples = @ExampleObject(name = "flight", value = Examples.VALID_NOTIFICATION_LIST)
             )
     )
-    public RestResponse<List<Notification>> list() {
-        return RestResponse.status(Response.Status.OK, notificationService.listAll());
+    public Uni<RestResponse<List<NotificationDto>>> list() {
+        return notificationService.listAll().onItem().transform(notifications -> RestResponse.status(Response.Status.OK, notifications));
     }
 
     /**
@@ -56,12 +58,11 @@ public class NotificationResource {
     @DELETE
     @Operation(summary = "Delete all notifications")
     @APIResponse(
-            responseCode = "204",
+            responseCode = "200",
             description = "All notifications deleted"
     )
-    public RestResponse<Void> deleteAll() {
-        notificationService.deleteAll();
-        return RestResponse.status(Response.Status.NO_CONTENT);
+    public Uni<RestResponse<Void>> deleteAll() {
+        return notificationService.deleteAll().onItem().transform(ignored -> RestResponse.status(Response.Status.OK));
     }
 
 

@@ -1,46 +1,42 @@
 package cz.muni.fi.airportmanager.passengerservice.service;
 
-import cz.muni.fi.airportmanager.passengerservice.model.Notification;
+import cz.muni.fi.airportmanager.passengerservice.entity.Notification;
+import cz.muni.fi.airportmanager.passengerservice.model.NotificationDto;
+import cz.muni.fi.airportmanager.passengerservice.repository.PassengerRepository;
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
 public class NotificationService {
 
+    @Inject
+    PassengerRepository passengerRepository;
+
+
     /**
-     * This is a temporary storage for notifications
+     * Delete all notifications
+     *
+     * @return number of deleted notifications
      */
-    private final List<Notification> notifications = new ArrayList<>();
+    @WithTransaction
+    public Uni<Long> deleteAll() {
+        // TODO implement this method using Notification active record
+        return Notification.deleteAll();
+    }
 
     /**
      * Get list of all notifications
      *
      * @return list of all notifications
      */
-    public List<Notification> listAll() {
-        return notifications;
-    }
-
-    /**
-     * Create a new notification
-     *
-     * @param notification notification to create
-     * @return created notification
-     */
-    public Notification createNotification(Notification notification) {
-        notification.id =
-                notifications.stream().mapToInt(n -> n.id).max().orElse(0) + 1;
-        notifications.add(notification);
-        return notification;
-    }
-
-    /**
-     * Delete all notifications
-     */
-    public void deleteAll() {
-        notifications.clear();
+    @WithTransaction
+    public Uni<List<NotificationDto>> listAll() {
+//        TODO implement this method after NotificationRepository is implemented
+        return passengerRepository.findNotificationsWithEmail();
     }
 
 }

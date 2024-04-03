@@ -1,142 +1,187 @@
 package cz.muni.fi.airportmanager.passengerservice.service;
 
-import cz.muni.fi.airportmanager.passengerservice.model.Passenger;
+import cz.muni.fi.airportmanager.passengerservice.entity.Notification;
+import cz.muni.fi.airportmanager.passengerservice.entity.Passenger;
+import cz.muni.fi.airportmanager.passengerservice.model.CreatePassengerDto;
+import cz.muni.fi.airportmanager.passengerservice.repository.PassengerRepository;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.BeforeEach;
+import io.quarkus.test.vertx.RunOnVertxContext;
+import io.quarkus.test.vertx.UniAsserter;
+import io.smallrye.mutiny.Uni;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 class PassengerServiceTest {
-    private PassengerService passengerService;
 
-    private Passenger passenger;
+    @InjectMock
+    PassengerRepository passengerRepository;
 
-    @BeforeEach
-    void setUp() {
-        passengerService = new PassengerService();
-        passenger = new Passenger();
-        passenger.id = 1;
-        passenger.firstName = "John";
-        passenger.lastName = "Doe";
-        passenger.email = "john.doe@example.com";
-        passenger.flightId = 100;
+    @Inject
+    PassengerService passengerService;
+
+
+    @Test
+    @RunOnVertxContext
+    void shouldGetListOfPassengers(UniAsserter asserter) {
+        var passenger = createTestPassenger();
+        asserter.execute(() -> Mockito.when(passengerRepository.listAll()).thenReturn(Uni.createFrom().item(List.of(passenger))));
+
+        asserter.assertThat(
+                () -> passengerService.listAll(),
+                passengers -> {
+                    assertNotNull(passengers);
+                    assertFalse(passengers.isEmpty());
+                    assertEquals(1, passengers.size());
+                    assertEquals(passenger, passengers.get(0));
+                }
+        );
     }
 
     @Test
-    void testListAllPassengers() {
-        passengerService.createPassenger(passenger);
-        List<Passenger> passengers = passengerService.listAll();
-        assertNotNull(passengers);
-        assertFalse(passengers.isEmpty());
-        assertEquals(1, passengers.size());
-        assertEquals(passenger, passengers.get(0));
+    @RunOnVertxContext
+    void shouldGetExistingPassenger(UniAsserter asserter) {
+        var passenger = createTestPassenger();
+        asserter.execute(() -> Mockito.when(passengerRepository.findById(passenger.getId())).thenReturn(Uni.createFrom().item(passenger)));
+
+        asserter.assertThat(
+                () -> passengerService.getPassenger(passenger.getId()),
+                found -> {
+                    assertNotNull(found);
+                    assertEquals(passenger, found);
+                }
+        );
     }
 
     @Test
-    void testGetPassenger_Success() {
-        passengerService.createPassenger(passenger);
-        Passenger found = passengerService.getPassenger(passenger.id);
-        assertNotNull(found);
-        assertEquals(passenger, found);
+    @RunOnVertxContext
+    void shouldGetPassengersForFlight(UniAsserter asserter) {
+        var passenger = createTestPassenger();
+        Long flightId = 123L;
+        asserter.execute(() -> Mockito.when(passengerRepository.findPassengersForFlight(flightId)).thenReturn(Uni.createFrom().item(List.of(passenger))));
+
+        asserter.assertThat(
+                () -> passengerService.getPassengersForFlight(flightId),
+                passengers -> {
+                    assertNotNull(passengers);
+                    assertFalse(passengers.isEmpty());
+                    assertEquals(1, passengers.size());
+                    assertEquals(passenger, passengers.get(0));
+                }
+        );
     }
 
     @Test
-    void testGetPassenger_NotFound() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            passengerService.getPassenger(999);
-        });
+    @RunOnVertxContext
+    void shouldCreatePassenger(UniAsserter asserter) {
+        var passengerDto = createTestPassengerDto();
+        var passenger = Passenger.fromDto(passengerDto);
+        asserter.execute(() -> Mockito.when(passengerRepository.persist(passenger)).thenReturn(Uni.createFrom().item(passenger)));
+
+        asserter.assertThat(
+                () -> passengerService.createPassenger(passengerDto),
+                created -> {
+                    assertNotNull(created);
+                    assertEquals(passenger, created);
+                }
+        );
     }
 
     @Test
-    void testGetPassengersForFlight() {
-        // Arrange: Create and add several passengers, some with the same flight ID
-        Passenger passenger1 = new Passenger();
-        passenger1.id = 2;
-        passenger1.firstName = "Alice";
-        passenger1.lastName = "Smith";
-        passenger1.email = "alice.smith@example.com";
-        passenger1.flightId = 100;
-        passengerService.createPassenger(passenger1);
+    @RunOnVertxContext
+    void shouldDeleteExistingPassenger(UniAsserter asserter) {
+        Long passengerId = 1L;
+        asserter.execute(() -> Mockito.when(passengerRepository.deleteById(passengerId)).thenReturn(Uni.createFrom().item(true)));
 
-        Passenger passenger2 = new Passenger();
-        passenger2.id = 3;
-        passenger2.firstName = "Bob";
-        passenger2.lastName = "Johnson";
-        passenger2.email = "bob.johnson@example.com";
-        passenger2.flightId = 101;
-        passengerService.createPassenger(passenger2);
-
-        passengerService.createPassenger(passenger); // passenger with flightId = 100 from setUp method
-
-        // Act: Retrieve passengers for a specific flight ID
-        List<Passenger> passengersForFlight100 = passengerService.getPassengersForFlight(100);
-
-        // Assert: Ensure the retrieved list contains the correct passengers
-        assertEquals(2, passengersForFlight100.size());
-        assertTrue(passengersForFlight100.contains(passenger));
-        assertTrue(passengersForFlight100.contains(passenger1));
+        asserter.assertTrue(
+                () -> passengerService.deletePassenger(passengerId)
+        );
     }
 
     @Test
-    void testUpdatePassenger_Success() {
-        passengerService.createPassenger(passenger);
-        passenger.lastName = "Smith";
-        Passenger updated = passengerService.updatePassenger(passenger);
-        assertNotNull(updated);
-        assertEquals("Smith", updated.lastName);
+    @RunOnVertxContext
+    void shouldDeleteAllPassengers(UniAsserter asserter) {
+        asserter.execute(() -> Mockito.when(passengerRepository.deleteAll()).thenReturn(Uni.createFrom().item(1L)));
+
+        asserter.assertThat(
+                () -> passengerService.deleteAllPassengers(),
+                count -> {
+                    assertNotNull(count);
+                    assertEquals(1L, count);
+                }
+        );
     }
 
     @Test
-    void testUpdatePassenger_NotFound() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            passengerService.updatePassenger(passenger);
-        });
+    @RunOnVertxContext
+    void shouldAddNotificationByFlightId(UniAsserter asserter) {
+        Long flightId = 123L;
+        Long passengerId = 1L;
+        var notification = createNotification();
+
+        // Mock the behavior of the repository
+        asserter.execute(() -> Mockito.when(passengerRepository.addNotificationByFlightId(flightId, notification)).thenReturn(Uni.createFrom().voidItem()));
+        asserter.execute(() -> Mockito.when(passengerRepository.findNotificationsForPassenger(passengerId)).thenReturn(Uni.createFrom().item(List.of(notification))));
+
+        asserter.execute(() -> passengerService.addNotificationByFlightId(flightId, notification))
+                .assertThat(
+                () -> passengerService.findNotificationsForPassenger(passengerId),
+                notifications -> assertTrue(notifications.stream().anyMatch(n -> n.message.equals(notification.message)))
+        );
     }
 
     @Test
-    void testDeletePassenger_Success() {
-        passengerService.createPassenger(passenger);
-        passengerService.deletePassenger(passenger.id);
-        assertThrows(IllegalArgumentException.class, () -> {
-            passengerService.getPassenger(passenger.id);
-        });
+    @RunOnVertxContext
+    void shouldFindNotificationsForPassenger(UniAsserter asserter) {
+        Long passengerId = 1L;
+        var notification = createNotification();
+        List<Notification> testNotifications = List.of(notification);
+        // Mock the behavior of the repository
+        asserter.execute(() -> Mockito.when(passengerRepository.findNotificationsForPassenger(passengerId)).thenReturn(Uni.createFrom().item(testNotifications)));
+
+        asserter.assertThat(
+                () -> passengerService.findNotificationsForPassenger(passengerId),
+                notifications -> {
+                    assertNotNull(notifications);
+                    assertFalse(notifications.isEmpty());
+                    assertEquals(testNotifications.size(), notifications.size());
+                    assertEquals(testNotifications, notifications);
+                }
+        );
     }
 
-    @Test
-    void testDeletePassenger_NotFound() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            passengerService.deletePassenger(999);
-        });
+
+    private Passenger createTestPassenger() {
+        Passenger passenger = new Passenger();
+        passenger.setId(1L);
+        passenger.setFirstName("John");
+        passenger.setLastName("Doe");
+        passenger.setFlightId(1L);
+        passenger.setEmail("john@gmail.com");
+        return passenger;
     }
 
-    @Test
-    void testDeleteAllPassengers() {
-        passengerService.createPassenger(passenger);
-        passengerService.deleteAllPassengers();
-        List<Passenger> passengers = passengerService.listAll();
-        assertTrue(passengers.isEmpty());
+    private CreatePassengerDto createTestPassengerDto() {
+        CreatePassengerDto passengerDto = new CreatePassengerDto();
+        passengerDto.firstName = "John";
+        passengerDto.lastName = "Doe";
+        passengerDto.flightId = 1L;
+        passengerDto.email = "john@gmail.com";
+        return passengerDto;
     }
 
-    @Test
-    void testCreatePassenger_Success() {
-        Passenger created = passengerService.createPassenger(passenger);
-        assertNotNull(created);
-        assertEquals(passenger, created);
-    }
-
-    @Test
-    void testCreatePassenger_AlreadyExists() {
-        passengerService.createPassenger(passenger);
-        assertThrows(IllegalArgumentException.class, () -> {
-            passengerService.createPassenger(passenger);
-        });
+    private Notification createNotification() {
+        Notification notification = new Notification();
+        notification.message = "Test message";
+        return notification;
     }
 }

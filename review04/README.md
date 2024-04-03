@@ -1,314 +1,305 @@
-# 03 - OpenAPI specification and gRPC
+# 04 - Async, Persistence
 
-## What is the role of API?
+## SmallRye Mutiny
 
-The main role of Application programming interface (API) is to allow easy communication between different software
-components. It should describe the functionality of the component and the way it can be used. The API should be easy to
-use and understand.
+Since we will be using reactive approach it is a good thing to know something about Mutiny.
 
-### Contract first approach
+Mutiny is a reactive programming library for Java. It is based on Reactive Streams and MicroProfile Reactive Streams Operators. So when you see `Uni` or `Multi` in the code, it means that the method returns a reactive type and the method is asynchronous.
 
-API is a first-class citizen meaning that it should be designed before the implementation. This approach is called
-contract first. The contract is a document that describes the API. The most popular format to define API documentation
-is OpenAPI.
+**What are `Uni` and `Multi`?**
 
-It's a good approach to spend more time on designing the API so other services (and teams) could rely on it when
-implementing their own services. It shouldn't be changed. If it's necessary to change the API, it should be done in a
-backward compatible way. Eg. versioning the api like `/api/v1/...` and `/api/v2/...`.
+`Uni` is a type that emits either a single item or an error. `Multi` is a type that emits a stream of items or an error.
 
-#### Benefits of contract first approach
+**Pros of asynchronous programming:**
+- Non-blocking
+- Better resource utilization
+- Better scalability
 
-- Teams can work in parallel on business logic since the API is already defined
-- The API is designed with the client in mind
-- No unused endpoints
+**Cons of asynchronous programming:**
+- Complexity of callbacks, exceptions
+- Harder to debug
+- Harder to test
 
-#### Drawbacks of contract first approach
+For more in depth discussion about asynchronous programming and the difference with multithreading, see [this article](https://www.baeldung.com/cs/async-vs-multi-threading).
 
-- Limited flexibility for changes in the API
-- Upfront time and effort to design the API
+### Mutiny's Fluent API
 
-### Code first approach
+Mutiny provides a fluent API for building reactive streams. It's a chain of operations in a readable and expressive manner. This approach simplifies complexity of asynchronous programming.
 
-The code first approach is the opposite of the contract first approach. First the code is written and then the API is
-generated from the code.
+The design of the API is designed to be easy to read and understand what the code does. It's a chain of operations that are executed when the previous operation is done.
 
-#### Benefits of code first approach
+### `onItem` and `transform` methods
 
-- Easy to start
-- Flexible with change the API
-- The API is always up to date
+- `onItem` and `transform` methods are used to process the result of the asynchronous operation. It's event driven reaction to the result of the operation when it's done.
 
-#### Drawbacks of code first approach
-
-- The API is not designed with the client in mind
-- May result in unused endpoints that are just "hanging around"
-
-## OpenAPI specification
-
-OpenAPI is a specification standard for describing REST APIs. It's a language-agnostic format that can be used to
-describe APIs for different programming languages.
-
-It is an open standard for describing your APIs, allowing you to provide an API specification encoded in a JSON or YAML
-document embedding the fundamentals of HTTP and JSON.
-
-### OpenAPI in Quarkus
-
-Quarkus supports OpenAPI specification generation from the code via `quarkus-smallrye-openapi` extension that we
-installed in the first lecture.
-
-#### Application annotation
-
-We can extend OpenAPI specification with additional information using `@OpenAPIDefinition` annotation for the whole
-application.
-
+Example:
 ```java
+Uni<String> processedUni = Uni.createFrom().item("Hello") // Creates an async uni that emits a single item
+        .onItem() // Reacts to the item
+        .transform(item -> item + " World"); // Transforms the item to antoher item that is synchronous
 
-@OpenAPIDefinition(
-        tags = {
-                @Tag(name = "widget", description = "Widget operations."),
-                @Tag(name = "gasket", description = "Operations related to gaskets")
-        },
-        info = @Info(
-                title = "Example API",
-                version = "1.0.1",
-                contact = @Contact(
-                        name = "Example API Support",
-                        url = "http://exampleurl.com/contact",
-                        email = "techsupport@example.com"),
-                license = @License(
-                        name = "Apache 2.0",
-                        url = "https://www.apache.org/licenses/LICENSE-2.0.html"))
-)
-public class FlightServiceApplication extends Application {
-    //...
-}
+
+Uni<String> chainedUni = Uni.createFrom().item(123) // Creates an async uni that emits a single item
+        .onItem() // Reacts to the item
+        .transformToUni(id -> fetchNameById(id)); // Transforms the item to another item
 ```
 
-Note that `FlightServiceApplication` extends `Application` class from `jakarta.ws.rs.core.Application`. It can define the components of an application and supplies additional meta-data. It's not necessary to extend this class, but it's required for the use
-of `@OpenAPIDefinition`.
+## Persistence with Panache
 
-It cal also be done in `application.properties`:
+Panache is ORM (Object Relational Mapping) layer for Quarkus. It is based on Hibernate ORM and Hibernate Reactive.
 
-```properties 
-quarkus.smallrye-openapi.tags.widget.name=widget
-quarkus.smallrye-openapi.tags.widget.description=Widget operations.
-quarkus.smallrye-openapi.tags.gasket.name=gasket
-quarkus.smallrye-openapi.tags.gasket.description=Operations related to gaskets
-quarkus.smallrye-openapi.info.title=Example API
-quarkus.smallrye-openapi.info.version=1.0.1
-```
+For both PanacheEntity and PanacheRepository, you can see examples bellow.
 
-#### Resource annotation
+### What is ORM?
 
-We can also provide additional information for resources using `@Tag` annotation.
+ORM is a technique that lets you query and manipulate data in a database using an object-oriented paradigm. Thus, instead of writing SQL queries, you can write Java code to perform the same operations.
+
+It introduces abstraction between the database and the application. You can change more easily the database without changing the application code.
+
+### PanacheEntity
+
+PanacheEntity is a base class for entities. It provides basic operations for entities such as persist, delete, find, etc. It's used for active record pattern.
+
+#### What gives you PanacheEntity?
+
+Attributes:
+- `id` - Automatically adds the primary key of the entity.
+
+Methods:
+- `persist()` - Persists the entity to the database.
+- `delete()` - Deletes the entity from the database.
+- `isPersistent()` - Checks if the entity is persistent.
+- `findById()` - Finds an entity by its primary key.
+- `listAll()` - Returns a list of all entities.
+- `count()` - Returns the number of entities.
+- `find()` - Finds entities by a query.
+- ... and more
+
+### PanacheRepository
+
+PanacheRepository is a base class for repositories. It provides similar logic as PanacheEntity, but it's used for repository pattern.
+
+But you need to define the entity more explicitly. With id, getters and setters, etc. Then you will create a repository class that extends `PanacheRepository<Entity>`.
+
+### Entities with relations
+
+If you have entities with relations, you can use `@OneToMany`, `@ManyToOne`, `@OneToOne`, `@ManyToMany` annotations to define the relation between entities. Then with `@JoinColumn` you can define the column that will be used for the join.
+
+#### Example
 
 ```java
+@Entity // JPA (Java Persistence API) entity 
+public class Post {
 
-@Tag(name = "Flight resource", description = "Provides Flight CRUD operations")
-public class FlightResource {
-    //...
-}
-```
+    @Id
+    @GeneratedValue
+    private Long id;
 
-#### Endpoint annotation
+    private String title;
 
-There are several annotations that can be used to provide additional information for endpoints.
+    @OneToMany(
+            mappedBy = "post", // The name of the field in PostComment that references back to this Post entity, indicating PostComment's ownership of the relationship.
+            cascade = CascadeType.ALL, // All operations on the child will be cascaded to the parent
+            orphanRemoval = true // If the child is removed from the collection, it will be removed from the database
+    )
+    @JoinColumn(name = "postId") // The name of the column that will be used for the join
+    private List<PostComment> comments = new ArrayList<>();
 
-- `@Operation` - provides information about the operation
-- `@APIResponse` - provides information about the response
-- `@Schema` - provides information about the schema
+    //Constructors, getters and setters removed for brevity
 
-Best understood on an example from `passenger-service`:
-
-```java
-/**
- * Update passenger
- *
- * @param id        id of passenger
- * @param passenger passenger to update
- */
-@PUT
-@Path("/{id}")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-@Operation(summary = "Update passenger")
-@APIResponse(
-        responseCode = "200",
-        description = "Updated passenger",
-        content = @Content(
-                mediaType = APPLICATION_JSON,
-                schema = @Schema(implementation = Passenger.class, required = true),
-                examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER)
-        )
-)
-@APIResponse(
-        responseCode = "404",
-        description = "Passenger with given id does not exist"
-)
-public RestResponse<Passenger> update(@Parameter(name = "id", required = true, description = "Passenger id") @PathParam("id") int id,
-                                      @Schema(implementation = Passenger.class, required = true)
-                                      Passenger passenger) {
-    if (passenger.id != id) {
-        return RestResponse.status(Response.Status.BAD_REQUEST);
+    public void addComment(PostComment comment) {
+        comments.add(comment);
+        comment.setPost(this);
     }
-    try {
-        var updatedPassenger = passengerService.updatePassenger(passenger);
-        return RestResponse.status(Response.Status.OK, updatedPassenger);
-    } catch (IllegalArgumentException e) {
-        return RestResponse.status(Response.Status.NOT_FOUND);
+
+    public void removeComment(PostComment comment) {
+        comments.remove(comment);
+        comment.setPost(null);
     }
 }
-```
 
-When you will run `quarkus dev` in `passenger-service`, you can see the OpenAPI specification in the browser
-at http://localhost:8078/q/openapi.
+@Entity
+public class PostComment {
 
-## What is gRPC?
+    @Id
+    @GeneratedValue
+    private Long id;
 
-gRPC is a high performance, open-source universal Remote Procedure Call (RPC) framework. It's based on HTTP/2 and
-Protocol Buffers. You can imagine it as a middleware between your service and outside world. Simply put client service with Stub is calling gRPC service as a async method call. 
+    private String review;
 
-![gRPC](img/grpc.png)
+    @ManyToOne
+    @JoinColumn(name = "postId") // postId is foreign key to the Post entity
+    private Post post; // This field references the Post entity
 
-### Main features:
-
-- HTTP/2 based - low latency, multiplexing, header compression, stream prioritization
-- High performance - binary protocol, efficient serialization, asynchronous by default
-- Bidirectional streaming - client and server can send messages at the same time
-
-### Differences between REST and gRPC
-
-| x             | REST                                   | gRPC                                                        |
-|---------------|----------------------------------------|-------------------------------------------------------------|
-| Data          | Text based                             | Binary                                                      |
-| Data formats  | Loose, often using JSON or XML schemas | Strict, uses Protocol Buffers for schema definition         |
-| Communication | One-directional                        | Supports bidirectional streaming                            |
-| Methods       | HTTP verbs (POST, GET,...)             | RPC methods                                                 |
-
-### Protocol Buffers
-
-Protocol Buffers are Interface Definition Language (IDL) for describing both the service interface and the structure of the payload messages. It's a binary format that is smaller and faster than JSON. It's defined in `.proto` files.
-
-Sample `src/main/proto/helloworld.proto` file:
-
-```proto
-syntax = "proto3";
-
-option java_multiple_files = true;
-option java_package = "io.quarkus.example";
-option java_outer_classname = "HelloWorldProto";
-
-package helloworld;
-
-// The greeting service definition.
-service Greeter {
-    // Sends a greeting
-    rpc SayHello (HelloRequest) returns (HelloReply) {}
-}
-
-// The request message containing the user's name.
-message HelloRequest {
-    string name = 1;
-    string surname = 2;
-}
-
-// The response message containing the greetings
-message HelloReply {
-    string message = 1;
+    //Constructors, getters and setters removed for brevity
 }
 ```
 
-From this file, Quarkus can generate Java classes that can be used in your application. To generate the classes use `mvn compile`.
+## Active record vs repository
+
+Both active record and repository are patterns for accessing data in a database.
+
+### Active record
+
+The Active record pattern is an approach where the data access logic is part of the entity itself. Each entity (or record) is responsible for its own persistence and encapsulates both the data and the behavior that operates on the data.
+
+Pros:
+- It's easy to set up for simple operations
+- Less boilerplate
+
+Cons:
+- Logic not separated from data
+- Tight coupling between schema and code
+
+#### Example
+
+```java
+@Entity
+public class Person extends PanacheEntity {
+    public String name;
+    public LocalDate birth;
+    public Status status;
+
+    public static Uni<Person> findByName(String name){
+        return find("name", name).firstResult();
+    }
+}
+```
+Basic usage
+```java    
+// persist it
+Uni<Void> persistOperation = person.persist();
+
+// check if it is persistent
+if(person.isPersistent()){
+    // delete it
+    Uni<Void> deleteOperation = person.delete();
+}
+
+// getting a list of all Person entities
+Uni<List<Person>> allPersons = Person.listAll();
+
+// finding a specific person by ID
+Uni<Person> personById = Person.findById(23L);
+```
+
+### Repository
+
+Instead of having both schema and logic in the same class, the repository pattern separates schema from data access logic in a separate class. 
+
+Pros:
+- Logic separated from data
+- Cleaner and more testable code
+- DAL (Data Access Layer) is decoupled from the rest of the application
+
+Cons:
+- More boilerplate for simple operations
+- Takes more time to set up
+
+#### Example
+
+```java
+@Entity
+public class Person {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String name;
+    private LocalDate birth;
+    private Status status;
+    
+    // getters and setters
+}
+
+@ApplicationScoped
+public class PersonRepository implements PanacheRepository<Person> {
+
+    // put your custom logic here as instance methods
+
+    public Uni<Person> findByName(String name){
+        return find("name", name).firstResult();
+    }
+
+    public Uni<List<Person>> findAlive(){
+        return list("status", Status.Alive);
+    }
+
+    public Uni<Long> deleteStefs(){
+        return delete("name", "Stef");
+    }
+}
+```
+
+#### `@WithTransaction` annotation
+
+- `@WithTransaction` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back. This annotation is used when accessing the database. Altering the database should be done in a transactional context, but also reading from the database. Example bellow.
+- Transactions follow unit of work pattern. It means that all operations in a transaction are treated as a single unit of work. If any operation fails, the whole transaction is rolled back.
+
+Example of sql query that should run in a transactional context:
+```sql
+myRows = query(SELECT * FROM A); 
+-- between these two queries, another transaction can delete the rows from table A, thus altering the result of the second query --> consistency problem
+moreRows = query(SELECT * FROM B WHERE a_id IN myRows[id]);
+```
+
+
+## How does dev services help us in development?
+
+Dev services gives us a way to make development easier. 
+
+What gives us dev services?
+- Automatic startup -- check configuration, download dependencies and start the service
+- Continuous testing -- automatic testing of the service
+- Configuration management -- automatic configuration of the service and database connection
+
+For this week's lecture the main benefit is a way to run a database in a docker container without any configuration from developer side. Of course, it's only for development purposes. But during the initial development phase, it's very useful. Before we will create a configuration to dockerized database.
 
 ## State of the project
 
-Since the last lecture the project now includes 2 modules - `flight-service` and `passenger-service`.
-
-- `flight-service` is a REST service that provides CRUD operations for flights. You already know this service from the previous lectures. Runs on port `8079`.
-- `passenger-service` is a REST service that provides CRUD operations for passengers and get new notifications. Also, it provides a gRPC interface to notify passenger about flight cancellation. Runs on port `8078`.
+- The `flight-service` has implemented the repository pattern with panache.
+- REST APIs and services are now asynchronous. 
+- Objects DTOs are created where needed. Eg. `NotificationDto` in `passenger-service`.
+- Panache extension and 
 
 ## Tasks
 
-### 1. Add OpenAPI specification to `flight-service`
+### 0. Running docker
 
-#### 1.1 Create information about the application
+Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker container.
 
-Create `FlightServiceApplication` class in `cz.muni.fi` that extends `Application` class from `jakarta.ws.rs.core.Application`. Add
-`@OpenAPIDefinition` annotation with `info` field. Add title, version and description as shown in the screenshot bellow.
+### 1. Make `Notification` active record entity
 
+In `passenger-service` make Notification entity as active record using PanacheEntity.
 
-#### 1.2 Create information about the resource
+Implement `deleteAll` in `NotificationService` with the usage of  `Notification` active record. The `listAll` method will be implemented in the next task.
 
-Add `@Tag` annotation for `FlightResource` class. Provide name and description as shown in the screenshot bellow.
+Check if the tests for Notification entity deletion are passing. Run in the passenger-service directory:
 
-#### 1.3 Create information about the endpoints
+```bash
+./mvnw clean test
+```
 
-Add `@Operation`, `@APIResponse`, `@Schema`, and `@Parameter` annotations for each method and parameter in `FlightResource` class similar to `PassengerResource` in `passenger-service`. You will find response examples in `Examples` class that you can use.
+### 2. Make `Passenger` entity
 
-- `@Operation` - provide summary and description
-- `@APIResponse` - provide response code, description, content and schema
-- `@Schema` - provide implementation and required
-- `@Parameter` - provide name, required and description
+In `Passenger` entity add correct annotations with getters and setters to make it persistence entity that will be used in `PassengerRepository`.
 
-![OpenAPI](img/openapi.png)
+Hmm, but what about the relation with notifications? Passenger can have multiple notifications. Add the relation between `Passenger` and `Notification` entities.
 
-### 2. Generate Grpc classes
+### 3. Implement `PassengerRepository`
 
-#### 2.1. Modify `flightcancellation.proto` file in `flight-service` and `passenger-service` module
+Implement methods in `PassengerRepository` to make it a repository for `Passenger` entity.
 
-Because we want from our services to act independently, we have to define the same contract in both services.
+Don't forget to implement `NotificationService#listAll` method using `PassengerRepository`.
 
-In `flightcancellation.proto` file add under the configuration `FlightCancellation` service with `CancelFlight` rpc that will take `CancelFlightRequest` with `id` (int) and `reason` (string) fields. It will return `CancelFlightResponse` with `status` (`FlightCancellationResponseStatus` enum) field.
+#### 3.1. How to test if everything is working?
 
-#### 2.2. Generate classes
+- Tests are passing
 
-Run `mvn compile` in services to generate classes from `.proto` file.
-
-When you run this command, you should be able to generated classes in `flight-service/target/generated-sources/grpc/cz/muni/fi/proto` and `passenger-service/target/generated-sources/grpc/cz/muni/fi/proto` directories. Check if they are there. This files will be used in `passenger-service` to implement gRPC service and in `flight-service` to implement gRPC stub.
-
-### 3. Implement `FlightCancellationService`
-
-Now we will implement `FlightCancellationService` in `passenger-service` that will implement `FlightCancellation` rpc.
-
-#### 3.1. Implement `cancelFlight` method
-
-Implement `cancelFlight` method in `FlightCancellationService` class. There is a JavaDoc that describes what the method should do. 
-
-#### 3.2. Test it with DevUI or Postman 
-
-**Dev UI**
-
-You can go to http://localhost:8078/q/dev-ui/io.quarkus.quarkus-grpc/services where you can test the gRPC service. You need to provide the id of the flight and the reason for the cancellation. The request shouldn't fail.
-
-**Postman**
-
-When you will be done, run passenger service in dev mode and try to call the gRPC service from Postman. You need to create new gRPC collection in Postman with url `localhost:9000` and choose CancelFlight. The request shouldn't fail.
-
-![Postman](img/postman_grpc.png)
-
-### 4. Use stub in `flight-service`
-
-Now because both `flight-service` and `passenger-service` have proto contract, we can use stubs in `flight-service` to call `cancelFlight` method. 
-
-#### 4.1. Use Grpc Client to use Stub `FlightCancellationService` in `FlightService`
-
-Now similar to injecting `FlightService` into `FlightResource` with `@Inject` we can inject `FlightCancellationService` into `FlightResource` with `@GrpcClient`. In `@GrpcClient` we need to provide the name of the service that we want to use. In our case it's `passenger-service`.
-
-The class of stub that we are injecting is `MutinyFlightCancellationGrpc.MutinyFlightCancellationStub`. Methods on this class are asynchronous and return `Uni` object. We can use `await().indefinitely()` to wait for the result.
-
-#### 4.2. Implement `cancelFlight` method in `FlightService`
-
-Implement `cancelFlight` method in `FlightService` that will call `cancelFlight` method on stub. You can use `await().indefinitely()` to wait for the result.
-
-#### 4.3. Test it 
-
-Now, everything should be set up. You can run both services in dev mode to try if they are communicating correctly.
-
-Scenario:
-1. Create new flight using `POST localhost:8079/flight`
-2. Create new passenger using `POST localhost:8078/passenger` with flightId = id of flight from step 1
-3. Cancel flight using `PUT localhost:8079/flight/{id}`
-4. Check if there is a list of notifications in `GET localhost:8078/notification` that contains notification about flight cancellation for passenger from step 2
+Test scenario
+- Create a flight using swagger ui
+- Create a passenger using swagger ui with appropriate flight id
+- Call cancel flight endpoint
+- Check if the GET notification endpoint returns the notification for the passenger with his email.
 
 ### X. Submit the solution
 
@@ -316,20 +307,18 @@ Scenario:
 
 ## Hints
 
-- Type of id should be `int32` in `.proto` file.
-- For example OpenAPI specification see `passenger-service` service.
-- `@GrpcClient("passenger-service")`
+- In `flight-service` you can find implemented repository pattern with panache.
+- If something is not working, and it should (Developers aren't doing mistakes right?) run maven clean and compile commands.
 
 ## Troubleshooting
 
-- If you are using IntelliJ, you can run `mvn compile` from IDE Maven plugin under lifecycle. Idea has problem of recognizing generated classes. Or reload all maven projects.
-  - There is also an option to right-click the generated sources directory and mark it as sources.
+- Check if your docker engine is running.
 
 ## Further reading
 
 - https://quarkus.io
-- https://www.openapis.org/
-- https://swagger.io/resources/articles/adopting-an-api-first-approach/
-- https://www.visual-paradigm.com/guide/development/code-first-vs-design-first/ 
-- https://grpc.io/docs/what-is-grpc/introduction/
-- https://quarkus.io/guides/grpc-getting-started
+- https://quarkus.io/guides/hibernate-reactive-panache
+- https://medium.com/@shiiyan/active-record-pattern-vs-repository-pattern-making-the-right-choice-f36d8deece94
+- https://quarkus.io/guides/mutiny-primer
+- https://medium.com/@rajibrath20/the-best-way-to-map-a-onetomany-relationship-with-jpa-and-hibernate-dbbf6dba00d3
+- https://quarkus.io/guides/dev-services
