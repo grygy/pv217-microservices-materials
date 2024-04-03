@@ -19,8 +19,8 @@ It's also useful for monitoring tools to check the state of the application and 
 #### Types
 
 1. Liveness -- The liveness probe checks if the service is healthy. If the probe fails, the service is not running, cannot be recovered, and should be restarted.
-2. Readiness -- If the application is ready to serve traffic, requests are not prohibited. Dependencies, databases, and external services are connected. If the readiness probe fails, the service is not yet ready to serve traffic, but it's not considered as a failure and the service is not restarted. This probe prevents routing to instance which is warming up or loading data.
-3. Startup -- This probe determinates if the application consider itself successfully initialized. That doesn't mean it's ready so serve traffic, but rather that all core components and configurations are loaded and initialized. 
+2. Readiness -- The readiness probe checks if the application is ready to serve traffic; requests are not prohibited. Dependencies, databases, and external services are connected. If the readiness probe fails, the service is not yet ready to serve traffic, but it's not considered a failure, and the service is not restarted. This probe prevents routing to the instance which is warming up or loading data.
+3. Startup -- The startup probe determines if the application considers itself successfully initialized. That doesn't necessarily mean it's ready to serve traffic, but rather that all core components and configurations are loaded and initialized.
 
 ### SmallRye Health
 
