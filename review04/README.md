@@ -41,26 +41,42 @@ Uni<String> processedUni = Uni.createFrom().item("Hello") // Creates an async un
 
 Uni<String> chainedUni = Uni.createFrom().item(123) // Creates an async uni that emits a single item
         .onItem() // Reacts to the item
-        .transformToUni(id -> fetchNameById(id)); // Transforms the item to another item
+        .transformToUni(number -> Uni.createFrom().item(number * 10)); // Transforms the item to another item
 ```
 
-## Persistence with Panache
-
-Panache is ORM (Object Relational Mapping) layer for Quarkus. It is based on Hibernate ORM and Hibernate Reactive.
-
-For both PanacheEntity and PanacheRepository, you can see examples bellow.
-
-### What is ORM?
+## What is Object Relational Mapping (ORM)?
 
 ORM is a technique that lets you query and manipulate data in a database using an object-oriented paradigm. Thus, instead of writing SQL queries, you can write Java code to perform the same operations.
 
 It introduces abstraction between the database and the application. You can change more easily the database without changing the application code.
 
-### PanacheEntity
+### Persistence with Panache
+
+Panache is ORM layer for Quarkus. It is based on Hibernate ORM and Hibernate Reactive.
+
+For both PanacheEntity and PanacheRepository, you can see examples bellow.
+
+## Active record vs repository
+
+Both active record and repository are patterns for accessing data in a database.
+
+### Active record
+
+The Active record pattern is an approach where the data access logic is part of the entity itself. Each entity (or record) is responsible for its own persistence and encapsulates both the data and the behavior that operates on the data.
+
+Pros:
+- It's easy to set up for simple operations
+- Less boilerplate
+
+Cons:
+- Logic not separated from data
+- Tight coupling between schema and code
+
+#### PanacheEntity
 
 PanacheEntity is a base class for entities. It provides basic operations for entities such as persist, delete, find, etc. It's used for active record pattern.
 
-#### What gives you PanacheEntity?
+##### What gives you PanacheEntity?
 
 Attributes:
 - `id` - Automatically adds the primary key of the entity.
@@ -75,13 +91,106 @@ Methods:
 - `find()` - Finds entities by a query.
 - ... and more
 
+#### Example
+
+```java
+import io.quarkus.hibernate.reactive.panache.PanacheEntity; // note the reactive package. There is also a non-reactive variant
+
+@Entity
+public class Person extends PanacheEntity {
+    public String name;
+    public LocalDate birth;
+    public Status status;
+
+    public static Uni<Person> findByName(String name){
+        return find("name", name).firstResult();
+    }
+}
+```
+Basic usage
+```java    
+// persist it
+Uni<Void> persistOperation = person.persist();
+
+// check if it is persistent
+if(person.isPersistent()){
+    // delete it
+    Uni<Void> deleteOperation = person.delete();
+}
+
+// getting a list of all Person entities
+Uni<List<Person>> allPersons = Person.listAll();
+
+// finding a specific person by ID
+Uni<Person> personById = Person.findById(23L);
+```
+
+### Repository
+
+Instead of having both schema and logic in the same class, the repository pattern separates schema from data access logic in a separate class. 
+
+Pros:
+- Logic separated from data
+- Cleaner and more testable code
+- DAL (Data Access Layer) is decoupled from the rest of the application
+
+Cons:
+- More boilerplate for simple operations
+- Takes more time to set up
+
 ### PanacheRepository
 
 PanacheRepository is a base class for repositories. It provides similar logic as PanacheEntity, but it's used for repository pattern.
 
 But you need to define the entity more explicitly. With id, getters and setters, etc. Then you will create a repository class that extends `PanacheRepository<Entity>`.
 
-### Entities with relations
+#### Example
+
+```java
+@Entity
+public class Person {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String name;
+    private LocalDate birth;
+    private Status status;
+    
+    // getters and setters
+}
+
+@ApplicationScoped
+public class PersonRepository implements PanacheRepository<Person> {
+
+    // put your custom logic here as instance methods
+
+    public Uni<Person> findByName(String name){
+        return find("name", name).firstResult();
+    }
+
+    public Uni<List<Person>> findAlive(){
+        return list("status", Status.Alive);
+    }
+
+    public Uni<Long> deleteStefs(){
+        return delete("name", "Stef");
+    }
+}
+```
+
+#### `@WithTransaction` annotation
+
+- `@WithTransaction` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back. This annotation is used when accessing the database. Altering the database should be done in a transactional context, but also reading from the database. Example bellow.
+- Transactions follow unit of work pattern. It means that all operations in a transaction are treated as a single unit of work. If any operation fails, the whole transaction is rolled back.
+
+Illustrative example of sql query that should run in a transactional context:
+```sql
+SELECT AVG(price) as mean_price FROM price_table; 
+-- between these two queries, another transaction can delete the rows from price_table, thus altering the result of the second query --> consistency problem
+SELECT * FROM product_table WHERE price > mean_price;
+```
+
+## Entities with relations
 
 If you have entities with relations, you can use `@OneToMany`, `@ManyToOne`, `@OneToOne`, `@ManyToMany` annotations to define the relation between entities. Then with `@JoinColumn` you can define the column that will be used for the join.
 
@@ -135,137 +244,31 @@ public class PostComment {
 }
 ```
 
-## Active record vs repository
-
-Both active record and repository are patterns for accessing data in a database.
-
-### Active record
-
-The Active record pattern is an approach where the data access logic is part of the entity itself. Each entity (or record) is responsible for its own persistence and encapsulates both the data and the behavior that operates on the data.
-
-Pros:
-- It's easy to set up for simple operations
-- Less boilerplate
-
-Cons:
-- Logic not separated from data
-- Tight coupling between schema and code
-
-#### Example
-
-```java
-@Entity
-public class Person extends PanacheEntity {
-    public String name;
-    public LocalDate birth;
-    public Status status;
-
-    public static Uni<Person> findByName(String name){
-        return find("name", name).firstResult();
-    }
-}
-```
-Basic usage
-```java    
-// persist it
-Uni<Void> persistOperation = person.persist();
-
-// check if it is persistent
-if(person.isPersistent()){
-    // delete it
-    Uni<Void> deleteOperation = person.delete();
-}
-
-// getting a list of all Person entities
-Uni<List<Person>> allPersons = Person.listAll();
-
-// finding a specific person by ID
-Uni<Person> personById = Person.findById(23L);
-```
-
-### Repository
-
-Instead of having both schema and logic in the same class, the repository pattern separates schema from data access logic in a separate class. 
-
-Pros:
-- Logic separated from data
-- Cleaner and more testable code
-- DAL (Data Access Layer) is decoupled from the rest of the application
-
-Cons:
-- More boilerplate for simple operations
-- Takes more time to set up
-
-#### Example
-
-```java
-@Entity
-public class Person {
-    @Id
-    @GeneratedValue
-    private Long id;
-    private String name;
-    private LocalDate birth;
-    private Status status;
-    
-    // getters and setters
-}
-
-@ApplicationScoped
-public class PersonRepository implements PanacheRepository<Person> {
-
-    // put your custom logic here as instance methods
-
-    public Uni<Person> findByName(String name){
-        return find("name", name).firstResult();
-    }
-
-    public Uni<List<Person>> findAlive(){
-        return list("status", Status.Alive);
-    }
-
-    public Uni<Long> deleteStefs(){
-        return delete("name", "Stef");
-    }
-}
-```
-
-#### `@WithTransaction` annotation
-
-- `@WithTransaction` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back. This annotation is used when accessing the database. Altering the database should be done in a transactional context, but also reading from the database. Example bellow.
-- Transactions follow unit of work pattern. It means that all operations in a transaction are treated as a single unit of work. If any operation fails, the whole transaction is rolled back.
-
-Example of sql query that should run in a transactional context:
-```sql
-myRows = query(SELECT * FROM A); 
--- between these two queries, another transaction can delete the rows from table A, thus altering the result of the second query --> consistency problem
-moreRows = query(SELECT * FROM B WHERE a_id IN myRows[id]);
-```
 
 
-## How does dev services help us in development?
+## How do dev services help us in development?
 
-Dev services gives us a way to make development easier. 
+Dev services give us a way to make development easier. 
 
-What gives us dev services?
+What are the benefits of dev services?
 - Automatic startup -- check configuration, download dependencies and start the service
 - Continuous testing -- automatic testing of the service
 - Configuration management -- automatic configuration of the service and database connection
 
-For this week's lecture the main benefit is a way to run a database in a docker container without any configuration from developer side. Of course, it's only for development purposes. But during the initial development phase, it's very useful. Before we will create a configuration to dockerized database.
+For this week's lecture the main benefit is a way to run a database in a Docker container without any configuration from developer side. Of course, it's only for development purposes. But during the initial development phase, it's very useful. Before we will create a configuration to dockerized database.
 
 ## State of the project
 
-- The `flight-service` has implemented the repository pattern with panache.
+- The `flight-service` has been updated with the repository pattern with Panache.
 - REST APIs and services are now asynchronous. 
 - Objects DTOs are created where needed. Eg. `NotificationDto` in `passenger-service`.
-- Panache extension and 
+- Panache extension has been added to the `passenger-service`.
 
 ## Tasks
 
-### 0. Running docker
+### 0. Running Docker
 
-Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker container.
+Install [Docker desktop](https://docs.docker.com/desktop/) or other Docker client. Our test database will run in Docker container.
 
 ### 1. Make `Notification` active record entity
 
@@ -273,7 +276,7 @@ In `passenger-service` make Notification entity as active record using PanacheEn
 
 Implement `deleteAll` in `NotificationService` with the usage of  `Notification` active record. The `listAll` method will be implemented in the next task.
 
-Check if the tests for Notification entity deletion are passing. Run in the passenger-service directory:
+Check if the tests for Notification entity deletion are passing. Use continuous testing or run in the passenger-service directory:
 
 ```bash
 ./mvnw clean test
@@ -281,7 +284,7 @@ Check if the tests for Notification entity deletion are passing. Run in the pass
 
 ### 2. Make `Passenger` entity
 
-In `Passenger` entity add correct annotations with getters and setters to make it persistence entity that will be used in `PassengerRepository`.
+In `Passenger` entity add correct annotations with getters and setters to make it a valid JPA entity that will be used in `PassengerRepository`.
 
 Hmm, but what about the relation with notifications? Passenger can have multiple notifications. Add the relation between `Passenger` and `Notification` entities.
 
@@ -307,12 +310,12 @@ Test scenario
 
 ## Hints
 
-- In `flight-service` you can find implemented repository pattern with panache.
+- In `flight-service` you can find implemented repository pattern with Panache.
 - If something is not working, and it should (Developers aren't doing mistakes right?) run maven clean and compile commands.
 
 ## Troubleshooting
 
-- Check if your docker engine is running.
+- Check if your Docker engine is running by running `docker ps` in the terminal.
 
 ## Further reading
 
