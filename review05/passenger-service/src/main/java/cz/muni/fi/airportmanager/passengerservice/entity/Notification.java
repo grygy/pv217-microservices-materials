@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import java.util.Objects;
 
 @Entity
-// TODO make this class an active record entity
 public class Notification extends PanacheEntity {
     public String message;
 

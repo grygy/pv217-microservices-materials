@@ -12,7 +12,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
-// TODO make this class a Panache repository
 public class PassengerRepository implements PanacheRepository<Passenger> {
 
 
@@ -24,7 +23,6 @@ public class PassengerRepository implements PanacheRepository<Passenger> {
      */
     @WithTransaction
     public Uni<List<Notification>> findNotificationsForPassenger(Long passengerId) {
-        // TODO implement this method
         return findById(passengerId).onItem().transform(passenger -> {
             if (passenger == null) {
                 return List.of();
@@ -42,7 +40,6 @@ public class PassengerRepository implements PanacheRepository<Passenger> {
      */
     @WithTransaction
     public Uni<Void> addNotificationByFlightId(Long flightId, Notification notification) {
-        // TODO implement this method
         // Find passengers by flightId
         return find("flightId", flightId).list()
                 .onItem().transformToUni(passengers -> {
@@ -63,7 +60,6 @@ public class PassengerRepository implements PanacheRepository<Passenger> {
      * @return list of passengers
      */
     public Uni<List<Passenger>> findPassengersForFlight(Long flightId) {
-        // TODO implement this method
         return find("flightId", flightId).list();
     }
 
@@ -73,7 +69,6 @@ public class PassengerRepository implements PanacheRepository<Passenger> {
      * @return list of notifications with passenger email
      */
     public Uni<List<NotificationDto>> findNotificationsWithEmail() {
-        // TODO implement this method
         return listAll()
                 .onItem().transform(passengers -> passengers.stream()
                         .flatMap(passenger -> passenger.getNotifications().stream()

@@ -24,7 +24,6 @@ public class NotificationService {
      */
     @WithTransaction
     public Uni<Long> deleteAll() {
-        // TODO implement this method using Notification active record
         return Notification.deleteAll();
     }
 
@@ -35,7 +34,6 @@ public class NotificationService {
      */
     @WithTransaction
     public Uni<List<NotificationDto>> listAll() {
-//        TODO implement this method after NotificationRepository is implemented
         return passengerRepository.findNotificationsWithEmail();
     }
 
