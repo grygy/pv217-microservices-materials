@@ -16,6 +16,18 @@ public class Examples {
             }
             """;
 
+    public static final String VALID_CREATE_FLIGHT = """
+            {
+                "name": "OK 123",
+                "airportFrom": "PRG",
+                "airportTo": "BTS",
+                "departureTime": "2021-01-01T12:00:00",
+                "arrivalTime": "2021-01-01T13:00:00",
+                "capacity": 100,
+                "status": "SCHEDULED"
+            }
+            """;
+
     public static final String VALID_FLIGHT_LIST = """
             [
                 {

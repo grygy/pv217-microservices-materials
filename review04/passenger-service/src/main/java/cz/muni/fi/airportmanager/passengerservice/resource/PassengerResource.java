@@ -1,8 +1,10 @@
 package cz.muni.fi.airportmanager.passengerservice.resource;
 
-import cz.muni.fi.airportmanager.passengerservice.model.Passenger;
+import cz.muni.fi.airportmanager.passengerservice.entity.Passenger;
+import cz.muni.fi.airportmanager.passengerservice.model.CreatePassengerDto;
 import cz.muni.fi.airportmanager.passengerservice.model.examples.Examples;
 import cz.muni.fi.airportmanager.passengerservice.service.PassengerService;
+import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -24,6 +26,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import java.util.List;
+import java.util.Objects;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -54,8 +57,8 @@ public class PassengerResource {
                     examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER_LIST)
             )
     )
-    public RestResponse<List<Passenger>> list() {
-        return RestResponse.status(Response.Status.OK, passengerService.listAll());
+    public Uni<RestResponse<List<Passenger>>> list() {
+        return passengerService.listAll().onItem().transform(passengers -> RestResponse.status(Response.Status.OK, passengers));
     }
 
     /**
@@ -77,19 +80,11 @@ public class PassengerResource {
                     examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER)
             )
     )
-    @APIResponse(
-            responseCode = "409",
-            description = "Passenger with given id already exists"
-    )
-    public RestResponse<Passenger> create(
-            @Schema(implementation = Passenger.class, required = true)
-            Passenger passenger) {
-        try {
-            var newPassenger = passengerService.createPassenger(passenger);
-            return RestResponse.status(Response.Status.CREATED, newPassenger);
-        } catch (IllegalArgumentException e) {
-            return RestResponse.status(Response.Status.CONFLICT);
-        }
+    public Uni<RestResponse<Passenger>> create(
+            @Schema(implementation = CreatePassengerDto.class, required = true)
+            CreatePassengerDto passenger) {
+        return passengerService.createPassenger(passenger)
+                .onItem().transform(createdPassenger -> RestResponse.status(Response.Status.CREATED, createdPassenger));
     }
 
     /**
@@ -115,51 +110,14 @@ public class PassengerResource {
             responseCode = "404",
             description = "Passenger with given id does not exist"
     )
-    public RestResponse<Passenger> get(@Parameter(name = "id", required = true, description = "Passenger id") @PathParam("id") int id) {
-        try {
-            var passenger = passengerService.getPassenger(id);
-            return RestResponse.status(Response.Status.OK, passenger);
-        } catch (IllegalArgumentException e) {
-            return RestResponse.status(Response.Status.NOT_FOUND);
-        }
-    }
-
-    /**
-     * Update passenger
-     *
-     * @param id        id of passenger
-     * @param passenger passenger to update
-     */
-    @PUT
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Update passenger")
-    @APIResponse(
-            responseCode = "200",
-            description = "Updated passenger",
-            content = @Content(
-                    mediaType = APPLICATION_JSON,
-                    schema = @Schema(implementation = Passenger.class, required = true),
-                    examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER)
-            )
-    )
-    @APIResponse(
-            responseCode = "404",
-            description = "Passenger with given id does not exist"
-    )
-    public RestResponse<Passenger> update(@Parameter(name = "id", required = true, description = "Passenger id") @PathParam("id") int id,
-                                          @Schema(implementation = Passenger.class, required = true)
-                                          Passenger passenger) {
-        if (passenger.id != id) {
-            return RestResponse.status(Response.Status.BAD_REQUEST);
-        }
-        try {
-            var updatedPassenger = passengerService.updatePassenger(passenger);
-            return RestResponse.status(Response.Status.OK, updatedPassenger);
-        } catch (IllegalArgumentException e) {
-            return RestResponse.status(Response.Status.NOT_FOUND);
-        }
+    public Uni<RestResponse<Passenger>> get(@Parameter(name = "id", required = true, description = "Passenger id") @PathParam("id") Long id) {
+        return passengerService.getPassenger(id)
+                .onItem().transform(passenger -> {
+                    if (passenger == null) {
+                        return RestResponse.status(Response.Status.NOT_FOUND);
+                    }
+                    return RestResponse.status(Response.Status.OK, passenger);
+                });
     }
 
     /**
@@ -170,13 +128,14 @@ public class PassengerResource {
     @DELETE
     @Path("/{id}")
     @Operation(summary = "Delete passenger")
-    public RestResponse<Passenger> delete(@Parameter(name = "id", required = true) @PathParam("id") int id) {
-        try {
-            passengerService.deletePassenger(id);
-            return RestResponse.status(Response.Status.OK);
-        } catch (IllegalArgumentException e) {
-            return RestResponse.status(Response.Status.NOT_FOUND);
-        }
+    public Uni<RestResponse<Passenger>> delete(@Parameter(name = "id", required = true) @PathParam("id") Long id) {
+        return passengerService.deletePassenger(id)
+                .onItem().transform(deleted -> {
+                    if (deleted) {
+                        return RestResponse.status(Response.Status.OK);
+                    }
+                    return RestResponse.status(Response.Status.NOT_FOUND);
+                });
     }
 
     /**
@@ -184,8 +143,8 @@ public class PassengerResource {
      */
     @DELETE
     @Operation(summary = "Delete all passengers")
-    public RestResponse<Passenger> deleteAll() {
-        passengerService.deleteAllPassengers();
-        return RestResponse.status(Response.Status.OK);
+    public Uni<RestResponse<Passenger>> deleteAll() {
+        return passengerService.deleteAllPassengers()
+                .onItem().transform(ignored -> RestResponse.status(Response.Status.OK));
     }
 }

@@ -1,8 +1,10 @@
 package cz.muni.fi.airportmanager.flightservice.resources;
 
+import cz.muni.fi.airportmanager.flightservice.model.CreateFlightDto;
 import cz.muni.fi.airportmanager.flightservice.model.example.Examples;
 import cz.muni.fi.airportmanager.flightservice.service.FlightService;
-import cz.muni.fi.airportmanager.flightservice.model.Flight;
+import cz.muni.fi.airportmanager.flightservice.model.FlightDto;
+import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -50,13 +52,13 @@ public class FlightResource {
             description = "Get list of all flights",
             content = @Content(
                     mediaType = APPLICATION_JSON,
-                    schema = @Schema(implementation = Flight.class, required = true),
+                    schema = @Schema(implementation = FlightDto.class, required = true),
                     examples = @ExampleObject(name = "flight", value = Examples.VALID_FLIGHT_LIST)
             )
     )
-    //    TODO add openapi docs
-    public RestResponse<List<Flight>> list() {
-        return RestResponse.status(Response.Status.OK, flightService.listAll());
+    public Uni<RestResponse<List<FlightDto>>> list() {
+        return flightService.listAll()
+                .onItem().transform(flights -> RestResponse.status(Response.Status.OK, flights));
     }
 
     /**
@@ -74,24 +76,18 @@ public class FlightResource {
             description = "Created flight",
             content = @Content(
                     mediaType = APPLICATION_JSON,
-                    schema = @Schema(implementation = Flight.class, required = true),
+                    schema = @Schema(implementation = FlightDto.class, required = true),
                     examples = @ExampleObject(name = "flight", value = Examples.VALID_FLIGHT)
             )
     )
     @APIResponse(
             responseCode = "409",
-            description = "Conflict - flight with given id already exists"
+            description = "Conflict"
     )
-    //    TODO add openapi docs
-    public RestResponse<Flight> create(
-            @Schema(implementation = Flight.class, required = true)
-            Flight flight) {
-        try {
-            var newFlight = flightService.createFlight(flight);
-            return RestResponse.status(Response.Status.CREATED, newFlight);
-        } catch (IllegalArgumentException e) {
-            return RestResponse.status(Response.Status.CONFLICT);
-        }
+    public Uni<RestResponse<FlightDto>> create(CreateFlightDto flight) {
+        return flightService.createFlight(flight)
+                .onItem().transform(newFlight -> RestResponse.status(Response.Status.CREATED, newFlight))
+                .onFailure(IllegalArgumentException.class).recoverWithItem(RestResponse.status(Response.Status.CONFLICT));
     }
 
 
@@ -110,7 +106,7 @@ public class FlightResource {
             description = "Flight with given id",
             content = @Content(
                     mediaType = APPLICATION_JSON,
-                    schema = @Schema(implementation = Flight.class, required = true),
+                    schema = @Schema(implementation = FlightDto.class, required = true),
                     examples = @ExampleObject(name = "flight", value = Examples.VALID_FLIGHT)
             )
     )
@@ -118,55 +114,12 @@ public class FlightResource {
             responseCode = "404",
             description = "Flight with given id does not exist"
     )
-    //    TODO add openapi docs
-    public RestResponse<Flight> get(@Parameter(name = "id", required = true) @PathParam("id") int id) {
-        try {
-            var flight = flightService.getFlight(id);
-            return RestResponse.status(Response.Status.OK, flight);
-        } catch (IllegalArgumentException e) {
-            return RestResponse.status(Response.Status.NOT_FOUND);
-        }
+    public Uni<RestResponse<FlightDto>> get(long id) {
+        return flightService.getFlight(id)
+                .onItem().transform(flight -> RestResponse.status(Response.Status.OK, flight))
+                .onFailure(IllegalArgumentException.class).recoverWithItem(RestResponse.status(Response.Status.NOT_FOUND));
     }
 
-
-    /**
-     * Update flight
-     *
-     * @param id     id of flight
-     * @param flight flight to update
-     */
-    @PUT
-    @Path("/{id}")
-    @Produces(APPLICATION_JSON)
-    @Consumes(APPLICATION_JSON)
-    @Operation(summary = "Update flight")
-    @APIResponse(
-            responseCode = "200",
-            description = "Updated flight",
-            content = @Content(
-                    mediaType = APPLICATION_JSON,
-                    schema = @Schema(implementation = Flight.class, required = true),
-                    examples = @ExampleObject(name = "flight", value = Examples.VALID_FLIGHT)
-            )
-    )
-    @APIResponse(
-            responseCode = "404",
-            description = "Flight with given id does not exist"
-    )
-    //    TODO add openapi docs
-    public RestResponse<Flight> update(@Parameter(name = "id", required = true) @PathParam("id") int id,
-                                       @Schema(implementation = Flight.class, required = true)
-                                       Flight flight) {
-        if (flight.id != id) {
-            return RestResponse.status(Response.Status.BAD_REQUEST);
-        }
-        try {
-            var updatedFlight = flightService.updateFlight(flight);
-            return RestResponse.status(Response.Status.OK, updatedFlight);
-        } catch (IllegalArgumentException e) {
-            return RestResponse.status(Response.Status.NOT_FOUND);
-        }
-    }
 
     /**
      * Delete flight
@@ -184,14 +137,16 @@ public class FlightResource {
             responseCode = "404",
             description = "Flight with given id does not exist"
     )
-    //    TODO add openapi docs
-    public RestResponse<Flight> delete(@Parameter(name = "id", required = true) @PathParam("id") int id) {
-        try {
-            flightService.deleteFlight(id);
-            return RestResponse.status(Response.Status.OK);
-        } catch (IllegalArgumentException e) {
-            return RestResponse.status(Response.Status.NOT_FOUND);
-        }
+    public Uni<RestResponse<Object>> delete(@Parameter(name = "id", required = true) @PathParam("id") long id) {
+        return flightService.deleteFlight(id)
+                .onItem().transform(wasDeleted -> {
+                    if (Boolean.TRUE.equals(wasDeleted)) {
+                        return
+                                RestResponse.status(Response.Status.OK);
+                    }
+                    return RestResponse.status(Response.Status.NOT_FOUND);
+                })
+                .onFailure(IllegalArgumentException.class).recoverWithItem(RestResponse.status(Response.Status.NOT_FOUND));
     }
 
     /**
@@ -203,9 +158,9 @@ public class FlightResource {
             responseCode = "200",
             description = "All flights deleted"
     )
-    public RestResponse<Flight> deleteAll() {
-        flightService.deleteAllFlights();
-        return RestResponse.status(Response.Status.OK);
+    public Uni<RestResponse<Void>> deleteAll() {
+        return flightService.deleteAllFlights()
+                .onItem().transform(ignored -> RestResponse.status(Response.Status.OK));
     }
 
     /**
@@ -222,14 +177,14 @@ public class FlightResource {
             responseCode = "404",
             description = "Flight with given id does not exist"
     )
-    //    TODO add openapi docs
-    public RestResponse<Flight> cancel(@Parameter(name = "id", required = true) @PathParam("id") int id) {
-        try {
-            flightService.cancelFlight(id);
-            return RestResponse.status(Response.Status.OK);
-        } catch (IllegalArgumentException e) {
-            return RestResponse.status(Response.Status.NOT_FOUND);
-        }
+    public Uni<RestResponse<Object>> cancel(@Parameter(name = "id", required = true) @PathParam("id") long id) {
+        return flightService.cancelFlight(id)
+                .onItem().transform(wasCancelled -> {
+                    if (Boolean.TRUE.equals(wasCancelled)) {
+                        return RestResponse.status(Response.Status.OK);
+                    }
+                    return RestResponse.status(Response.Status.NOT_FOUND);
+                });
     }
 
 }
