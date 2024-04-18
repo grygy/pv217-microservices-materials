@@ -252,7 +252,7 @@ Dev services give us a way to make development easier.
 
 What are the benefits of dev services?
 - Automatic startup -- check configuration, download dependencies and start the service
-- Continuous testing -- automatic testing of the service
+- Continuous testing -- continuous testing of the application
 - Configuration management -- automatic configuration of the service and database connection
 
 For this week's lecture the main benefit is a way to run a database in a Docker container without any configuration from developer side. Of course, it's only for development purposes. But during the initial development phase, it's very useful. Before we will create a configuration to dockerized database.
