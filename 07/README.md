@@ -127,7 +127,7 @@ Apache Kafka uses Apache Zookeeper to manage the brokers and the topics. Zookeep
 
 ### 0. Running docker
 
-Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client.
+Install [Docker desktop](https://docs.docker.com/engine/install/) or other docker client.
 
 ### 1. Introduction to task
 

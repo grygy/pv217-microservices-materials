@@ -30,7 +30,8 @@ Key attributes of unit tests:
 
 ### `QuarkusTest` annotation
 
-Quarkus provides a `QuarkusTest` annotation that allows you to write tests for your Quarkus application. It starts the application in a test mode and provides you with a test client to interact with the application. It also allows you to inject beans and other resources into your tests.
+Quarkus provides a `QuarkusTest` annotation that allows you to write tests for your Quarkus application. It starts a new instance of the application in a test mode and provides you with a test client to interact with the application. It also allows you to inject beans and other resources into your tests.
+
 
 ### Mocking
 
@@ -56,10 +57,6 @@ We will depend on the following technologies to write tests:
 - Mockito -- Mocking
 - Test vertx -- Testing asynchronous code
 
-### JUnit
-
-JUnit is a simple framework to write repeatable tests.
-
 #### Examples
 
 Basic
@@ -67,28 +64,28 @@ Basic
 ```java
 @Test // Basic synchronous test
 public void testBasicFunctionality() {
-    SimpleService service = new SimpleService();
-    // <expected>, <actual>, <message>
-    assertEquals("Expected output", service.doSomething(), "Service did not return the expected output."); 
-}
+        SimpleService service = new SimpleService();
+        // <expected>, <actual>, <message>
+        assertEquals("Expected output", service.doSomething(), "Service did not return the expected output.");
+        }
 
 @Test
 @RunOnVertxContext // Test running on vertx context (asynchronous)
 public void testSimpleUni(UniAsserter asserter) { // Gives us UniAsserter to assert the result from Uni
-    asserter.assertThat(
+        asserter.assertThat(
         () -> Uni.createFrom().item("Hello"), // Asynchronous code or function
         result -> assertEquals("Hello", result, "Did not return hello") // When the result is available, assert it
-    );
-}
+        );
+        }
 
 @Test
 @TestReactiveTransaction // Similar to RunOnVertxContext, but for reactive transactions when we need to manipulate with the database
 public void testReactiveTransaction(UniAsserter asserter) {
-    asserter.assertThat(
+        asserter.assertThat(
         () -> Uni.createFrom().item("Expected Result"),
         result -> assertEquals("Expected Result", result, "Did not return expected result.")
-    );
-}
+        );
+        }
 ```
 
 Mocked
@@ -99,7 +96,7 @@ public class MockedServiceUniTest {
 
     @InjectMock // Similar to Inject, but injects a mock instead of a real instance
     DataService dataService;
-    
+
     @Inject
     MyService myService; // My service is using DataService
 
@@ -116,8 +113,8 @@ public class MockedServiceUniTest {
         asserter.execute(() ->  Mockito.when(dataService.getDataAsUni()).thenReturn(Uni.createFrom().item("Mocked Data")));
 
         asserter.assertThat(
-            () -> myService.getDataAsUni(),
-            result -> assertEquals("Mocked Data", result, "Did not return mocked data")
+                () -> myService.getDataAsUni(),
+                result -> assertEquals("Mocked Data", result, "Did not return mocked data")
         );
     }
 }
@@ -133,16 +130,16 @@ RestAssured is a Java library for testing REST APIs. It's a great tool to implem
 @QuarkusTest
 @TestHTTPEndpoint(GreetingResource.class) // (Optional) Which endpoint to test
 public class GreetingResourceTest {
-    
+
     // We can also mock underlying services if needed
-    
+
     @Test
     public void testHelloEndpoint() {
         when() // When we call the endpoint
-            .get() // With GET method 
-            .then() // Then
-            .statusCode(200) // Expecting status code 200
-            .body(is("hello")); // And the body to be "hello"
+                .get() // With GET method 
+                .then() // Then
+                .statusCode(200) // Expecting status code 200
+                .body(is("hello")); // And the body to be "hello"
     }
 
     @Test
@@ -170,7 +167,7 @@ public class GreetingResourceTest {
 
 ### 0. Running docker
 
-Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker container.
+Install [Docker desktop](https://docs.docker.com/engine/install/) or other docker client. Our test database will run in docker container.
 
 ### 1. Implement unit tests for `PassengerRepository`
 

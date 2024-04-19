@@ -30,7 +30,8 @@ Key attributes of unit tests:
 
 ### `QuarkusTest` annotation
 
-Quarkus provides a `QuarkusTest` annotation that allows you to write tests for your Quarkus application. It starts the application in a test mode and provides you with a test client to interact with the application. It also allows you to inject beans and other resources into your tests.
+Quarkus provides a `QuarkusTest` annotation that allows you to write tests for your Quarkus application. It starts a new instance of the application in a test mode and provides you with a test client to interact with the application. It also allows you to inject beans and other resources into your tests.
+
 
 ### Mocking
 
@@ -55,10 +56,6 @@ We will depend on the following technologies to write tests:
 - RestAssured -- REST API testing
 - Mockito -- Mocking
 - Test vertx -- Testing asynchronous code
-
-### JUnit
-
-JUnit is a simple framework to write repeatable tests.
 
 #### Examples
 

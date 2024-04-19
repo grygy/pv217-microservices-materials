@@ -1,5 +1,6 @@
 package cz.muni.fi.airportmanager.passengerservice.resource;
 
+import cz.muni.fi.airportmanager.passengerservice.entity.Notification;
 import cz.muni.fi.airportmanager.passengerservice.entity.Passenger;
 import cz.muni.fi.airportmanager.passengerservice.model.CreatePassengerDto;
 import cz.muni.fi.airportmanager.passengerservice.model.examples.Examples;
@@ -118,6 +119,52 @@ public class PassengerResource {
                     }
                     return RestResponse.status(Response.Status.OK, passenger);
                 });
+    }
+
+    /**
+     * Get passengers for a flight by flight id
+     * @param flightId flight id
+     *                 @return list of passengers for a flight
+     */
+    @GET
+    @Path("/flight/{flightId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Get passengers for a flight by flight id")
+    @APIResponse(
+            responseCode = "200",
+            description = "List of passengers for a flight",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Passenger.class, required = true),
+                    examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER_LIST)
+            )
+    )
+    public Uni<RestResponse<List<Passenger>>> getPassengersForFlight(@Parameter(name = "flightId", required = true, description = "Flight id") @PathParam("flightId") Long flightId) {
+        return passengerService.getPassengersForFlight(flightId)
+                .onItem().transform(passengers -> RestResponse.status(Response.Status.OK, passengers));
+    }
+
+    /**
+     * Get all notifications for a passenger
+     * @param passengerId passenger id
+     *                    @return list of notifications for a passenger
+     */
+    @GET
+    @Path("/{passengerId}/notifications")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Get all notifications for a passenger")
+    @APIResponse(
+            responseCode = "200",
+            description = "List of notifications for a passenger",
+            content = @Content(
+                    mediaType = APPLICATION_JSON,
+                    schema = @Schema(implementation = Passenger.class, required = true),
+                    examples = @ExampleObject(name = "flight", value = Examples.VALID_NOTIFICATION_LIST)
+            )
+    )
+    public Uni<RestResponse<List<Notification>>> getNotificationsForPassenger(@Parameter(name = "passengerId", required = true, description = "Passenger id") @PathParam("passengerId") Long passengerId) {
+        return passengerService.findNotificationsForPassenger(passengerId)
+                .onItem().transform(passengers -> RestResponse.status(Response.Status.OK, passengers));
     }
 
     /**
