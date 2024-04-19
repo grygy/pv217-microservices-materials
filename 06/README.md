@@ -178,7 +178,7 @@ volumes: # Volumes that will be used in the services
 
 ### 0. Running docker
 
-Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker
+Install [Docker desktop](https://docs.docker.com/engine/install/) or other docker client. Our test database will run in docker
 container.
 
 ### 1. Define `BaggageClientResource` in `passenger-service`

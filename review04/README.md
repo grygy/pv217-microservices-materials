@@ -268,7 +268,7 @@ For this week's lecture the main benefit is a way to run a database in a Docker 
 
 ### 0. Running Docker
 
-Install [Docker desktop](https://docs.docker.com/desktop/) or other Docker client. Our test database will run in Docker container.
+Install [Docker desktop](https://docs.docker.com/engine/install/) or other Docker client. Our test database will run in Docker container.
 
 ### 1. Make `Notification` active record entity
 

@@ -170,7 +170,7 @@ public class GreetingResourceTest {
 
 ### 0. Running docker
 
-Install [Docker desktop](https://docs.docker.com/desktop/) or other docker client. Our test database will run in docker container.
+Install [Docker desktop](https://docs.docker.com/engine/install/) or other docker client. Our test database will run in docker container.
 
 ### 1. Implement unit tests for `PassengerRepository`
 
