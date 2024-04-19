@@ -28,21 +28,6 @@ class NotificationServiceTest {
     @InjectMock
     PassengerRepository passengerRepository;
 
-    private Notification createNotification() {
-        Notification notification = new Notification();
-        notification.id = 1L;
-        notification.message = "Test message";
-        return notification;
-    }
-
-    private NotificationDto createNotificationDto() {
-        NotificationDto notificationDto = new NotificationDto();
-        notificationDto.id = 1L;
-        notificationDto.message = "Test message";
-        notificationDto.email = "test@test.com";
-        return notificationDto;
-    }
-
     @Test
     @TestReactiveTransaction
     void shouldGetListOfNotifications(UniAsserter asserter) {
@@ -74,5 +59,21 @@ class NotificationServiceTest {
                     assertNotNull(deletedCount);
                     assertEquals(1L, deletedCount);
                 });
+    }
+
+
+    private Notification createNotification() {
+        Notification notification = new Notification();
+        notification.id = 1L;
+        notification.message = "Test message";
+        return notification;
+    }
+
+    private NotificationDto createNotificationDto() {
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.id = 1L;
+        notificationDto.message = "Test message";
+        notificationDto.email = "test@test.com";
+        return notificationDto;
     }
 }

@@ -9,5 +9,6 @@
   <modules>
     <module>passenger-service</module>
     <module>flight-service</module>
+    <module>baggage-service</module>
   </modules>
 </project>

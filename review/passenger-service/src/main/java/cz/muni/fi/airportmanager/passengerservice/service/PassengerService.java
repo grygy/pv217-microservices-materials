@@ -1,23 +1,28 @@
 package cz.muni.fi.airportmanager.passengerservice.service;
 
+import cz.muni.fi.airportmanager.passengerservice.client.BaggageClientResource;
 import cz.muni.fi.airportmanager.passengerservice.entity.Notification;
 import cz.muni.fi.airportmanager.passengerservice.entity.Passenger;
 import cz.muni.fi.airportmanager.passengerservice.model.CreatePassengerDto;
+import cz.muni.fi.airportmanager.passengerservice.model.PassengerWithBaggageDto;
 import cz.muni.fi.airportmanager.passengerservice.repository.PassengerRepository;
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @ApplicationScoped // This bean will be created once per application and live as long as the application lives
 public class PassengerService {
 
     @Inject
     PassengerRepository passengerRepository;
+
+    @RestClient
+    BaggageClientResource baggageClientResource;
+
 
     /**
      * Get list of all passengers
@@ -92,7 +97,6 @@ public class PassengerService {
     }
 
 
-
     /**
      * Get all notifications for passenger
      *
@@ -102,5 +106,32 @@ public class PassengerService {
     @WithTransaction
     public Uni<List<Notification>> findNotificationsForPassenger(Long passengerId) {
         return passengerRepository.findNotificationsForPassenger(passengerId);
+    }
+
+    /**
+     * Get passenger passenger with baggage
+     *
+     * @param passengerId passenger id
+     * @return passenger with baggage
+     * @throws RuntimeException if baggage service fails
+     */
+    @WithTransaction
+    public Uni<PassengerWithBaggageDto> getPassengerWithBaggage(Long passengerId) {
+        // TODO implement this method. It should get passenger and call rest client to get baggage
+        var passengerWithBaggage = new PassengerWithBaggageDto();
+        return passengerRepository.findById(passengerId)
+                .onItem().transformToUni(passenger ->
+                        baggageClientResource.getBaggageForPassengerId(passenger.getId())
+                                .onItem().transform(baggage -> {
+                                            passengerWithBaggage.id = passenger.getId();
+                                            passengerWithBaggage.firstName = passenger.getFirstName();
+                                            passengerWithBaggage.lastName = passenger.getLastName();
+                                            passengerWithBaggage.email = passenger.getEmail();
+                                            passengerWithBaggage.flightId = passenger.getFlightId();
+                                            passengerWithBaggage.baggage = baggage;
+                                            return passengerWithBaggage;
+                                        }
+                                )
+                );
     }
 }

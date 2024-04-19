@@ -15,6 +15,26 @@ public class Examples {
             }
             """;
 
+    public static final String VALID_PASSENGER_WITH_BAGGAGE = """
+            {
+                            "id": 1
+                            "firstName": "John",
+                            "lastName": "Doe",
+                            "email": "john@gmail.com",
+                            "flightId": 1,
+                            "notifications": [],
+                            "baggage": [
+                                {
+                                    "id": 1,
+                                    "weight": 20,
+                                    "passengerId": 1,
+                                    "status": "CHECKED_IN"
+                                }
+                            ]
+            }
+            """;
+
+
     public static final String VALID_PASSENGER_LIST = """
             [
                 {
