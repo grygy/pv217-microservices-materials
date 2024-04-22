@@ -59,7 +59,7 @@ Dockerfile is a text document that contains all the commands and application con
 
 ```Dockerfile
 # Use the official image as a base image that our application will run on
-FROM registry.access.redhat.com/ubi8/openjdk-17:1.18
+FROM registry.access.redhat.com/ubi8/openjdk-21:1.19
 
 # Set environment variables
 ENV LANGUAGE='en_US:en'
