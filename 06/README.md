@@ -4,7 +4,7 @@
 
 Quarkus provides a simple way to create a REST client for other services. Using the REST Client Reactive is as simple as creating an interface using the proper Jakarta REST and MicroProfile annotations.
 
-The method in the interface gives us access to HTTP communication with other services. Thus, we can use this interface in other parts of our application.
+The interface method gives us access to HTTP communication with other services. Thus, we can use this interface in different parts of our application.
 
 #### Example
 
@@ -21,7 +21,7 @@ public interface ExtensionsService {
 
 ## Containerization
 
-Containerization is a lightweight alternative to full machine virtualization that involves encapsulating an application in a container with its own operating environment. Containers are isolated from one another and bundle their own software, libraries and configuration files.
+Containerization is a lightweight alternative to full machine virtualization that involves encapsulating an application in a container with its own operating environment. Containers are isolated from one another and bundle their own software, libraries, and configuration files.
 
 ### Why is containerization important?
 
@@ -35,11 +35,11 @@ Docker is a platform for developing, shipping, and running applications using co
 
 #### Docker image
 
-A Docker image is a file that contains all the necessary dependencies and configuration to run a container. It is a lightweight, standalone, executable package that includes everything needed to run a piece of software, including the code, a runtime, libraries, environment variables, and configuration files.
+A Docker image is a file that contains all the necessary dependencies and configurations to run a container. It is a lightweight, standalone, executable package that includes everything needed to run a piece of software, including the code, a runtime, libraries, environment variables, and configuration files.
 
 #### Docker container
 
-A container is a runtime instance of a Docker image. Meaning, it is a running instance of the containerized application. Containers can be run, started, stopped, moved, and deleted. When containers are deleted, any data that is not in a volume is lost.
+A container is a runtime instance of a Docker image. This means it is a running instance of the containerized application. Containers can be run, started, stopped, moved, and deleted. When containers are deleted, any data that is not in a volume is lost.
 
 #### Docker volume
 
@@ -47,15 +47,15 @@ A Docker volume is a directory that is outside the lifecycle of the container. I
 
 #### Docker engine
 
-Docker engine is core of the Docker. It is a client-server application that builds and runs containers.
+The Docker engine is the core of Docker. It is a client-server application that builds and runs containers.
 
 #### Dockerhub
 
-Dockerhub is a cloud-based registry service which allows you to select images from a wide range of applications and base images. You can also upload your own images to the registry.
+Dockerhub is a cloud-based registry service that allows you to select images from a wide range of applications and base images. You can also upload your own images to the registry.
 
 #### Dockerfile
 
-Dockerfile is a text document that contains all the commands and application configuration to assemble an image. Docker reads the Dockerfile and executes the commands in the file to build the image.
+A dockerfile is a text document that contains all the commands and application configuration to assemble an image. Docker reads the Dockerfile and executes the commands in the file to build the image.
 
 ```Dockerfile
 # Use the official image as a base image that our application will run on
@@ -85,14 +85,14 @@ ENTRYPOINT [ "/opt/jboss/container/java/run/run-java.sh" ]
 
 #### What does the Dockerfile do?
 
-- It uses the official image as a base image that our application will run on.
+- It uses the official image as a base image on which our application will run.
 - It can build the application from the source code.
-- It copies the application jar file to the container.
-- It exposes the port that the application will run on.
+- It copies the application jar file and sends it to the container.
+- It exposes the port on which the application will run.
 - It sets up environment variables that will be used to run the application.
 - It runs the application.
 
-#### How to build docker image?
+#### How to build a docker image?
 
 First, we need to build the docker image for the application. We can do it using the `docker build` command.
 
@@ -170,20 +170,20 @@ volumes: # Volumes that will be used in the services
 ## State of the project
 
 - There is a new `baggage-service` is a REST service for tracking baggage running on port 8077.
-  - It supports CRUD operations for baggage along with claiming and marking baggage as lost.
-  - You can also retrieve baggage for a passenger based on passenger id.
-  - Check `BaggageResource` for more details.
+    - It supports CRUD operations for baggage along with claiming and marking baggage as lost.
+    - You can also retrieve baggage for a passenger based on passenger id.
+    - Check `BaggageResource` for more details.
 
 ## Tasks
 
 ### 0. Running docker
 
-Install [Docker desktop](https://docs.docker.com/engine/install/) or other docker client. Our test database will run in docker
+Install [Docker desktop](https://docs.docker.com/engine/install/) or another docker client. Our test database will run in the docker
 container.
 
 ### 1. Define `BaggageClientResource` in `passenger-service`
 
-#### 1.1. Run `baggage-service` 
+#### 1.1. Run `baggage-service`
 
 Run the `baggage-service` in dev mode. Then check the swagger UI at http://localhost:8077/q/swagger-ui.
 
@@ -191,23 +191,23 @@ Examine the *Get baggage by passenger id* endpoint. We will use it in `passenger
 
 #### 1.2. Define `BaggageClientResource` interface
 
-In `passenger-service` define a new interface `BaggageClientResource`. This interface will represent REST client for the Baggage service.
+In `passenger-service` define a new interface `BaggageClientResource`. This interface will represent the REST client for the Baggage service.
 
 1. Create a config key for the baggage service URL in `application.properties` file. See todo in `application.properties` file.
-2. Follow the TODOs in `BaggageClientResource` interface. 
+2. Follow the TODOs in `BaggageClientResource` interface.
 
-#### 1.3. 
+#### 1.3.
 
-Now we want to use the `BaggageClientResource` in `PassengerService` to retrieve baggage for a passenger. Go to `PassengerService` and implement the `getBaggageForPassenger` method.
+Now, we want to use the `BaggageClientResource` in `PassengerService` to retrieve baggage for a passenger. Go to `PassengerService` and implement the `getBaggageForPassenger` method.
 
 #### 1.4. Test it
 
-1. In Swagger create a passenger in `passenger-service` and then create a baggage for the passenger in `baggage-service`.
-2. Try to get the baggage fot his passenger using `GET /passenger/{passengerId}/baggage` endpoint.
+1. In Swagger, create a passenger in `passenger-service` and then create a baggage for the passenger in `baggage-service`.
+2. Try to get the baggage for his passenger using the `GET /passenger/{passengerId}/baggage` endpoint.
 
 ### 2. Create docker-compose file for baggage-service
 
-Quarkus already created a Dockerfiles for us, so we can easily use them in docker compose and run the services in containers.
+Quarkus already created Dockerfiles for us, so we can easily use them in Docker compose and run the services in containers.
 
 #### 2.1. Package the application
 
@@ -255,7 +255,7 @@ First, we need to build the docker image for the `baggage-service`:
 docker compose build
 ```
 
-Now, let's run use the docker compose to run both `baggage-service` and `database` in a single command.
+Now, let's use the docker compose to run both `baggage-service` and `database` in a single command.
 
 ```bash
 docker compose up
@@ -276,7 +276,7 @@ Go to `flight-service` and `passenger-service` and make a production build of th
 
 #### 3.2. Add missing configuration to `docker-compose.yml`
 
-In the root of the project you can find `docker-compose.yml` file. It already contains configuration baggage service and database. Now, we need to add configuration for `flight-service` and `passenger-service`.
+In the root of the project, you can find the `docker-compose.yml` file. It already contains configuration baggage service and database. Now, we need to add configuration for `flight-service` and `passenger-service`.
 
 Follow the TODOs in the file. Don't forget to set up environment variables for the services. Examine `application.properties` files in the passenger and flight services to see what environment variables are needed.
 
@@ -292,8 +292,8 @@ Check if everything is running.
 
 ### 4. Verify if everything is working
 
-1. With every service running in docker containers, try to create a flight, create a passenger, create baggage.
-2. Cancel the flight and see if grpc communication is working.
+1. With every service running in docker containers, try to create a flight, create a passenger, and create baggage.
+2. Cancel the flight and see if gRPC communication is working.
 3. Try to retrieve baggage for a passenger in passenger service.
 
 ### X. Submit the solution
