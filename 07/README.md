@@ -12,11 +12,11 @@ Message brokers can support different messaging patterns, such as point-to-point
 
 ### Channel (Topic)
 
-A channel is a logical path for communication between the producer(s) and the consumer(s). The producer sends messages to the channel, and the consumer receives messages from the channel. 
+A channel is a logical path for communication between the producer(s) and the consumer(s). The producer sends messages to the channel, and the consumer receives messages from the channel.
 
 ### Producer/Consumer
 
-Producer (Publisher) sends messages to the broker, and the Consumer (Subscriber or Processor) receives messages from the broker and processes them. The producer and consumer do not need to know about each other, and they can be added or removed without affecting the other components.
+The producer (Publisher) sends messages to the broker, and the Consumer (Subscriber or Processor) receives messages from the broker and processes them. The producer and consumer do not need to know about each other, and they can be added or removed without affecting the other components.
 
 The communication between the producer and the consumer is asynchronous, which means that the producer does not wait for the consumer to process the message. This allows for better scalability and performance.
 
@@ -34,19 +34,19 @@ Image source: *https://aws.amazon.com/what-is/pub-sub-messaging/*
 
 ### REST vs Messaging
 
-| **Aspect**              | **REST**                                                                                          | **Messaging**                                                                                 |
-|-------------------------|---------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| **Communication Style** | Synchronous: Client sends a request and waits for a response. Is one to one.                      | Asynchronous: Producers send messages without waiting for a response. May be many to many.    |
-| **Receiver**            | Client knows the address of the server and sends requests directly to it.                         | Producers send messages to a broker, which then distributes them to consumers.                |
-| **Data Format**         | Typically JSON or XML.                                                                            | Can vary widely (e.g., JSON, XML, binary) depending on the messaging protocol and system.     |
-| **Reliability**         | Depends on HTTP(S) protocol: can implement retries for idempotent requests.                       | Higher reliability through message queuing, durable storage, and retry mechanisms.            |
-| **Scalability**         | Can scale vertically and horizontally, but may require load balancers for efficient distribution. | Naturally supports high scalability through message brokers that manage message distribution. |
-| **Use Cases**           | Ideal for CRUD operations and direct interactions between services.                               | Suited for event-driven architectures.                                                        |
-| **Coupling**            | Tends to couple client and server to the API contract.                                            | Reduces coupling between services by using events or messages.                                |
+| **Aspect**              | **REST**                                                                                         | **Messaging**                                                                                 |
+|-------------------------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| **Communication Style** | Synchronous: The client sends a request and waits for a response. It is one to one.              | Asynchronous: Producers send messages without waiting for a response. It may be many to many. |
+| **Receiver**            | The client knows the address of the server and sends requests directly to it.                    | Producers send messages to a broker, which then distributes them to consumers.                |
+| **Data Format**         | Typically JSON or XML.                                                                           | Can vary widely (e.g., JSON, XML, binary) depending on the messaging protocol and system.     |
+| **Reliability**         | Depends on HTTP(S) protocol: can implement retries for idempotent requests.                      | Higher reliability through message queuing, durable storage, and retry mechanisms.            |
+| **Scalability**         | Can scale vertically and horizontally but may require load balancers for efficient distribution. | Naturally supports high scalability through message brokers that manage message distribution. |
+| **Use Cases**           | Ideal for CRUD operations and direct interactions between services.                              | Suited for event-driven architectures.                                                        |
+| **Coupling**            | Tends to couple client and server to the API contract.                                           | Reduces coupling between services by using events or messages.                                |
 
 ## Kafka
 
-Apache Kafka is one of the implementation of the message broker. It is a distributed streaming platform that can be used for event-driven architectures, real-time analytics, and data integration. It is designed to be scalable, fault-tolerant, and durable.
+Apache Kafka is one of the implementations of the message broker. It is a distributed streaming platform that can be used for event-driven architectures, real-time analytics, and data integration. It is designed to be scalable, fault-tolerant, and durable.
 
 ### Producer
 
@@ -69,7 +69,7 @@ public class MyProducer {
 
 #### Serialization
 
-The producer serializes the message before sending it to the broker. The serialization is the process of converting the message into a format that can be transmitted over the network. The message can be serialized to different formats, such as JSON, XML, or binary.
+The producer serializes the message before sending it to the broker. Serialization is the process of converting the message into a format that can be transmitted over the network. The message can be serialized to different formats, such as JSON, XML, or binary.
 
 In Quarkus, we can define the serialization using the `application.properties` file:
 
@@ -93,13 +93,13 @@ public class MyConsumer {
 }
 ```
 
-Additionally, `@Blocking` annotation can be used to process the message in a blocking way due to the nature of Quarkus Reactive Architecture. Similarly, `@Transactional` can be used to process the message in a blocking way to perform a transaction in the database. 
+Additionally, `@Blocking` annotation can be used to process the message in a blocking way due to the nature of Quarkus Reactive Architecture. Similarly, `@Transactional` can be used to process the message in a blocking way to perform a transaction in the database.
 
 ### Consumer and Producer
 
-We can additionally use the `@Outgoing` along with the `@Incoming` annotations to create a consumer and producer in the same class. Thus, accepting the message from one channel, do some work, and sending it to another.
+We can additionally use the `@Outgoing` along with the `@Incoming` annotations to create a consumer and producer in the same class. Thus, accepting the message from one channel, doing some work, and sending it to another.
 
-Method annotated with `@Outgoing` cannot be called from the code but it needs to be invoked by the framework.
+The method annotated with `@Outgoing` cannot be called from the code, but the framework needs to invoke it.
 
 ```java
 @ApplicationScoped
@@ -127,19 +127,19 @@ Apache Kafka uses Apache Zookeeper to manage the brokers and the topics. Zookeep
 
 ### 0. Running docker
 
-Install [Docker desktop](https://docs.docker.com/engine/install/) or other docker client.
+Install [Docker desktop](https://docs.docker.com/engine/install/) or another docker client.
 
 ### 1. Introduction to task
 
-Right now, we have a simple notification system in the `passenger-service` that handles notification about the flight
-cancellation. Now, we want to add a new feature that will also notify the passengers about the baggage status change. We
+Right now, we have a simple notification system in the `passenger-service` that handles notifications about flight
+cancellations. Now, we want to add a new feature that will also notify the passengers about the baggage status change. We
 want to use Kafka to handle communication between the `passenger-service` and the `baggage-service`.
 
 ### 2. Add Kafka producer to the `baggage-service`
 
 #### 2.1. Prepare `BaggageStateChange` class
 
-Prepare a new class `BaggageStateChange` in the `baggage-service` that will be the payload of the message. The class
+Prepare a new class `BaggageStateChange` in the `baggage-service`, which will be the payload of the message. The class
 should contain the following fields:
 
 - `baggageId` - the id of the baggage
@@ -165,7 +165,7 @@ mp.messaging.outgoing.baggage-state-change.value.serializer=io.quarkus.kafka.cli
 
 #### 2.4. Connect the `BaggageStateChangeProducer` with the `BaggageService`
 
-When the state change we want to send the message as well. Go to the `BaggageService` and inject
+When the state changes, we want to send the message as well. Go to the `BaggageService` and inject
 the `BaggageStateChangeProducer` and call the `send` method when the baggage state changes.
 
 ### 3. Add Kafka consumer to the `passenger-service`
@@ -186,7 +186,7 @@ create a new `Notification` for the passenger.
 
 ### 4. Test the communication
 
-Thanks to the Quarkus Dev Services, we can easily test the communication between the services using the Kafka. Dev
+Thanks to the Quarkus Dev Services, we can easily test the communication between the services using Kafka. Dev
 services will start the Kafka broker for us. We will prepare it for production later.
 
 Scenario:

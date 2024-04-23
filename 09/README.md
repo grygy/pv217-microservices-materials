@@ -5,14 +5,13 @@
 In distributed microservices systems, failures are inevitable. The network is unreliable, services can be slow, and the
 system can be under heavy load. To build resilient systems, we need to handle these failures gracefully.
 
-In this lecture we will use the SmallRye Fault Tolerance library which implements the MicroProfile Fault Tolerance
+In this exercise, we will use the SmallRye Fault Tolerance library, which implements the MicroProfile Fault Tolerance
 specification. This library provides a set of annotations to handle these challenges and build more resilient systems.
 
 ### SmallRye Fault Tolerance annotations
 
 - `@Timeout` -- It defines a timeout for a method. If the method takes longer than the specified time,
-  a `TimeoutException` is thrown. It's useful for preventing a method from taking too long to execute and possibly
-  giving user a faster feedback.
+  a `TimeoutException` is thrown. It's useful for preventing a method from executing too long and possibly giving users faster feedback.
 - `@Retry` -- It specifies that a method should be executed again if it fails. You can specify the maximum number of
   retries and the delay between retries. It's useful for handling transient failures.
 - `@CircuitBreaker` -- It specifies that a method should be executed in a circuit breaker. If the method fails, the
@@ -20,7 +19,7 @@ specification. This library provides a set of annotations to handle these challe
   and the method is executed again. If it fails, the circuit is opened again. If it succeeds, the circuit is closed
   again. It's useful for not overloading a failing service.
 - `@Fallback` -- It specifies a fallback method that should be executed if the original method fails. It's useful for
-  providing a default value (eg. default recommendations) or a default behavior when a method fails.
+  providing a default value (e.g. default recommendations) or a default behavior when a method fails.
 
 #### Example
 
@@ -68,31 +67,31 @@ public class HelloResource {
 
 ## Tracing
 
-In modern cloud based application it is important to have visibility into the system. Tracing is a technique to follow the flow of the code and understand how the different services interact with each other. It is useful for debugging, performance analysis, and understanding the system.
+In modern cloud-based applications, it is important to have visibility into the system. Tracing is a technique to follow the flow of the code and understand how the different services interact with each other. It is useful for debugging, performance analysis, and understanding the system.
 
 ### OpenTelemetry
 
-OpenTelemetry is a set of APIs, libraries, agents, and instrumentation to provide observability for cloud-native software. It provides a set of tools to generate, collect, and export telemetry data (traces) for analysis. 
+OpenTelemetry is a set of APIs, libraries, agents, and instrumentation to provide observability for cloud-native software. It provides a set of tools to generate, collect, and export telemetry data (traces) for analysis.
 
 ### Jaeger
 
-Jaeger is an open-source, end-to-end distributed tracing system. It is used for monitoring and troubleshooting microservices-based distributed systems. It is used to monitor and troubleshoot distributed systems.
+Jaeger is an open-source, end-to-end distributed tracing system. It is used to monitor and troubleshoot microservices-based distributed systems. It is used to monitor and troubleshoot distributed systems.
 
 It collects data from the services using OpenTelemetry over gRPC, stores them, and visualizes the traces in a user-friendly way.
 
 It supports:
 - Collecting traces from the services
 - Storing the traces
-- Visualizing the traces 
+- Visualizing the traces
 - Querying the traces
 
 ![Jaeger UI](./img/jaeger-ui.png)
 
 ## State of the project
 
-- In `baggage-service`, there is artificial failure in `BaggageResource.getBaggageByPassengerId` method.
+- In `baggage-service,` there is an artificial failure in the `BaggageResource.getBaggageByPassengerId` method.
 - Smallrye fault tolerance is added to all services.
-- Opentelemetry extensions is added to the `flight-service` and `baggage-service`.
+- Opentelemetry extension is added to the `flight-service` and `baggage-service`.
 
 ## Tasks
 
@@ -108,15 +107,15 @@ Baggage service has 50 % of failure to retrieve baggage by passenger id.
 
 1. Create a passenger and baggage for the passenger.
 2. Try to retrieve the passenger with baggage using `/passenger/{passengerId}/baggage` endpoint.
-   1. It should fail 50 % of the time.
+    1. It should fail 50 % of the time.
 3. Add a `@Retry` annotation to the `getPassengerWithBaggage` method in `PassengerResource`. Set the maximum number of retries to 4 and the delay between retries to 500 ms.
 4. Try again to retrieve the passenger with baggage using `/passenger/{passengerId}/baggage` endpoint.
-   1. It should almost always succeed. Note the delay of the response meaning the baggage service failed and the retry was executed.
+    1. It should almost always succeed. Note the delay in the response, which means the baggage service failed, and the retry was executed.
 
 ### 2. Add fault tolerance to the `flight-service`
 
 #### 2.1. In `flight-service`, go to `FlightService` and follow the TODOs
- 
+
 Add a `@CircuitBreaker` annotation to the `cancelFlight` method.
 
 ### 3. Add OpenTelemetry config
@@ -161,13 +160,13 @@ In `docker-compose.yaml` set `QUARKUS_OTEL_ENDPOINT` environment variable to mar
 
 1. Go to `http://localhost:16686` and check if the traces are visible.
 2. Check the traces for the `passenger-service` and `POST /passenger/{passengerId}/baggage` operation.
-3. You should be able to see the traces with retries in both passenger and baggage services similar to the image below.
+3. You should be able to see the traces with retries in both passenger and baggage services, similar to the image below.
 
-    ![Jaeger UI](./img/jaeger-ui.png)
+   ![Jaeger UI](./img/jaeger-ui.png)
 
 4. Open one of the traces
 
-    ![Jaeger UI](./img/jaeger-detail.png)
+   ![Jaeger UI](./img/jaeger-detail.png)
 
 ### X. Submit the solution
 

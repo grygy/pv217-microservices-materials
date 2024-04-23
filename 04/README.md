@@ -2,9 +2,9 @@
 
 ## SmallRye Mutiny
 
-Since we will be using reactive approach it is a good thing to know something about Mutiny.
+Since we will be using a reactive approach, it is a good thing to know something about Mutiny.
 
-Mutiny is a reactive programming library for Java. It is based on Reactive Streams and MicroProfile Reactive Streams Operators. So when you see `Uni` or `Multi` in the code, it means that the method returns a reactive type and the method is asynchronous.
+Mutiny is a reactive programming library for Java. It is based on Reactive Streams and MicroProfile Reactive Streams Operators. So when you see `Uni` or `Multi` in the code, it means that the method returns a reactive type, and the method is asynchronous.
 
 **What are `Uni` and `Multi`?**
 
@@ -24,7 +24,7 @@ For more in depth discussion about asynchronous programming and the difference w
 
 ### Mutiny's Fluent API
 
-Mutiny provides a fluent API for building reactive streams. It's a chain of operations in a readable and expressive manner. This approach simplifies complexity of asynchronous programming.
+Mutiny provides a fluent API for building reactive streams. It's a chain of operations that is readable and expressive. This approach simplifies the complexity of asynchronous programming.
 
 The design of the API is designed to be easy to read and understand what the code does. It's a chain of operations that are executed when the previous operation is done.
 
@@ -48,13 +48,13 @@ Uni<String> processedUni = Uni.createFrom().item("Hello") // Creates an async un
 
 ORM is a technique that lets you query and manipulate data in a database using an object-oriented paradigm. Thus, instead of writing SQL queries, you can write Java code to perform the same operations.
 
-It introduces abstraction between the database and the application. You can change more easily the database without changing the application code.
+It introduces abstraction between the database and the application. You can change the database more easily without changing the application code.
 
 ### Persistence with Panache
 
 Panache is ORM layer for Quarkus. It is based on Hibernate ORM and Hibernate Reactive.
 
-For both PanacheEntity and PanacheRepository, you can see examples bellow.
+For both PanacheEntity and PanacheRepository, you can see examples below.
 
 ## Active record vs repository
 
@@ -94,7 +94,7 @@ Methods:
 #### Example
 
 ```java
-import io.quarkus.hibernate.reactive.panache.PanacheEntity; // note the reactive package. There is also a non-reactive variant
+import io.quarkus.hibernate.reactive.panache.PanacheEntity; // note the reactive package. There is also a non-reactive variant.
 
 @Entity
 public class Person extends PanacheEntity {
@@ -142,7 +142,7 @@ Cons:
 
 PanacheRepository is a base class for repositories. It provides similar logic as PanacheEntity, but it's used for repository pattern.
 
-But you need to define the entity more explicitly. With id, getters and setters, etc. Then you will create a repository class that extends `PanacheRepository<Entity>`.
+But you need to define the entity more explicitly with id, getters, setters, etc. Then you will create a repository class that extends `PanacheRepository<Entity>`.
 
 #### Example
 
@@ -181,9 +181,9 @@ public class PersonRepository implements PanacheRepository<Person> {
 #### `@WithTransaction` annotation
 
 - `@WithTransaction` annotation is used to mark a method as transactional. It means that the method will be executed in a transactional context. If the method fails, the transaction will be rolled back. This annotation is used when accessing the database. Altering the database should be done in a transactional context, but also reading from the database. Example bellow.
-- Transactions follow unit of work pattern. It means that all operations in a transaction are treated as a single unit of work. If any operation fails, the whole transaction is rolled back.
+- Transactions follow a unit of work pattern. It means that all operations in a transaction are treated as a single unit of work. If any operation fails, the whole transaction is rolled back.
 
-Illustrative example of sql query that should run in a transactional context:
+Illustrative example of SQL query that should run in a transactional context:
 ```sql
 SELECT AVG(price) as mean_price FROM price_table; 
 -- between these two queries, another transaction can delete the rows from price_table, thus altering the result of the second query --> consistency problem
@@ -192,7 +192,7 @@ SELECT * FROM product_table WHERE price > mean_price;
 
 ## Entities with relations
 
-If you have entities with relations, you can use `@OneToMany`, `@ManyToOne`, `@OneToOne`, `@ManyToMany` annotations to define the relation between entities. Then with `@JoinColumn` you can define the column that will be used for the join.
+If you have entities with relations, you can use `@OneToMany`, `@ManyToOne`, `@OneToOne`, `@ManyToMany` annotations to define the relation between entities. Then, with `@JoinColumn`, you can specify the column that will be used for the join.
 
 #### Example
 
@@ -251,11 +251,11 @@ public class PostComment {
 Dev services give us a way to make development easier.
 
 What are the benefits of dev services?
-- Automatic startup -- check configuration, download dependencies and start the service
+- Automatic startup -- check configuration, download dependencies, and start the service
 - Continuous testing -- continuous testing of the application
 - Configuration management -- automatic configuration of the service and database connection
 
-For this week's lecture the main benefit is a way to run a database in a Docker container without any configuration from developer side. Of course, it's only for development purposes. But during the initial development phase, it's very useful. Before we will create a configuration to dockerized database.
+For this exercise, the main benefit is a way to run a database in a Docker container without any configuration from the developer side. Of course, it's only for development purposes. But during the initial development phase, it's very useful. Before we create a configuration for the dockerized database,
 
 ## State of the project
 
@@ -268,11 +268,11 @@ For this week's lecture the main benefit is a way to run a database in a Docker 
 
 ### 0. Running Docker
 
-Install [Docker desktop](https://docs.docker.com/engine/install/) or other Docker client. Our test database will run in Docker container.
+Install [Docker desktop](https://docs.docker.com/engine/install/) or another Docker client. Our test database will run in a Docker container.
 
 ### 1. Make `Notification` active record entity
 
-In `passenger-service` make Notification entity as active record using PanacheEntity.
+In `passenger-service`, make the Notification entity as active record using PanacheEntity.
 
 Implement `deleteAll` in `NotificationService` with the usage of  `Notification` active record. The `listAll` method will be implemented in the next task.
 
@@ -284,9 +284,9 @@ Check if the tests for Notification entity deletion are passing. Use continuous 
 
 ### 2. Make `Passenger` entity
 
-In `Passenger` entity add correct annotations with getters and setters to make it a valid JPA entity that will be used in `PassengerRepository`.
+In the `Passenger` entity add correct annotations with getters and setters to make it a valid JPA entity that will be used in `PassengerRepository`.
 
-Hmm, but what about the relation with notifications? Passenger can have multiple notifications. Add the relation between `Passenger` and `Notification` entities.
+Hmm, but what about the relationship with notifications? Passengers can have multiple notifications. Add the relation between `Passenger` and `Notification` entities.
 
 ### 3. Implement `PassengerRepository`
 
@@ -294,13 +294,13 @@ Implement methods in `PassengerRepository` to make it a repository for `Passenge
 
 Don't forget to implement `NotificationService#listAll` method using `PassengerRepository`.
 
-#### 3.1. How to test if everything is working?
+#### 3.1. How do you test if everything is working?
 
 - Tests are passing
 
 Test scenario
-- Create a flight using swagger ui
-- Create a passenger using swagger ui with appropriate flight id
+- Create a flight using Swagger UI
+- Create a passenger using Swagger UI with appropriate flight id
 - Call cancel flight endpoint
 - Check if the GET notification endpoint returns the notification for the passenger with his email.
 
@@ -310,8 +310,8 @@ Test scenario
 
 ## Hints
 
-- In `flight-service` you can find implemented repository pattern with Panache.
-- If something is not working, and it should (Developers aren't doing mistakes right?) run maven clean and compile commands.
+- In `flight-service`, you can find implemented repository pattern with Panache.
+- If something is not working, and it should (Developers aren't making mistakes, right?), run maven clean and compile commands.
 
 ## Troubleshooting
 

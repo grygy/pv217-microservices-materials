@@ -1,8 +1,8 @@
 # 04 - Testing
 
-## Why are tests important?
+## Why are tests necessary?
 
-Test are a crucial part of software development. Test ensure that the code you write is working as expected. They also help you to understand the code and how to compose it. Easily testable code is also easier to maintain and refactor.
+Tests are a crucial part of software development. Tests ensure that the code you write is working as expected. They also help you to understand the code and how to compose it. Easily testable code is also easier to maintain and refactor.
 
 Key benefits of testing:
 - Detecting bugs early
@@ -21,7 +21,7 @@ AI tools are great for generating basic tests and data. BE AWARE that they are n
 
 ## Unit tests
 
-The most common type of tests are unit tests. The key idea of unit tests is to test the smallest piece of code possible in isolation. Usually, this means testing a single method or function and checking if for given input it returns the expected output.
+The most common type of tests are unit tests. The key idea of unit tests is to test the smallest piece of code possible in isolation. Usually, this means testing a single method or function and checking if, for a given input, it returns the expected output.
 
 Key attributes of unit tests:
 - Fast
@@ -35,19 +35,19 @@ Quarkus provides a `QuarkusTest` annotation that allows you to write tests for y
 
 ### Mocking
 
-But how to isolate the code from the rest of the system? The answer is mocking. Mocking is a technique used to isolate the code under test from the rest of the system. It is used to replace the real dependencies of the code with fake ones. This allows you to test the code in isolation.
+But how do we isolate the code from the rest of the system? The answer is mocking. Mocking is a technique used to isolate the code under test from the rest of the system. It is used to replace the real dependencies of the code with fake ones. This allows you to test the code in isolation.
 
 ## Integration tests
 
-Integration tests are used to test the interaction between different parts of the system. Usually it means testing flows in the system and checking if the system behaves as expected. In our case of `passenger-service` it could mean testing if the passenger can be created and then retrieved from the database using the REST API. This tests every layer of the system.
+Integration tests are used to test the interaction between different parts of the system. Usually, this means testing the system's flow and checking if the system behaves as expected. In our case of `passenger-service` it could mean testing if the passenger can be created and then retrieved from the database using the REST API. This tests every layer of the system.
 
-They ensure that the system is set up correctly also in production environment.
+They ensure that the system is set up correctly and also in a production environment.
 
 ### `@QuarkusIntegrationTest` annotation
 
 Quarkus provides a `@QuarkusIntegrationTest` annotation that allows you to write integration tests for your Quarkus application. These tests are executed against the build artifact -- whether it's a JAR file, a native executable, or a container image -- using the production configuration profile.
 
-It's a black box in terms of the actual execution but thanks to the dev services and the test containers it's possible to test the whole system in production-like environment.
+It's a black box in terms of the actual execution, but thanks to the dev services and the test containers, it's possible to test the whole system in a production-like environment.
 
 ## Technologies
 
@@ -55,7 +55,7 @@ We will depend on the following technologies to write tests:
 - JUnit 5 -- Unit tests
 - RestAssured -- REST API testing
 - Mockito -- Mocking
-- Test vertx -- Testing asynchronous code
+- Test Vert.x -- Testing asynchronous code
 
 #### Examples
 
@@ -122,7 +122,7 @@ public class MockedServiceUniTest {
 
 ### RestAssured
 
-RestAssured is a Java library for testing REST APIs. It's a great tool to implement integration tests but also unit tests for REST endpoints.
+RestAssured is a Java library for testing REST APIs. It's a great tool to implement integration tests and unit tests for REST endpoints.
 
 #### Examples
 
@@ -167,11 +167,11 @@ public class GreetingResourceTest {
 
 ### 0. Running docker
 
-Install [Docker desktop](https://docs.docker.com/engine/install/) or other docker client. Our test database will run in docker container.
+Install [Docker desktop](https://docs.docker.com/engine/install/) or another docker client. Our test database will run in a docker container.
 
 ### 1. Implement unit tests for `PassengerRepository`
 
-Go to `PassengerRepositoryTest` and implement the todo's. You don't need to mock anything because Quarkus provides a test database for you.
+Go to `PassengerRepositoryTest` and implement the todos. You don't need to mock anything because Quarkus provides a test database for you.
 
 Don't forget to add at least two of your own tests.
 
@@ -187,17 +187,17 @@ Go to `PassengerResourceTest` and implement the todo's. You will need to mock th
 
 ### 4. Implement integration tests for `PassengerResource`
 
-Go to `PassengerResourceIT` and implement the todo's. There is one test already implemented, use it as an example. In this test you don't need to mock anything, you will test the whole system.
+Go to `PassengerResourceIT` and implement the todo's. One test has already been implemented; use it as an example. In this test, you don't need to mock anything; you will test the whole system.
 
 ### 5. Verify if everything is working
 
-Run the following command in the root of the project:
+Run the following command at the root of the project:
 
 ```bash
 mvn verify -DskipITs=false
 ```
 
-If everything is working, all tests should pass and you are ready to submit the solution.
+If everything is working, all tests should pass, and you are ready to submit the solution.
 
 ### X. Submit the solution
 

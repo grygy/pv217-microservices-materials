@@ -2,11 +2,9 @@
 
 ## What is Quarkus?
 
-Quarkus is an open-source Kubernetes-native Java framework tailored for GraalVM and HotSpot, crafted from best-of-breed
-Java libraries and standards. The goal is to make Java the leading platform in Kubernetes and serverless environments
-while offering developers a framework to address a wider range of distributed application architectures.
+Quarkus is an open-source Kubernetes-native Java framework tailored for GraalVM and HotSpot, crafted from best-of-breed Java libraries and standards. The goal is to make Java the leading platform in Kubernetes and serverless environments while offering developers a framework to address a broader range of distributed application architectures.
 
-## How is Quarkus different to Spring boot
+## How is Quarkus different from Spring boot
 
 ### Spring Boot
 
@@ -24,19 +22,18 @@ while offering developers a framework to address a wider range of distributed ap
 - Offers Dev UI and live reload for rapid development and testing.
 - Offers a unified reactive API for both imperative and reactive programming styles.
 - Offers Native Images for even faster startup and lower memory footprint.
-- Offers easy native compilation which creates Native Images for even faster startup and lower memory footprint.
+- Offers easy native compilation, which creates Native Images for even faster startup and lower memory footprint.
 
 ## Quarkus Technologies
 
 - **Maven** or **Gradle** to create a new project, add or remove extensions, launch development mode, debug your
   application, and build your application.
 - **Jakarta EE** to write your business logic and REST endpoints.
-- **MicroProfile** to health check, monitor, configure your application.
+- **MicroProfile** to health check, monitor, and configure your application.
 
 ## Tasks
 
-This week's lecture will be more about reading and understanding the Quarkus developer experience than about coding. We
-will create a simple Quarkus application and run it in development mode.
+This exercise will be more about reading and understanding the Quarkus developer experience than about coding. We will create a simple Quarkus application and run it in development mode.
 
 ### 0. Prerequisites
 
@@ -45,7 +42,7 @@ Install Java 21
 1. Install OpenJDK 21
    Find the latest version of OpenJDK 21 [here](https://jdk.java.net/21/).
 
-2. Check java version
+2. Check the Java version
     ```bash
     java --version
    # should be 21
@@ -73,8 +70,7 @@ Install Java 21
 
 ### 1. Install Quarkus CLI
 
-Even though Quarkus application can be created using Maven, Quarkus CLI is a convenient tool to create and manage
-Quarkus applications.
+Even though Quarkus application can be created using Maven, Quarkus CLI is a convenient tool to create and manage Quarkus applications.
 
 1. Install Quarkus CLI
     - You can find more installation options [here](https://quarkus.io/guides/cli-tooling).
@@ -100,10 +96,9 @@ Quarkus applications.
 
 1. Create a Quarkus application
 
-   Let's use `quarkus create app <groupID>:<artifactID>` to create a Quarkus application. We will add
-   the `resteasy-reactive-jackson` extension to support REST endpoints.
-    - `groupID` is the package name of the application. It is usually the reverse domain name of the organization.
-    - `artifactID` is the name of the application (and .jar file).
+   Let's use `quarkus create app <groupID>:<artifactID>` to create a Quarkus application. We will add the `resteasy-reactive-jackson` extension to support REST endpoints.
+   - `groupID` is the name of the application package. It is usually the reverse domain name of the organization.
+   - `artifactID` is the application's name (and .jar file).
     ```bash
     quarkus create app cz.muni.fi:flight-service --extension='resteasy-reactive-jackson'
     ```
@@ -131,18 +126,15 @@ cd flight-service
 quarkus dev
 ```
 
-The application should download dependencies and start on port 8080. You can access the basic REST endpoint
-at http://localhost:8080/hello. It should return "*Hello from RESTEasy Reactive*".
+The application should download dependencies and start on port 8080. You can access the basic REST endpoint at http://localhost:8080/hello. It should return "*Hello from RESTEasy Reactive*".
 
 ### 4. What is Quarkus development mode?
 
-Quarkus development mode is a powerful feature that makes Quarkus development fast and easy. It offers the following
-features:
+Quarkus development mode is a powerful feature that makes Quarkus development fast and easy. It offers the following features:
 
 #### 4.1. Live reload
 
-Quarkus automatically reloads the application when you change the configuration. So no more restarting the application
-after every change.
+Quarkus automatically reloads the application when you change the configuration. So, no more restarting the application after every change.
 
 #### 4.2. Dev UI
 
@@ -152,15 +144,13 @@ You can find Dev UI at http://localhost:8080/q/dev-ui. It offers the following f
 - Extension documentation - Shows documentation for the extensions used in the application.
 - Configuration visualization - Shows which configuration properties are used in the application. You can also change
   the configuration and see the changes in the application.
-- Continuous testing visualization - Shows status of the tests in graphical form.
-- Dev Services - Starts and stops external services like databases, Kafka, etc. You don't need to setup database for
-  testing. Quarkus will do it for you.
+- Continuous testing visualization - Shows the status of the tests in graphical form.
+- Dev Services - Starts and stops external services like databases, Kafka, etc. You don't need to setup a database for testing. Quarkus will do it for you.
 - Build metrics - Shows how long it takes to build the application.
 
 #### 4.3. Quarkus dev CLI
 
-When you look the console, you can see that Quarkus runs tests after every change. This is called continuous testing. It
-helps you to find bugs as soon as possible.
+When you look at the console, you can see that Quarkus runs tests after every change. This is called continuous testing. It helps you to find bugs as soon as possible.
 
 - You can also run tests manually by pressing `r` in the console.
 - You can press `s` to force restart the application.
@@ -169,10 +159,7 @@ Press `h` to see all available commands and try some of them.
 
 ### 5. Change the code
 
-Try to change the code, refresh the site, and see how Quarkus reacts. For example, you can change the message in
-the `hello()` method
-in `GreetingResource.java` and see how it changes in the browser. You will see live reload in action with continuous
-testing.
+Try to change the code, refresh the site, and see how Quarkus reacts. For example, you can change the message in the `hello()` method in `GreetingResource.java` and see how it changes in the browser. You will see live reload in action with continuous testing.
 
 1. Go to `GreetingResource.java` and change the message in the `hello()` method.
 2. Go to `GreetingResourceTest.java` and change the test to match the new message.
@@ -180,24 +167,21 @@ testing.
 
 ### 6. Configure the application
 
-In `application.properties` you can configure the application. For example, you can change the port on which the
-application runs.
+In `application.properties`, you can configure the application. For example, you can change the port on which the application runs.
 
-Try to adding the following line to `application.properties` and see how it changes in the browser.
+Try adding the following line to `application.properties` and see how it changes in the browser.
 
 ```properties
 quarkus.http.port=8079
 ```
 
-Now kill the application and run it again. You should see that the application runs on port 8079.
+Now, kill the application and run it again. You should see that the application runs on port 8079.
 
-In `application.properties` you can also configure the configuration of the extensions or add your own configuration. We
-will use it much more in the following lectures.
+In `application.properties` you can also configure the configuration of the extensions or add your own configuration. We will use it much more in the following exercises.
 
 #### 6.1. Separate configuration for development and production
 
-For each property, you can define a separate value for development and production by prefix. For example, you can define
-a different port for development and production.
+For each property, you can define a separate value for development and production by prefix. For example, you can define a different port for development and production.
 
 Prefixes:
 
@@ -206,8 +190,7 @@ Prefixes:
 - `%test` - test
 - `%prod` - production
 
-Add the following lines to `application.properties` and restart dev mode of the application. The application should
-still run on port 8079.
+Add the following lines to `application.properties` and restart the dev mode of the application. The application should still run on port 8079.
 
 ```properties
 quarkus.http.port=8080
@@ -216,8 +199,7 @@ quarkus.http.port=8080
 
 #### 6.2. Using configuration in the code
 
-You can inject configuration into your code using `@ConfigProperty` annotation. For example, you can inject the port
-into the `GreetingResource.java` class.
+You can inject configuration into your code using `@ConfigProperty` annotation. For example, you can inject the port into the `GreetingResource.java` class.
 
 Add the following property to `GreetingResource.java` class and import the `ConfigProperty`.
 
@@ -226,9 +208,9 @@ Add the following property to `GreetingResource.java` class and import the `Conf
 int port;
 ```
 
-Now you can use the `port` variable in the `hello()` method.
+Now, you can use the `port` variable in the `hello()` method.
 
-```java
+```Java
 @GET
 @Produces(MediaType.TEXT_PLAIN)
 public String hello(){
@@ -236,21 +218,17 @@ public String hello(){
         }
 ```
 
-Repair the unit test in `GreetingResourceTest.java` by adding port property to `GreetingResourceTest` class in the same
-way as in the `GreetingResource` class.
+Repair the unit test in `GreetingResourceTest.java` by adding the port property to `GreetingResourceTest` class in the same way as in the `GreetingResource` class.
 
 ### 7. Add extension
 
-Quarkus offers a lot of extensions that you can add to your application. You can find the list of
-extensions [here](https://quarkus.io/extensions/).
+Quarkus offers many extensions that you can add to your application. You can find the list of extensions [here](https://quarkus.io/extensions/).
 
-Currently, we have already some extensions present in the application. You can find them in the `pom.xml` file. For
-example, the `quarkus-resteasy-reactive` extension is present which enables us to make REST endpoints.
+Currently, we already have some extensions present in the application. You can find them in the `pom.xml` file. For example, the `quarkus-resteasy-reactive` extension is present, which enables us to make REST endpoints.
 
 #### 7.1. Add extension using CLI
 
-So let's add another extension. We will add the `quarkus-smallrye-openapi` extension which enables us to generate
-OpenAPI documentation for our REST endpoints. We will discuss openapi in more detail in the following lectures.
+So, let's add another extension. We will add the `quarkus-smallrye-openapi` extension, which enables us to generate OpenAPI documentation for our REST endpoints. We will discuss OpenAPI in more detail in the following exercises.
 
 Put the following line to the console and see how Quarkus adds the extension to the application.
 
@@ -260,8 +238,7 @@ quarkus extension add quarkus-smallrye-openapi
 
 Now, you should see the `quarkus-smallrye-openapi` extension in the `pom.xml` file.
 
-Run the application again and go to http://localhost:8079/q/swagger-ui. You should see the OpenAPI documentation for
-the `GreetingResource` class.
+Run the application again and go to http://localhost:8079/q/swagger-ui. You should see the OpenAPI documentation for the `GreetingResource` class.
 
 #### 7.2. Other CLI commands related to extensions
 
