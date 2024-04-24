@@ -187,7 +187,7 @@ Go to `PassengerResourceTest` and implement the todo's. You will need to mock th
 
 ### 4. Implement integration tests for `PassengerResource`
 
-Go to `PassengerResourceIT` and implement the todo's. One test has already been implemented; use it as an example. In this test, you don't need to mock anything; you will test the whole system.
+Go to `PassengerResourceTestIT` and implement the todo's. One test has already been implemented; use it as an example. In this test, you don't need to mock anything; you will test the whole system.
 
 ### 5. Verify if everything is working
 

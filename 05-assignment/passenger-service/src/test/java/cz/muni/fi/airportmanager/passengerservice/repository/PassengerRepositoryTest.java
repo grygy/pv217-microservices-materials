@@ -39,22 +39,6 @@ class PassengerRepositoryTest {
     void shouldFindNotificationsForPassenger(UniAsserter asserter) {
         // TODO implement this test
         // create a passenger and a notification, add the notification to the passenger and test if the notification is found
-        Passenger passenger = createTestPassenger();
-        Notification notification = createTestNotification();
-
-        asserter
-                .execute(() -> passengerRepository.persist(passenger))
-                .execute(() -> {
-                    passenger.addNotification(notification);
-                    return passengerRepository.persist(passenger);
-                })
-                .assertThat(
-                        () -> passengerRepository.findNotificationsForPassenger(passenger.getId()),
-                        notifications -> {
-                            assertEquals(1, notifications.size());
-                            assertEquals(notification.message, notifications.get(0).message);
-                        }
-                );
     }
 
     @Test
@@ -64,16 +48,6 @@ class PassengerRepositoryTest {
         // It should test that the notification is added to the appropriate passengers
         // call addNotificationByFlightId and then check if the notification is present in the passenger's notifications
         // using findNotificationsForPassenger method
-        Passenger passenger = createTestPassenger();
-        Notification notification = createTestNotification();
-
-        asserter
-                .execute(() -> passengerRepository.persist(passenger))
-                .execute(() -> passengerRepository.addNotificationByFlightId(passenger.getFlightId(), notification))
-                .assertThat(
-                        () -> passengerRepository.findNotificationsForPassenger(passenger.getId()),
-                        notifications -> assertTrue(notifications.stream().anyMatch(n -> n.message.equals(notification.message)))
-                );
     }
 
     @Test
@@ -82,18 +56,6 @@ class PassengerRepositoryTest {
         // TODO implement this test
         // Persist a passenger and then get the its record by flight id
         // test findPassengersForFlight method
-
-        Passenger passenger = createTestPassenger();
-
-        asserter
-                .execute(() -> passengerRepository.persist(passenger))
-                .assertThat(
-                        () -> passengerRepository.findPassengersForFlight(passenger.getFlightId()),
-                        passengers -> {
-                            assertEquals(1, passengers.size());
-                            assertEquals(passenger.getId(), passengers.get(0).getId());
-                        }
-                );
     }
 
     @Test
@@ -102,21 +64,6 @@ class PassengerRepositoryTest {
         // TODO implement this test
         // this test should find all notifications with the email of the passenger
         // test findNotificationsWithEmail method
-        Passenger passenger = createTestPassenger();
-        Notification notification = createTestNotification();
-        passenger.addNotification(notification);
-
-        asserter
-                .execute(() -> passengerRepository.persist(passenger))
-                .assertThat(
-                        passengerRepository::findNotificationsWithEmail,
-                        notificationDtos -> {
-                            assertEquals(1, notificationDtos.size());
-                            NotificationDto dto = notificationDtos.get(0);
-                            assertEquals(notification.message, dto.message);
-                            assertEquals(passenger.getEmail(), dto.email);
-                        }
-                );
     }
 
     @Test
@@ -124,14 +71,6 @@ class PassengerRepositoryTest {
     void shouldHandleNoNotificationsForPassenger(UniAsserter asserter) {
         // TODO implement this test
         // test findNotificationsForPassenger method
-        Passenger passenger = createTestPassenger();
-
-        asserter
-                .execute(() -> passengerRepository.persist(passenger))
-                .assertThat(
-                        () -> passengerRepository.findNotificationsForPassenger(passenger.getId()),
-                        notifications -> assertEquals(0, notifications.size())
-                );
     }
 
     @Test
@@ -139,10 +78,6 @@ class PassengerRepositoryTest {
     void shouldHandleInvalidPassengerIdForNotifications(UniAsserter asserter) {
         // TODO implement this test
         // test findNotificationsForPassenger method
-        asserter.assertThat(
-                () -> passengerRepository.findNotificationsForPassenger(-1L),
-                notifications -> assertEquals(0, notifications.size())
-        );
     }
 
     @Test
@@ -150,14 +85,6 @@ class PassengerRepositoryTest {
     void shouldNotAddNotificationToNonExistentFlight(UniAsserter asserter) {
         // TODO implement this test
         // test addNotificationByFlightId method
-        Notification notification = createTestNotification();
-
-        asserter
-                .execute(() -> passengerRepository.addNotificationByFlightId(-1L, notification))
-                .assertThat(
-                        () -> passengerRepository.findNotificationsWithEmail(),
-                        notifications -> assertEquals(0, notifications.size())
-                );
     }
 
     @Test
@@ -165,11 +92,6 @@ class PassengerRepositoryTest {
     void shouldHandleNoPassengersForFlight(UniAsserter asserter) {
         // TODO implement this test
         // test findPassengersForFlight method
-        asserter
-                .assertThat(
-                        () -> passengerRepository.findPassengersForFlight(-1L),
-                        passengers -> assertEquals(0, passengers.size())
-                );
     }
 
     @Test
@@ -177,11 +99,6 @@ class PassengerRepositoryTest {
     void shouldHandleEmptyPassengerRepositoryForNotificationsWithEmail(UniAsserter asserter) {
         // TODO implement this test
         // test findNotificationsWithEmail method
-        asserter
-                .assertThat(
-                        passengerRepository::findNotificationsWithEmail,
-                        notifications -> assertEquals(0, notifications.size())
-                );
     }
 
 
@@ -190,11 +107,6 @@ class PassengerRepositoryTest {
     void shouldNotFindNonExistentPassenger(UniAsserter asserter) {
         // TODO implement this test
         // test findById method
-        asserter
-                .assertThat(
-                        () -> passengerRepository.findById(-1L),
-                        Assertions::assertNull
-                );
     }
 
     @Test
@@ -202,14 +114,5 @@ class PassengerRepositoryTest {
     void shouldDeletePassenger(UniAsserter asserter) {
         // TODO implement this test
         // test deleteById method
-        Passenger passenger = createTestPassenger();
-
-        asserter
-                .execute(() -> passengerRepository.persist(passenger))
-                .execute(() -> passengerRepository.deleteById(passenger.getId()))
-                .assertThat(
-                        () -> passengerRepository.findById(passenger.getId()),
-                        Assertions::assertNull
-                );
     }
 }
