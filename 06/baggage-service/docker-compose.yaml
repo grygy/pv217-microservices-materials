@@ -3,6 +3,7 @@ services:
   baggage-service:
     # TODO Add baggage-service service
     # TODO Don't forget to add environment variables for the database connection settings
+    # Don't forget to add the depends_on and networks configuration
       build:
         context: .
         dockerfile: src/main/docker/Dockerfile.jvm
@@ -23,6 +24,7 @@ services:
   db:
     # TODO Add baggage-service database from postgres image
     # TODO Don't forget to add environment variables for the database connection settings
+    # Don't forget to add the volumes and networks configuration
     image: postgres:16.2
     environment:
       POSTGRES_DB: baggage-database

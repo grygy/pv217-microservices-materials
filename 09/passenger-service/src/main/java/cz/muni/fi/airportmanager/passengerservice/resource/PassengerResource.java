@@ -115,6 +115,7 @@ public class PassengerResource {
             responseCode = "404",
             description = "Passenger with given id does not exist"
     )
+    // TODO add timeout for 250ms
     @Timeout(250)
     public Uni<RestResponse<Passenger>> get(@Parameter(name = "id", required = true, description = "Passenger id") @PathParam("id") Long id) {
         return passengerService.getPassenger(id)

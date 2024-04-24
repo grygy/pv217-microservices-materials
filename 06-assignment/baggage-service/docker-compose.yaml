@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  baggage-service:
+    # TODO Add baggage-service service
+    # TODO Don't forget to add environment variables for the database connection settings
+    # Don't forget to add the depends_on and networks configuration
+
+
+  db:
+    # TODO Add baggage-service database from postgres image
+    # TODO Don't forget to add environment variables for the database connection settings
+    # Don't forget to add the volumes and networks configuration
+
+
+  # Define your custom networks
+networks:
+  app-network:
+      driver: bridge
+
+  # Define your volumes
+volumes:
+  db-data:

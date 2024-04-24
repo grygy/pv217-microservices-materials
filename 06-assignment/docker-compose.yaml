@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  flight-service:
+    # TODO Add flight-service service configuration with the required environment variables (5 of them)
+    # Port 8079 is exposed to the outside world
+    # Don't forget to add the depends_on and networks configuration
+
+  passenger-service:
+    # TODO Add passenger-service service configuration with the required environment variables (5 of them)
+    # Port 8078 and 9000 (grpc) are exposed to the outside world
+    # Don't forget to add the depends_on and networks configuration
+
+  baggage-service:
+    build:
+      context: ./baggage-service
+      dockerfile: src/main/docker/Dockerfile.jvm
+    ports:
+      - "8077:8077"
+    environment:
+      QUARKUS_DATASOURCE_DB_KIND: postgresql
+      QUARKUS_DATASOURCE_USERNAME: user
+      QUARKUS_DATASOURCE_PASSWORD: password
+      QUARKUS_DATASOURCE_REACTIVE_URL: vertx-reactive:postgresql://baggage-db:5432/baggage-database
+    depends_on:
+      - baggage-db
+    networks:
+      - app-network
+
+  flight-db:
+    # TODO Add flight-db service configuration with the required environment variables (3 of them) and should match the flight-service configuration
+    # Don't forget to add the volumes and networks configuration
+
+  passenger-db:
+    # TODO Add passenger-db service configuration with the required environment variables (3 of them) and should match the passenger-service configuration
+    # Don't forget to add the volumes and networks configuration
+
+  baggage-db:
+    image: postgres:16.2
+    environment:
+      POSTGRES_DB: baggage-database
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - baggage-db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  # TODO add flight-db-data and passenger-db-data volumes
+  baggage-db-data:

@@ -101,7 +101,7 @@ It supports:
 
 Add a `@Timeout` annotation to the `get` method. Set the value to 250 milliseconds.
 
-#### 1.2. In `passenger-service`, add `@Retry` annotation to the `getPassengerWithBaggage` in `PassengerResource`.
+#### 1.2. In `passenger-service`, add `@Retry` annotation to the `getPassengerWithBaggage` in `PassengerService`.
 
 Baggage service has 50 % of failure to retrieve baggage by passenger id.
 
