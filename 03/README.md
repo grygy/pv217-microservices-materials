@@ -295,9 +295,15 @@ Scenario:
 3. Cancel flight using `PUT localhost:8079/flight/{id}`
 4. Check if there is a list of notifications in `GET localhost:8078/notification` that contains notifications about flight cancellation for passenger from step 2
 
-### X. Submit the solution
+### 5. Submit the solution
 
-[//]: # (TODO after setting up github classroom)
+1. Finish the tasks
+2. Push the changes to the main branch
+3. GitHub Classroom automatically prepared a feedback pull request for you
+4. Go to the repository on GitHub and find the feedback pull request
+5. Set label to "Submitted"
+6. GitHub Actions will run basic checks for your submission
+7. Teacher will evaluate the submission as well and give you feedback
 
 ## Hints
 
