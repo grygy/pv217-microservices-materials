@@ -265,9 +265,15 @@ cd passenger-service && mvn clean install && cd ../baggage-service && mvn clean 
 
 Test the application as in the previous step.
 
-### X. Submit the solution
+### 6. Submit the solution
 
-[//]: # (TODO after setting up github classroom)
+1. Finish the tasks
+2. Push the changes to the main branch
+3. GitHub Classroom automatically prepared a feedback pull request for you
+4. Go to the repository on GitHub and find the feedback pull request
+5. Set label to "Submitted"
+6. GitHub Actions will run basic checks for your submission
+7. Teacher will evaluate the submission as well and give you feedback
 
 ## Hints
 

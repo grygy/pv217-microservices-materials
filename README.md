@@ -48,3 +48,8 @@ Each exercise will be iteration over previous ones. The main goal is to incremen
 9.  Fault tolerance, tracing -- Adding fault tolerance techniques and tracing to services.
 10. Authentication between services -- Explanation of different authentication techniques, and implementing basic authentication between services.
 
+## Structure of the repository
+
+The repository contains assignments and solutions. Assignments have `-assignment` suffix, and solutions do not have any suffix.
+
+In each assignment, you will find a README.md file with the explanation of the topic and tasks. The solution contains example implementation of the tasks.
