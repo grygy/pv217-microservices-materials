@@ -196,7 +196,7 @@ In `passenger-service` define a new interface `BaggageClientResource`. This inte
 1. Create a config key for the baggage service URL in `application.properties` file. See todo in `application.properties` file.
 2. Follow the TODOs in `BaggageClientResource` interface.
 
-#### 1.3.
+#### 1.3. Use `BaggageClientResource` in `PassengerService`
 
 Now, we want to use the `BaggageClientResource` in `PassengerService` to retrieve baggage for a passenger. Go to `PassengerService` and implement the `getBaggageForPassenger` method.
 
@@ -244,6 +244,8 @@ in `./src/main/docker` directory.
 #### 2.3. Create docker compose configuration
 
 Now, we have a working docker container for `baggage-service`. Let's make a docker-compose configuration with db connection as well.
+
+Check the `application.properties` file in `baggage-service` to see what environment variables are needed for the service to run.
 
 In `baggage-service` go to `docker-compose.yml` file and create a configuration for baggage-service. See TODOs in the file.
 

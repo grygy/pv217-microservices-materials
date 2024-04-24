@@ -118,20 +118,5 @@ public class PassengerService {
     @WithTransaction
     public Uni<PassengerWithBaggageDto> getPassengerWithBaggage(Long passengerId) {
         // TODO implement this method. It should get passenger and call rest client to get baggage
-        var passengerWithBaggage = new PassengerWithBaggageDto();
-        return passengerRepository.findById(passengerId)
-                .onItem().transformToUni(passenger ->
-                        baggageClientResource.getBaggageForPassengerId(passenger.getId())
-                                .onItem().transform(baggage -> {
-                                            passengerWithBaggage.id = passenger.getId();
-                                            passengerWithBaggage.firstName = passenger.getFirstName();
-                                            passengerWithBaggage.lastName = passenger.getLastName();
-                                            passengerWithBaggage.email = passenger.getEmail();
-                                            passengerWithBaggage.flightId = passenger.getFlightId();
-                                            passengerWithBaggage.baggage = baggage;
-                                            return passengerWithBaggage;
-                                        }
-                                )
-                );
     }
 }
