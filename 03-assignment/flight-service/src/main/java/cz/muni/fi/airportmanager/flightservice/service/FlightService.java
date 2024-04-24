@@ -19,8 +19,7 @@ public class FlightService {
      */
     private final Map<Integer, Flight> flights = new HashMap<>();
 
-    @GrpcClient("passenger-service")
-    MutinyFlightCancellationGrpc.MutinyFlightCancellationStub flightCancellationStub;
+    // TODO inject flight cancellation stub using @GrpcClient
 
     /**
      * Get list of all flights
@@ -106,13 +105,5 @@ public class FlightService {
 //        TODO set flight status to CANCELLED in flights map
 //        TODO use FlightCancellationRequest.newBuilder() to create a request body
 //        TODO await the result
-        if (flights.get(id) == null) {
-            throw new IllegalArgumentException("Flight with id " + id + " does not exist");
-        }
-        flights.get(id).status = FlightStatus.CANCELLED;
-        var response = flightCancellationStub.cancelFlight(FlightCancellationRequest.newBuilder().setId(id).setReason("Unknown").build()).await().indefinitely();
-        if (response.getStatus() != FlightCancellationResponseStatus.Cancelled) {
-            throw new RuntimeException("Flight cancellation failed");
-        }
     }
 }
