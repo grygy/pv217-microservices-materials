@@ -172,7 +172,7 @@ the `BaggageStateChangeProducer` and call the `send` method when the baggage sta
 
 #### 3.1. Copy Baggage State Change class to the `passenger-service`
 
-Copy the `BaggageStateChange` class along with the `BaggageStatus` enum to the `passenger-service` to `/kafka/model`
+Copy the `BaggageStateChange` class along with the `BaggageStatus` enum to the `passenger-service` to `kafka/model`
 package.
 
 #### 3.2. Add Baggage State Change consumer

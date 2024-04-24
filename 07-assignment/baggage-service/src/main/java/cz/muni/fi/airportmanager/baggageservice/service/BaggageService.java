@@ -17,8 +17,6 @@ import java.util.List;
 public class BaggageService {
 
     // TODO inject BaggageStateChangeProducer
-    @Inject
-    BaggageStateChangeProducer baggageStateChangeProducer;
 
 
     @WithTransaction
@@ -51,7 +49,6 @@ public class BaggageService {
         return baggage.persist().onItem().transform(
                 persistedBaggage -> {
 //                    TODO produce message to kafka
-                    baggageStateChangeProducer.send((Baggage) persistedBaggage);
                     return (Baggage) persistedBaggage;
                 }
         );
@@ -82,7 +79,6 @@ public class BaggageService {
             }
             baggage.status = BaggageStatus.CLAIMED;
             // TODO produce message to kafka
-            baggageStateChangeProducer.send(baggage);
             return Baggage.persist(baggage).replaceWith(true);
         });
     }
@@ -112,7 +108,6 @@ public class BaggageService {
             }
             baggage.status = BaggageStatus.LOST;
 //          // TODO produce message to kafka
-            baggageStateChangeProducer.send(baggage);
             return Baggage.persist(baggage).replaceWith(true);
         });
     }
