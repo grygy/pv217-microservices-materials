@@ -129,7 +129,6 @@ public class PassengerService {
      */
     @WithTransaction
     // TODO add retries with maxRetries set to 4 and delay to 500 ms
-    @Retry(maxRetries = 4, delay = 500)
     public Uni<PassengerWithBaggageDto> getPassengerWithBaggage(Long passengerId) {
         var passengerWithBaggage = new PassengerWithBaggageDto();
         return passengerRepository.findById(passengerId)

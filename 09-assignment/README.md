@@ -101,14 +101,14 @@ It supports:
 
 Add a `@Timeout` annotation to the `get` method. Set the value to 250 milliseconds.
 
-#### 1.2. In `passenger-service`, add `@Retry` annotation to the `getPassengerWithBaggage` in `PassengerResource`.
+#### 1.2. In `passenger-service`, add `@Retry` annotation to the `getPassengerWithBaggage` in `PassengerService`.
 
 Baggage service has 50 % of failure to retrieve baggage by passenger id.
 
 1. Create a passenger and baggage for the passenger.
 2. Try to retrieve the passenger with baggage using `/passenger/{passengerId}/baggage` endpoint.
     1. It should fail 50 % of the time.
-3. Add a `@Retry` annotation to the `getPassengerWithBaggage` method in `PassengerResource`. Set the maximum number of retries to 4 and the delay between retries to 500 ms.
+3. Add a `@Retry` annotation to the `getPassengerWithBaggage` method in `PassengerService`. Set the maximum number of retries to 4 and the delay between retries to 500 ms.
 4. Try again to retrieve the passenger with baggage using `/passenger/{passengerId}/baggage` endpoint.
     1. It should almost always succeed. Note the delay in the response, which means the baggage service failed, and the retry was executed.
 

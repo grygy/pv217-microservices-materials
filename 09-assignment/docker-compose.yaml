@@ -34,7 +34,6 @@ services:
       QUARKUS_BAGGAGE_RESOURCE_URL: http://baggage-service:8077
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       # TODO set QUARKUS_OTEL_ENDPOINT
-      QUARKUS_OTEL_ENDPOINT: http://jaeger-all-in-one:4317
     depends_on:
       - passenger-db
     networks:
@@ -153,14 +152,6 @@ services:
 
 #  TODO add jaeger
   jaeger-all-in-one:
-    image: jaegertracing/all-in-one:1.55.0
-    ports:
-      - "16686:16686" # Jaeger UI
-      - "4317:4317"   # OTLP gRPC receiver
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-    networks:
-      - app-network
 
 networks:
   app-network:
