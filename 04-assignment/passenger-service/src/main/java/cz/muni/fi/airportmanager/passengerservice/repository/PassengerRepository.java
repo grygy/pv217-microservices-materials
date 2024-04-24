@@ -25,12 +25,6 @@ public class PassengerRepository implements PanacheRepository<Passenger> {
     @WithTransaction
     public Uni<List<Notification>> findNotificationsForPassenger(Long passengerId) {
         // TODO implement this method
-        return findById(passengerId).onItem().transform(passenger -> {
-            if (passenger == null) {
-                return List.of();
-            }
-            return passenger.getNotifications();
-        });
     }
 
 
@@ -44,16 +38,6 @@ public class PassengerRepository implements PanacheRepository<Passenger> {
     public Uni<Void> addNotificationByFlightId(Long flightId, Notification notification) {
         // TODO implement this method
         // Find passengers by flightId
-        return find("flightId", flightId).list()
-                .onItem().transformToUni(passengers -> {
-                    // Add notification to each passenger
-                    for (Passenger passenger : passengers) {
-                        passenger.addNotification(notification);
-                    }
-                    // Persist changes
-                    return this.persist(passengers);
-                })
-                .replaceWithVoid();
     }
 
     /**
@@ -64,7 +48,6 @@ public class PassengerRepository implements PanacheRepository<Passenger> {
      */
     public Uni<List<Passenger>> findPassengersForFlight(Long flightId) {
         // TODO implement this method
-        return find("flightId", flightId).list();
     }
 
     /**
@@ -74,11 +57,5 @@ public class PassengerRepository implements PanacheRepository<Passenger> {
      */
     public Uni<List<NotificationDto>> findNotificationsWithEmail() {
         // TODO implement this method
-        return listAll()
-                .onItem().transform(passengers -> passengers.stream()
-                        .flatMap(passenger -> passenger.getNotifications().stream()
-                                .map(notification -> new NotificationDto(notification.id, notification.message, passenger.getEmail()))
-                        ).toList()
-                );
     }
 }
