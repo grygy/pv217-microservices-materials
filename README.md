@@ -12,7 +12,7 @@ Each exercise will be iteration over previous ones. The main goal is to incremen
 
 ## Technologies
 
-- Java 21
+- Java
 - Quarkus framework
 - RestEasy Reactive
 - REST Client Reactive
