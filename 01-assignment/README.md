@@ -73,18 +73,18 @@ Install Java 21
 Even though Quarkus application can be created using Maven, Quarkus CLI is a convenient tool to create and manage Quarkus applications.
 
 1. Install Quarkus CLI
-    - You can find more installation options [here](https://quarkus.io/guides/cli-tooling).
-        ```bash
-        # linux 
-        curl -Ls https://sh.jbang.dev | bash -s - trust add https://repo1.maven.org/maven2/io/quarkus/quarkus-cli/
-        curl -Ls https://sh.jbang.dev | bash -s - app install --fresh --force quarkus@quarkusio
-    
-        # mac Homebrew
-        brew install quarkusio/tap/quarkus
-    
-        # windows Scoop
-        scoop install quarkus-cli
-        ```
+   - You can find more installation options [here](https://quarkus.io/guides/cli-tooling).
+       ```bash
+       # linux 
+       curl -Ls https://sh.jbang.dev | bash -s - trust add https://repo1.maven.org/maven2/io/quarkus/quarkus-cli/
+       curl -Ls https://sh.jbang.dev | bash -s - app install --fresh --force quarkus@quarkusio
+   
+       # mac Homebrew
+       brew install quarkusio/tap/quarkus
+   
+       # windows Scoop
+       scoop install quarkus-cli
+       ```
 
 2. Check Quarkus CLI version
     ```bash
@@ -96,11 +96,11 @@ Even though Quarkus application can be created using Maven, Quarkus CLI is a con
 
 1. Create a Quarkus application
 
-   Let's use `quarkus create app <groupID>:<artifactID>` to create a Quarkus application. We will add the `resteasy-reactive-jackson` extension to support REST endpoints.
+   Let's use `quarkus create app <groupID>:<artifactID>` to create a Quarkus application.
    - `groupID` is the name of the application package. It is usually the reverse domain name of the organization.
    - `artifactID` is the application's name (and .jar file).
     ```bash
-    quarkus create app cz.muni.fi:flight-service --extension='resteasy-reactive-jackson'
+    quarkus create app cz.muni.fi:flight-service
     ```
 
 2. Explore the app
@@ -108,16 +108,16 @@ Even though Quarkus application can be created using Maven, Quarkus CLI is a con
    Open the project in IntelliJ IDEA or your favorite IDE.
 
    The folder `flight-service` should be created. It contains the following files:
-    - `pom.xml` - This is the Maven project file. It contains information like the project's name, version,
-      dependencies, and plugins. It's essential for building and managing the project.
-    - `src/main/resources/application.properties` - This file is used for application configuration. You can define
-      various settings related to your application here.
-    - `src/main/java/cz/muni/fi//GreetingResource.java` - This is a REST endpoint. It's a simple Java class that handles
-      HTTP requests and returns responses.
-    - `src/test/java/cz/muni/fi//GreetingResourceTest.java` - This is a unit test for the REST endpoint. It helps ensure
-      your code works as expected.
-    - `src/test/java/cz/muni/fi//GreetingResourceIT.java` - This is an integration test for the REST endpoint. It tests
-      how different parts of the application work together.
+   - `pom.xml` - This is the Maven project file. It contains information like the project's name, version,
+     dependencies, and plugins. It's essential for building and managing the project.
+   - `src/main/resources/application.properties` - This file is used for application configuration. You can define
+     various settings related to your application here.
+   - `src/main/java/cz/muni/fi//GreetingResource.java` - This is a REST endpoint. It's a simple Java class that handles
+     HTTP requests and returns responses.
+   - `src/test/java/cz/muni/fi//GreetingResourceTest.java` - This is a unit test for the REST endpoint. It helps ensure
+     your code works as expected.
+   - `src/test/java/cz/muni/fi//GreetingResourceIT.java` - This is an integration test for the REST endpoint. It tests
+     how different parts of the application work together.
 
 ### 3. Run the application
 
@@ -224,7 +224,7 @@ Repair the unit test in `GreetingResourceTest.java` by adding the port property 
 
 Quarkus offers many extensions that you can add to your application. You can find the list of extensions [here](https://quarkus.io/extensions/).
 
-Currently, we already have some extensions present in the application. You can find them in the `pom.xml` file. For example, the `quarkus-resteasy-reactive` extension is present, which enables us to make REST endpoints.
+Currently, we already have some extensions present in the application. You can find them in the `pom.xml` file. For example, the `REST` extension is present, which enables us to make REST endpoints.
 
 #### 7.1. Add extension using CLI
 
@@ -242,8 +242,7 @@ Run the application again and go to http://localhost:8079/q/swagger-ui. You shou
 
 #### 7.2. Other CLI commands related to extensions
 
-- `quarkus extension list` - Lists all available extensions.
-- `quarkus extension list --installed` - Lists all installed extensions.
+- `quarkus extension list` - Lists all installed extensions.
 - `quarkus extension remove <extension>` - Removes the extension from the application.
 
 ### 8. Submit the solution
