@@ -40,7 +40,7 @@ This exercise will be more about reading and understanding the Quarkus developer
 Install Java 21
 
 1. Install OpenJDK 21
-   Find the latest version of OpenJDK 21 [here](https://jdk.java.net/21/).
+   Find the latest version of OpenJDK 21 [here](https://jdk.java.net/21/). Installation instruction for different operating systems can be found [here](https://www.freecodecamp.org/news/install-openjdk-free-java-multi-os-guide/).
 
 2. Check the Java version
     ```bash
@@ -67,6 +67,8 @@ Install Java 21
     ```bash
     mvn --version
     ```
+5. Install the latest version of IntelliJ IDEA to mitigate issues with the IDE and Quarkus.
+   - Install IntelliJ IDEA from [here](https://www.jetbrains.com/idea/download/).
 
 ### 1. Install Quarkus CLI
 
