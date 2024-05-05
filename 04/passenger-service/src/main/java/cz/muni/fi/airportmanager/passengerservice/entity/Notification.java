@@ -7,6 +7,7 @@ import java.util.Objects;
 
 @Entity
 // TODO make this class an active record entity
+// TODO Add field message (String) and passengerId (Long)
 public class Notification extends PanacheEntity {
     public String message;
 
