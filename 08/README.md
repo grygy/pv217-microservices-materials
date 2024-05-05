@@ -95,6 +95,15 @@ public class PassengerResource {
 }
 ```
 
+#### PromQL queries example
+
+- `http_requests_total` -- The total number of HTTP requests.
+- `http_requests_total{job="apiserver", handler="/api/comments"}` -- The total number of HTTP requests for the `/api/comments` handler.
+- `http_requests_total{job="apiserver", handler="/api/comments"}[5m]` -- The total number of HTTP requests for the `/api/comments` handler in the last 5 minutes.
+- `rate(http_requests_total[5m])[30m:1m]` -- The rate of HTTP requests per second over the last 30 minutes with a resolution of 1 minute.
+
+Additional examples can be found in official documentation [here](https://prometheus.io/docs/prometheus/latest/querying/examples/).
+
 ### Grafana
 
 Grafana is a visualization tool that provides a way to visualize the metrics collected by data providers (in our case Prometheus). Through dashboards, we can monitor the state of services.
