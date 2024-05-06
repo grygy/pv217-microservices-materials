@@ -12,6 +12,7 @@ services:
       QUARKUS_DATASOURCE_PASSWORD: password
       QUARKUS_DATASOURCE_REACTIVE_URL: vertx-reactive:postgresql://flight-db:5432/flight-database
       QUARKUS_GRPC_CLIENTS_PASSENGER_SERVICE_HOST: passenger-service
+      QUARKUS_OTEL_ENDPOINT: http://jaeger-all-in-one:4317
     depends_on:
       - flight-db
     networks:
@@ -29,9 +30,11 @@ services:
       QUARKUS_DATASOURCE_USERNAME: user
       QUARKUS_DATASOURCE_PASSWORD: password
       QUARKUS_DATASOURCE_REACTIVE_URL: vertx-reactive:postgresql://passenger-db:5432/passenger-database
-#      It communicates on the internal port not exposed one
+      #      It communicates on the internal port not exposed one
       QUARKUS_BAGGAGE_RESOURCE_URL: http://baggage-service:8077
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # TODO set QUARKUS_OTEL_ENDPOINT
+      QUARKUS_OTEL_ENDPOINT: http://jaeger-all-in-one:4317
     depends_on:
       - passenger-db
     networks:
@@ -49,6 +52,7 @@ services:
       QUARKUS_DATASOURCE_PASSWORD: password
       QUARKUS_DATASOURCE_REACTIVE_URL: vertx-reactive:postgresql://baggage-db:5432/baggage-database
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      QUARKUS_OTEL_ENDPOINT: http://jaeger-all-in-one:4317
     depends_on:
       - baggage-db
     networks:
@@ -144,6 +148,17 @@ services:
       - ./grafana/provisioning/dashboards:/var/lib/grafana/dashboards
     depends_on:
       - prometheus
+    networks:
+      - app-network
+
+#  TODO add jaeger
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:1.55.0
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "4317:4317"   # OTLP gRPC receiver
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
     networks:
       - app-network
 

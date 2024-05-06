@@ -23,7 +23,6 @@ class NotificationResourceTest {
     @InjectMock
     NotificationService notificationService;
 
-
     @Test
     void shouldGetEmptyList() {
         Mockito.when(notificationService.listAll()).thenReturn(Uni.createFrom().item(List.of()));
@@ -65,5 +64,4 @@ class NotificationResourceTest {
         notificationDto.email = "test@test.com";
         return notificationDto;
     }
-
 }

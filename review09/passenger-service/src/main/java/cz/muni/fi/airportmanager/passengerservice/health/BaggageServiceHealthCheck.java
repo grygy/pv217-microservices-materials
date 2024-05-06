@@ -17,8 +17,6 @@ public class BaggageServiceHealthCheck implements AsyncHealthCheck {
 
     @Override
     public Uni<HealthCheckResponse> call() {
-        // TODO call the baggage service readinessCheck and see if response.getStatus() is HealthCheckResponse.Status.UP. decide accordingly
-        // TODO don't forget to handle the case when the call fails
         return baggageClientResource.readinessCheck()
                 .onItem().transform(response -> {
                     if (response.getStatus() == HealthCheckResponse.Status.DOWN) {

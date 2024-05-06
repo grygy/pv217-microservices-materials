@@ -10,6 +10,7 @@ import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.util.List;
@@ -127,6 +128,8 @@ public class PassengerService {
      * @throws RuntimeException if baggage service fails
      */
     @WithTransaction
+    // TODO add retries with maxRetries set to 4 and delay to 500 ms
+    @Retry(maxRetries = 4, delay = 500)
     public Uni<PassengerWithBaggageDto> getPassengerWithBaggage(Long passengerId) {
         var passengerWithBaggage = new PassengerWithBaggageDto();
         return passengerRepository.findById(passengerId)

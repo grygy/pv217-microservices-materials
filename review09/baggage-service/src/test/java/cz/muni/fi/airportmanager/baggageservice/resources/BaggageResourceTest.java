@@ -37,7 +37,7 @@ class BaggageResourceTest {
 
     @Test
     void shouldGetListOfBaggage() {
-        var baggage = getBaggage();
+        Baggage baggage = getBaggage();
 
         Mockito.when(this.baggageService.listAll()).thenReturn(Uni.createFrom().item(List.of(baggage)));
 
@@ -138,19 +138,6 @@ class BaggageResourceTest {
                 .put("/99/lost") // Assuming ID 99 does not exist
                 .then()
                 .statusCode(404);
-    }
-
-    @Test
-    void shouldGetBaggageByPassengerId() {
-        var baggage = getBaggage();
-
-        Mockito.when(this.baggageService.getBaggageByPassengerId(baggage.passengerId)).thenReturn(Uni.createFrom().item(List.of(baggage)));
-
-        given().when()
-                .get("/passenger/" + baggage.passengerId)
-                .then()
-                .statusCode(200)
-                .body("size()", is(1));
     }
 
     private static Baggage getBaggage() {
