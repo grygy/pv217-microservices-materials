@@ -1,0 +1,42 @@
+Your identification number:,Assignment number:,How would you rate the overall clarity of the explanations provided in the exercises?,How would you rate the overall clarity of the instructions provided in the exercises?,How many hours did you spend on the exercise?,How would you rate the difficulty level of the exercises?,"Did you encounter any technical issues or bugs while completing the exercises? If so, please describe them.","In your opinion, what improvements could be made to the exercise materials to enhance the learning experience?","Please share any other comments, suggestions, or feedback you have regarding the exercises."
+9,4,Somewhat clear,Very clear,3,Just right,"I was not familiar with this approach before, therefore it was taking me some time. ","I do not see how the section ""How do dev services help us in development?"" maps to the previous exercise materials.",
+1,1,Very clear,Somewhat clear,1,Difficult,"I had to install java and set up environment variables, which was not present in the tutorial. Aditionally there was a version mismatch that caused the excercise not to build.",make a running excercise. ,"otherwise great job. all steps are clear, apart for some minor setback with snowballing effect"
+1,2,Very clear,Very clear,0.25,Just right,"The Idea needs to be updated to the latest version (2024.1) as of writing, to correctly identify the project, then everything works as it should","mention to check version of the IDEA environment and update it. Also readme from the parent repository is not viisble if flight-service is opened as a project in IDEA, maybe just copypaste it there or something like that. mention that you can see your endpoints on the seagger-ui bundled with quarkus. then it is much easier to see what whould go to postman. ",the excercise is just right in the terms of content. just some minor tweak to README and everything will be fine with this one. 
+1,3,Very clear,Somewhat clear,1,Difficult,no technical bugs ,"You should explicitly say that you need run ""quarkus dev"" or other command to launch the application in the README.md to start testing it. Test it with postman just does not work if the app is not running. Also I did not have to run ""mvn compile"" to generate classes, this probably happens automatically when I launch ""quarkus dev"" so maybe specify the steps more explicitly","The excercise is a bit harder than previous ones, good. Just clear up the README, so people know how to progress and how to properly launch the tests. The information is there, it is just scattered in the README and not in a concise way, as it should be. 
+"
+2,07,Somewhat clear,Very clear,1,Easy,"None, because I haven't tried the actual implementation. But the instructions are clear and concise so I would have no problems given I had the needed tools and time.","I was missing explanation of some concepts, but maybe there were in the previous excersices (I am starting with 07) or they are not important. Namely: @Blocking anotation, maybe I would add a picture of the Kafka vs. Zookeeper architercture, why is this called a change state instead of pure messaging","Small writing things: 
+- in the messaging section for words like producer and consumer I don't see a reason to be capitalized, or at least all follow the same rule
+- I am not sure whether it is suitable to use the ""we"" pronoun in such study materials. But given that most of the studets will be CZ/SK it will sounds OK to them.
+The comparison between REST and Messaging is very useful."
+2,08,Very clear,Very clear,1,Just right,"No, but with the time and tools I would be able to do the implementation.",Some instruction for writing the Prometheus queries would be nice.,"Writing stuff:
+- Tasks 1.1 use code on ""add extension""
+- Use bold on Health check types "
+2,09,Somewhat clear,Very clear,1,Easy,"No, but with the time and tools I would be able to do the implementation.",I would add some architecture picture of OpenTelemetry and Jaeger.,"Small writing stuff:
+- additional comma in State of the project"
+10,5,Neutral,Very clear,1.25,Easy,,"- I wouldn't present AI tools as best friends like that, either show how to prompt them properly, or warn them about the huge possibility of bad tests :)
+
+- format the examples (last })
+
+- links to the technologies used are missing
+
+- MockedServiceUni(t)Test
+
+- (a big one) I don't see any benefit in letting students _just_ write the todos, especially when it comes to tests. I would much rather see at least some form of ""gamification"" (e.g. find bugs in this code using unit tests), or reversing the task and doing TDD.
+I don't think that just showing unittests and filling todos will motivate students to actually write the tests - but that's just my hot take :) especially when there is so many tests present to write
+
+- hints and troubleshooting don't provide much value here IMO",
+5,7,Somewhat clear,Very clear,1,Just right,Not really,,"Step 2 One of the subtasks is to create fields and constructors, it is much better to recommend using lombok, which is a common practice in modern java, to circumvent creating boilerplate code. (Yes, I know this is an exercise on middleware, not focused on java, but still)
+
+If BaggageStateChanges and BaggageStatus are entities for kafka messages that are needed in both services, you should not copy the Classes, why not have an artifact with entities that are used in multiple services?
+
+"
+1,4,Very clear,Somewhat unclear,1,Just right,"quarkus dev command from cmd will build the proto files, however build from IDEA IDE will not",mention that you need to build respective services separately and not in the root directory,mention all the fields that should be in the entities explicitly and not only in tests
+1,5,Very clear,Very clear,1,Just right,none,"everything looked good to me, good excercise",
+1,6,Very clear,Very clear,0.5,Easy,"This is my domain so the time and difficulty can be a bit misleading, however I did not encounter any technical difficulties","The docker files could be rewritten as a single docker compose file, reducing the complexity of the docker solution, however I am nitpicking at this point",
+3,1,Very clear,Neutral,2,Easy,I had a problem setting up the quarkus therefore the long duration of the excercise,make the setup process more clear,
+3,2,Very clear,Very clear,0.2,Very easy,,,Overall very clear and straightforward exercise.
+3,3,Very clear,Very clear,1.5,Just right,Generating of Java classes from proto files seems a bit alien from the standard way. ,,
+3,4,Very clear,Very clear,1,Just right,,,At least I practiced TDD.
+3,5,Very clear,Very clear,0.5,Very easy,,,"I know that the exercise is supposed to educate the students on the importance of testing, but I feel like there is a lot of repetition, and the time to complete the exercise could be spent in a more interesting way. 
+"
+2,10,Somewhat clear,Very clear,1,Easy,"No, I haven't done the actual implementation, but the instructions are very clear and concise.","The explanations of the general types of authentication are a little unclear, namely the Mutual TLS authentication and SSO. In the table it is said that TLS is used for both sides but in the explanation there is talked only about the client. How do we get the certificates? Regarding SSO I am missing a bit of context, from where do we get the universal token? Giving examples like logging in with Google / Facebook accounts would be nice too.","It's useful for user authentication, so he doesn't need to write a username and password for every request. -> he / she"
