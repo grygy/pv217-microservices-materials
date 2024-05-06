@@ -6,6 +6,8 @@ import cz.muni.fi.airportmanager.passengerservice.model.CreatePassengerDto;
 import cz.muni.fi.airportmanager.passengerservice.model.PassengerWithBaggageDto;
 import cz.muni.fi.airportmanager.passengerservice.model.examples.Examples;
 import cz.muni.fi.airportmanager.passengerservice.service.PassengerService;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -81,6 +83,7 @@ public class PassengerResource {
                     examples = @ExampleObject(name = "flight", value = Examples.VALID_PASSENGER)
             )
     )
+    @Counted(value = "passenger_create_count", description = "How many times passenger was created")
     public Uni<RestResponse<Passenger>> create(
             @Schema(implementation = CreatePassengerDto.class, required = true)
             CreatePassengerDto passenger) {
@@ -162,6 +165,7 @@ public class PassengerResource {
                     examples = @ExampleObject(name = "flight", value = Examples.VALID_NOTIFICATION_LIST)
             )
     )
+    @Counted(value = "notification_get_count", description = "How many times notifications were retrieved")
     public Uni<RestResponse<List<Notification>>> getNotificationsForPassenger(@Parameter(name = "passengerId", required = true, description = "Passenger id") @PathParam("passengerId") Long passengerId) {
         return passengerService.findNotificationsForPassenger(passengerId)
                 .onItem().transform(passengers -> RestResponse.status(Response.Status.OK, passengers));
@@ -211,6 +215,7 @@ public class PassengerResource {
                     examples = @ExampleObject(name = "passenger with baggage", value = Examples.VALID_PASSENGER_WITH_BAGGAGE)
             )
     )
+    @Timed(value = "get_passenger_with_baggage", description = "A measure of how long it takes to get passenger with baggage")
     public Uni<RestResponse<?>> getPassengerWithBaggage(@Parameter(name = "passengerId", required = true, description = "Passenger id") @PathParam("passengerId") Long passengerId) {
         return passengerService.getPassengerWithBaggage(passengerId)
                 .onItem().transform(passenger -> {

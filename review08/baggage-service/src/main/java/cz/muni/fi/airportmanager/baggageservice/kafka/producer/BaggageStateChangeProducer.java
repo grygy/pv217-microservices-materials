@@ -9,7 +9,6 @@ import org.eclipse.microprofile.reactive.messaging.Emitter;
 @ApplicationScoped
 public class BaggageStateChangeProducer {
 
-    // TODO inject Emitter for baggage-state-change channel
     @Channel("baggage-state-change")
     Emitter<BaggageStateChange> emitter;
 
@@ -19,7 +18,6 @@ public class BaggageStateChangeProducer {
      * @param baggage baggage to send
      */
     public void send(Baggage baggage) {
-        // TODO convert baggage to BaggageStateChange and send it to Kafka
         BaggageStateChange baggageStateChange = new BaggageStateChange();
         baggageStateChange.baggageId = baggage.id;
         baggageStateChange.passengerId = baggage.passengerId;

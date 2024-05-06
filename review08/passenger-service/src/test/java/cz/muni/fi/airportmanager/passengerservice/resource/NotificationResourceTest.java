@@ -58,7 +58,6 @@ class NotificationResourceTest {
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-
     private NotificationDto createNotificationDto() {
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.id = 1L;
@@ -66,4 +65,5 @@ class NotificationResourceTest {
         notificationDto.email = "test@test.com";
         return notificationDto;
     }
+
 }
