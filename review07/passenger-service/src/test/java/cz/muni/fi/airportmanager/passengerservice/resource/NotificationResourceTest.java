@@ -58,12 +58,6 @@ class NotificationResourceTest {
                 .statusCode(Response.Status.OK.getStatusCode());
     }
 
-    private Notification createNotification() {
-        Notification notification = new Notification();
-        notification.id = 1L;
-        notification.message = "Test message";
-        return notification;
-    }
 
     private NotificationDto createNotificationDto() {
         NotificationDto notificationDto = new NotificationDto();

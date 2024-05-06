@@ -30,6 +30,31 @@ class PassengerServiceTest {
     @Inject
     PassengerService passengerService;
 
+    private Passenger createTestPassenger() {
+        Passenger passenger = new Passenger();
+        passenger.setId(1L);
+        passenger.setFirstName("John");
+        passenger.setLastName("Doe");
+        passenger.setFlightId(1L);
+        passenger.setEmail("john@gmail.com");
+        return passenger;
+    }
+
+    private CreatePassengerDto createTestPassengerDto() {
+        CreatePassengerDto passengerDto = new CreatePassengerDto();
+        passengerDto.firstName = "John";
+        passengerDto.lastName = "Doe";
+        passengerDto.flightId = 1L;
+        passengerDto.email = "john@gmail.com";
+        return passengerDto;
+    }
+
+    private Notification createNotification() {
+        Notification notification = new Notification();
+        notification.message = "Test message";
+        return notification;
+    }
+
     @Test
     @RunOnVertxContext
     void shouldGetListOfPassengers(UniAsserter asserter) {
@@ -148,6 +173,23 @@ class PassengerServiceTest {
 
     @Test
     @RunOnVertxContext
+    void shouldAddNotificationForPassenger(UniAsserter asserter) {
+
+        Long passengerId = 1L;
+        var notification = createNotification();
+        // Mock the behavior of the repository
+        asserter.execute(() -> Mockito.when(passengerRepository.addNotificationForPassenger(passengerId, notification)).thenReturn(Uni.createFrom().voidItem()));
+        asserter.execute(() -> Mockito.when(passengerRepository.findNotificationsForPassenger(passengerId)).thenReturn(Uni.createFrom().item(List.of(notification))));
+
+        asserter.execute(() -> passengerService.addNotificationForPassenger(passengerId, notification))
+                .assertThat(
+                () -> passengerService.findNotificationsForPassenger(passengerId),
+                notifications -> assertTrue(notifications.stream().anyMatch(n -> n.message.equals(notification.message)))
+        );
+    }
+
+    @Test
+    @RunOnVertxContext
     void shouldFindNotificationsForPassenger(UniAsserter asserter) {
 
         Long passengerId = 1L;
@@ -203,31 +245,5 @@ class PassengerServiceTest {
                 passengers -> assertTrue(passengers.isEmpty())
         );
     }
-
-    private Passenger createTestPassenger() {
-        Passenger passenger = new Passenger();
-        passenger.setId(1L);
-        passenger.setFirstName("John");
-        passenger.setLastName("Doe");
-        passenger.setFlightId(1L);
-        passenger.setEmail("john@gmail.com");
-        return passenger;
-    }
-
-    private CreatePassengerDto createTestPassengerDto() {
-        CreatePassengerDto passengerDto = new CreatePassengerDto();
-        passengerDto.firstName = "John";
-        passengerDto.lastName = "Doe";
-        passengerDto.flightId = 1L;
-        passengerDto.email = "john@gmail.com";
-        return passengerDto;
-    }
-
-    private Notification createNotification() {
-        Notification notification = new Notification();
-        notification.message = "Test message";
-        return notification;
-    }
-
 
 }
