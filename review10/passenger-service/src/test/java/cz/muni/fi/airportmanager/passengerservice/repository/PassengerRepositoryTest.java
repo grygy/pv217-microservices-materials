@@ -217,5 +217,4 @@ class PassengerRepositoryTest {
         notification.message = "Test notification message";
         return notification;
     }
-
 }

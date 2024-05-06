@@ -30,13 +30,6 @@ class PassengerServiceTest {
     @Inject
     PassengerService passengerService;
 
-
-    private Notification createNotification() {
-        Notification notification = new Notification();
-        notification.message = "Test message";
-        return notification;
-    }
-
     @Test
     @RunOnVertxContext
     void shouldGetListOfPassengers(UniAsserter asserter) {
@@ -247,4 +240,9 @@ class PassengerServiceTest {
         return passengerDto;
     }
 
+    private Notification createNotification() {
+        Notification notification = new Notification();
+        notification.message = "Test message";
+        return notification;
+    }
 }
