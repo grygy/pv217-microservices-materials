@@ -8,7 +8,7 @@ The goal of this project is to create a simple airport management system. The sy
 
 ## Exercise design
 
-Each exercise will be iteration over previous ones. The main goal is to incrementally create the whole application over the semester.
+Each exercise will be an iteration of the previous ones. The main goal is to create the whole application over the semester incrementally.
 
 ## Technologies
 
@@ -46,10 +46,12 @@ Each exercise will be iteration over previous ones. The main goal is to incremen
 7.  Messaging using Apache Kafka -- Implement messaging using Apache Kafka between services.
 8.  Health checks, metrics, and monitoring -- Add health checks, metrics, and monitoring tools to services and connect them to Prometheus and Grafana.
 9.  Fault tolerance, tracing -- Adding fault tolerance techniques and tracing to services.
-10. Authentication between services -- Explanation of different authentication techniques, and implementing basic authentication between services.
+10. Authentication between services -- Explanation of different authentication techniques and implementing basic authentication between services.
 
 ## Structure of the repository
 
 The repository contains assignments and solutions. Assignments have `-assignment` suffix, and solutions do not have any suffix.
 
-In each assignment, you will find a README.md file with the explanation of the topic and tasks. The solution contains example implementation of the tasks.
+In each assignment, you will find a README.md file with an explanation of the topic and tasks. The solution contains an example of the implementation of the tasks.
+
+The repository also includes the `evaluation_results.csv` file that includes raw data from the feedback given by other students.
