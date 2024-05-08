@@ -5,10 +5,10 @@ import cz.muni.fi.airportmanager.passengerservice.client.BaggageClientResource;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.smallrye.mutiny.Uni;
-import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.mockito.Mockito;
 
 import static io.restassured.RestAssured.given;

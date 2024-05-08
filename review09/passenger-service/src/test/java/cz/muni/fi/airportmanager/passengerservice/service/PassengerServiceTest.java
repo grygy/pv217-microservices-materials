@@ -246,4 +246,5 @@ class PassengerServiceTest {
         passengerDto.email = "john@gmail.com";
         return passengerDto;
     }
+
 }

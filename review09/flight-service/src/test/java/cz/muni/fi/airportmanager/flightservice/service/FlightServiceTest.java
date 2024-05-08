@@ -135,7 +135,6 @@ class FlightServiceTest {
         );
     }
 
-
     private Flight createOngoingFlight() {
         var future = Date.from(java.time.Instant.now().plus(Duration.ofMinutes(1000 * 60)));
         var past = Date.from(java.time.Instant.now().minus(Duration.ofMinutes(1000 * 60)));
