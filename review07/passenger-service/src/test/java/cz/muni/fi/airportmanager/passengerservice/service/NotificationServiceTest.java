@@ -28,6 +28,8 @@ class NotificationServiceTest {
     @InjectMock
     PassengerRepository passengerRepository;
 
+
+
     @Test
     @TestReactiveTransaction
     void shouldGetListOfNotifications(UniAsserter asserter) {
@@ -60,7 +62,6 @@ class NotificationServiceTest {
                     assertEquals(1L, deletedCount);
                 });
     }
-
 
     private Notification createNotification() {
         Notification notification = new Notification();

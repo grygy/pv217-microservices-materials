@@ -76,4 +76,21 @@ public class PassengerRepository implements PanacheRepository<Passenger> {
                         ).toList()
                 );
     }
+
+    /**
+     * Add notification to a passenger
+     *
+     * @param passengerId  passenger id
+     * @param notification notification to add
+     */
+    public Uni<Void> addNotificationForPassenger(Long passengerId, Notification notification) {
+        return findById(passengerId
+        ).onItem().transform(passenger -> {
+            if (passenger != null) {
+                passenger.addNotification(notification);
+                return this.persist(passenger);
+            }
+            return null;
+        }).replaceWithVoid();
+    }
 }

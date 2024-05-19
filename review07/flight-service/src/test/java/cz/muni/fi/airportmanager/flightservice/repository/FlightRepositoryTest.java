@@ -21,8 +21,8 @@ class FlightRepositoryTest {
     FlightRepository flightRepository;
 
     Flight createOngoingFlight() {
-        var future = Date.from(java.time.Instant.now().plus(Duration.ofMinutes(1000 * 60)));
-        var past = Date.from(java.time.Instant.now().minus(Duration.ofMinutes(1000*60)));
+        var future = Date.from(java.time.Instant.now().plus(Duration.ofMinutes(1000*60)));
+        var past = Date.from(java.time.Instant.now().minus(Duration.ofMinutes(1000 * 60)));
         var flight = new Flight();
         flight.setName("Test Flight");
         flight.setAirportFrom("Airport A");

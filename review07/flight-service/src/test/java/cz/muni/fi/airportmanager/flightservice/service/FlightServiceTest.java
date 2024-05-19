@@ -30,6 +30,7 @@ class FlightServiceTest {
     FlightService flightService;
 
 
+
     @Test
     @RunOnVertxContext  // Make sure the test method is run on the Vert.x event loop. aka support async
     // Gives us UniAsserter
@@ -136,7 +137,7 @@ class FlightServiceTest {
 
     private Flight createOngoingFlight() {
         var future = Date.from(java.time.Instant.now().plus(Duration.ofMinutes(1000*60)));
-        var past = Date.from(java.time.Instant.now().minus(Duration.ofMinutes(1000*60)));
+        var past = Date.from(java.time.Instant.now().minus(Duration.ofMinutes(1000 * 60)));
         var flight = new Flight();
         flight.setName("Test Flight");
         flight.setAirportFrom("Airport A");
@@ -149,4 +150,5 @@ class FlightServiceTest {
 
         return flight;
     }
+
 }

@@ -19,7 +19,6 @@ class PassengerRepositoryTest {
     @Inject
     PassengerRepository passengerRepository;
 
-
     @Test
     @TestReactiveTransaction
     void shouldFindNotificationsForPassenger(UniAsserter asserter) {
@@ -53,6 +52,23 @@ class PassengerRepositoryTest {
         asserter
                 .execute(() -> passengerRepository.persist(passenger))
                 .execute(() -> passengerRepository.addNotificationByFlightId(passenger.getFlightId(), notification))
+                .assertThat(
+                        () -> passengerRepository.findNotificationsForPassenger(passenger.getId()),
+                        notifications -> assertTrue(notifications.stream().anyMatch(n -> n.message.equals(notification.message)))
+                );
+    }
+
+    @Test
+    @TestReactiveTransaction
+    void shouldAddNotificationForPassenger(UniAsserter asserter) {
+
+        // It should test that the notification is added to the appropriate passenger
+        Passenger passenger = createTestPassenger();
+        Notification notification = createTestNotification();
+
+        asserter
+                .execute(() -> passengerRepository.persist(passenger))
+                .execute(() -> passengerRepository.addNotificationForPassenger(passenger.getId(), notification))
                 .assertThat(
                         () -> passengerRepository.findNotificationsForPassenger(passenger.getId()),
                         notifications -> assertTrue(notifications.stream().anyMatch(n -> n.message.equals(notification.message)))
@@ -201,4 +217,5 @@ class PassengerRepositoryTest {
         notification.message = "Test notification message";
         return notification;
     }
+
 }
