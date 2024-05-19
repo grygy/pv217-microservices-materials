@@ -10,9 +10,11 @@ import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import java.util.Base64;
 import java.util.List;
 
 @ApplicationScoped // This bean will be created once per application and live as long as the application lives
@@ -23,6 +25,12 @@ public class PassengerService {
 
     @RestClient
     BaggageClientResource baggageClientResource;
+
+    @ConfigProperty(name = "baggage-service.rest.username")
+    String username;
+
+    @ConfigProperty(name = "baggage-service.rest.password")
+    String password;
 
 
     /**
@@ -132,9 +140,10 @@ public class PassengerService {
     @Retry(maxRetries = 4, delay = 500)
     public Uni<PassengerWithBaggageDto> getPassengerWithBaggage(Long passengerId) {
         var passengerWithBaggage = new PassengerWithBaggageDto();
+
         return passengerRepository.findById(passengerId)
                 .onItem().transformToUni(passenger ->
-                        baggageClientResource.getBaggageForPassengerId(passenger.getId())
+                        baggageClientResource.getBaggageForPassengerIdWithAuth(passenger.getId())
                                 .onItem().transform(baggage -> {
                                             passengerWithBaggage.id = passenger.getId();
                                             passengerWithBaggage.firstName = passenger.getFirstName();

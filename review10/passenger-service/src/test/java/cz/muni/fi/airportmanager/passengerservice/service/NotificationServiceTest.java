@@ -28,6 +28,7 @@ class NotificationServiceTest {
     @InjectMock
     PassengerRepository passengerRepository;
 
+
     @Test
     @TestReactiveTransaction
     void shouldGetListOfNotifications(UniAsserter asserter) {
@@ -75,5 +76,4 @@ class NotificationServiceTest {
         notificationDto.email = "test@test.com";
         return notificationDto;
     }
-
 }
