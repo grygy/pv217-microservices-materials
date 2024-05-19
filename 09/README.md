@@ -75,9 +75,9 @@ OpenTelemetry is a set of APIs, libraries, agents, and instrumentation to provid
 
 ### Jaeger
 
-Jaeger is an open-source, end-to-end distributed tracing system. It is used to monitor and troubleshoot microservices-based distributed systems. It is used to monitor and troubleshoot distributed systems.
+Jaeger is an open-source, end-to-end distributed tracing system. It is used to monitor and troubleshoot microservices-based distributed systems.
 
-It collects data from the services using OpenTelemetry over gRPC, stores them, and visualizes the traces in a user-friendly way.
+It collects data from the services using OpenTelemetry over gRPC, HTTP 1.1. or TChannel, stores them, and visualizes the traces in a user-friendly way.
 
 It supports:
 - Collecting traces from the services
@@ -90,8 +90,8 @@ It supports:
 ## State of the project
 
 - In `baggage-service,` there is an artificial failure in the `BaggageResource.getBaggageByPassengerId` method.
-- Smallrye fault tolerance is added to all services.
-- Opentelemetry extension is added to the `flight-service` and `baggage-service`.
+- Smallrye Fault Tolerance is added to all services.
+- OpenTelemetry extension is added to the `flight-service` and `baggage-service`.
 
 ## Tasks
 
