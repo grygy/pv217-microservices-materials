@@ -19,7 +19,7 @@ It's also useful for monitoring tools to check the state of the application and 
 #### Types
 
 1. Liveness -- The liveness probe checks if the service is healthy. If the probe fails, the service is not running, cannot be recovered, and should be restarted.
-2. Readiness -- The readiness probe checks if the application is ready to serve traffic; requests are not prohibited. Dependencies, databases, and external services are connected. If the readiness probe fails, the service is not yet ready to serve traffic, but it's not considered a failure, and the service is not restarted. This probe prevents routing to the instance which is warming up or loading data.
+2. Readiness -- The readiness probe checks if the application is ready to serve traffic. Dependencies, databases, and external services are connected. If the readiness probe fails, the service is not ready to serve traffic, but it's not considered a failure, and the service is not restarted. This probe prevents routing to the instance which is warming up or loading data.
 3. Startup -- The startup probe determines if the application considers itself successfully initialized. That doesn't necessarily mean it's ready to serve traffic, but rather that all core components and configurations are loaded and initialized.
 
 ### SmallRye Health
@@ -27,9 +27,9 @@ It's also useful for monitoring tools to check the state of the application and 
 SmallRye Health is an implementation of MicroProfile Health. It simplifies the process of creating health checks and provides a way to check the state of the application. Due to the built-in health checks, it also exposes some of this information out-of-the-box.
 
 1. `HealthCheck` interface -- Health checks are implemented as classes that implement the `HealthCheck` interface.
-2. `@Liveness` annotations -- Checks if the service is running.
-3. `@Readiness` annotations -- Checks if the service is connected to the database/Kafka,... without any additional code and is ready to serve requests.
-4. `@Startup` annotations -- Option for slow starting containers to delay an invocation of the liveness check.
+2. `@Liveness` annotation -- Checks if the service is running.
+3. `@Readiness` annotation -- Checks if the service is connected to the database, Kafka,... -- is ready to serve requests.
+4. `@Startup` annotation -- Option for slow starting containers to delay an invocation of the liveness check.
 
 ## Monitoring and Metrics
 
@@ -55,9 +55,13 @@ Business specific metrics are important to understand the state of the applicati
 ![Monitoring architecture](./img/metrics_architecture.jpg)
 
 
+### Micrometer
+
+Micrometer is an observability facade that supports multiple monitoring systems like Prometheus, Graphite, InfluxDB, etc. It provides a way to collect metrics and send them to the monitoring system.
+
 ### Micrometer metrics
 
-Micrometer metrics provide a way to collect metrics and send them to the monitoring system. With the `micrometer-registry-prometheus` extension, we can send metrics to Prometheus, such as memory usage, CPU usage, latency, custom metrics, etc.
+Micrometer metrics provide a way to collect metrics and send them to the monitoring system. With the `micrometer-registry-prometheus` extension, we can send metrics to Prometheus (metrics registry), such as memory usage, CPU usage, latency, custom metrics, etc.
 
 Micrometer monitors the state of the application and exposes those metrics on the `/q/metrics` endpoint for Prometheus to scrape.
 
@@ -65,7 +69,7 @@ Micrometer monitors the state of the application and exposes those metrics on th
 
 Prometheus is a monitoring system that collects metrics from the services and stores them in a database. It provides a way to query and visualize the metrics.
 
-It pulls the metrics data from the `/q/metrics` endpoint of the services every few seconds and stores them in the database for further analysis. We can then write a query in PromQL that can be visualized in a visualization solution like Grafana.
+It pulls the metrics data from the `/q/metrics` endpoint of the services every given period (1 minute by default) and stores them in the database for further analysis. We can then write a query in PromQL that can be visualized in a visualization solution like Grafana.
 
 Prometheus can also send alerts if the metrics are not in the expected range.
 
@@ -75,6 +79,8 @@ Prometheus can also send alerts if the metrics are not in the expected range.
 - **Counter** -- A metric that represents a single numerical value that only ever goes up. Cumulative in nature.
 - **Summary** -- A metric to represent the distribution of a set of values.
 - **Timer** -- A metric to measure the duration of a particular event.
+
+Note that only the counter and timer metrics are supported as annotations in Quarkus.
 
 #### Example custom metrics
 
@@ -160,7 +166,7 @@ In `FlightResource` class, add a counter metric to count the number of flights c
 
 #### 2.2. Add custom timer metric to `FlightResource`
 
-In `FlightResource` class, inject `MeterRegistry` and add a timer metric to measure the duration of the `cancel` method.
+In `FlightResource` class, add a timer metric to measure the duration of the `cancel` method.
 
 #### 2.3. Check the metrics in Prometheus
 
