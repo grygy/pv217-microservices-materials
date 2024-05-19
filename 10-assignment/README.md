@@ -35,38 +35,38 @@ Mutual TLS authentication is a type of authentication that uses client certifica
 
 #### Single sign-on (SSO)
 
-Single sign-on (SSO) is a type of authentication that allows users to log in once and access multiple systems without re-authenticating. The client sends HTTP requests with the Authorization header that contains the word Bearer followed by a space and a token. The server uses the token to authenticate the user against the identity provider.
+Single sign-on (SSO) is a type of authentication that allows users to log in once and access multiple systems without re-authenticating. The client sends HTTP requests with the Authorization header that contains a token. The server uses the token to authenticate the user against the identity provider.
 
 ### HTTPS
 
 When the application is running in a production environment, it's important to use HTTPS to secure the communication between the client and the server. HTTPS is a secure version of HTTP that uses SSL/TLS to encrypt the data transmitted between the client and the server. It provides a secure channel for the client and the server to communicate over the internet. **Always use HTTPS in a production environment.** However, we can use HTTP in our development environment.
 
-### Examples for Basic authentication
+### Examples for authentication
 
 ```java
 @Path("/api/public")
 public class PublicResource {
 
-    @GET
-    @PermitAll // allow all access
-    @Produces(MediaType.TEXT_PLAIN)
-    public String publicResource() {
-        return "public";
-   }
-   
-    @GET
-    @RolesAllowed("user") // allow only users with role "user" to access this resource
-    @Path("/me")
-    public String me(@Context SecurityContext securityContext) { // inject the security context
-      return securityContext.getUserPrincipal().getName();
-    }
+  @GET
+  @PermitAll // allow all access
+  @Produces(MediaType.TEXT_PLAIN)
+  public String publicResource() {
+    return "public";
+  }
 
-    @GET
-    @RolesAllowed("admin") // allow only users with role "admin" to access this resource 
-    @Produces(MediaType.TEXT_PLAIN)
-    public String adminResource() {
-      return "admin";
-    }
+  @GET
+  @RolesAllowed("user") // allow only users with role "user" to access this resource
+  @Path("/me")
+  public String me(@Context SecurityContext securityContext) { // inject the security context
+    return securityContext.getUserPrincipal().getName();
+  }
+
+  @GET
+  @RolesAllowed("admin") // allow only users with role "admin" to access this resource 
+  @Produces(MediaType.TEXT_PLAIN)
+  public String adminResource() {
+    return "admin";
+  }
 }
 ```
 
