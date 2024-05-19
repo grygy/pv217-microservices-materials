@@ -16,11 +16,11 @@ A channel is a logical path for communication between the producer(s) and the co
 
 ### Producer/Consumer
 
-The producer (Publisher) sends messages to the broker, and the Consumer (Subscriber or Processor) receives messages from the broker and processes them. The producer and consumer do not need to know about each other, and they can be added or removed without affecting the other components.
+The Producer (Publisher) sends messages to the broker, and the Consumer (Subscriber or Processor) receives messages from the broker and processes them. The producer and consumer do not need to know about each other, and they can be added or removed without affecting the other components. Producer can also be a consumer and vice versa.
 
 The communication between the producer and the consumer is asynchronous, which means that the producer does not wait for the consumer to process the message. This allows for better scalability and performance.
 
-The message is sent to a topic, which is a logical channel for communication. The producer sends messages to a topic, and the consumer receives messages from a topic. The broker ensures that the messages are delivered to all consumers subscribed to the topic.
+The message is sent to a channel, which is a logical channel for communication. The producer sends messages to the channel, and the consumer receives messages from the channel. The broker ensures that the messages are delivered to all consumers subscribed to the channel.
 
 ![Messaging](./img/pubsub.png)
 
@@ -28,7 +28,7 @@ Image source: *https://aws.amazon.com/what-is/pub-sub-messaging/*
 
 ### Challenges
 
-- **Idempotency**: The same message may be delivered multiple times.
+- **Idempotency**: The same message may be delivered multiple times which can have unwanted side effects.
 - **Ordering**: The order of messages may not be guaranteed.
 - **Monitoring**: It's harder to monitor the communication between services.
 
@@ -50,7 +50,7 @@ Apache Kafka is one of the implementations of the message broker. It is a distri
 
 ### Producer
 
-The producer is responsible for sending messages to the Kafka broker. It can send messages to one or more topics.
+The producer is responsible for sending messages to the Kafka broker which corresponds to the messaging channel. It can send messages to one or more topics.
 
 We can use the Emitter interface to send messages to the Kafka broker. The Emitter interface is a part of the Reactive Messaging API, which is a part of the MicroProfile specification.
 
@@ -97,7 +97,7 @@ Additionally, `@Blocking` annotation can be used to process the message in a blo
 
 ### Consumer and Producer
 
-We can additionally use the `@Outgoing` along with the `@Incoming` annotations to create a consumer and producer in the same class. Thus, accepting the message from one channel, doing some work, and sending it to another.
+We can additionally use the `@Outgoing` along with the `@Incoming` annotations to create a consumer and producer in the same method. Thus, accepting the message from one channel, doing some work, and sending it to another.
 
 The method annotated with `@Outgoing` cannot be called from the code, but the framework needs to invoke it.
 
@@ -109,7 +109,7 @@ public class MyConsumerProducer {
     @Outgoing("my-other-topic") // The name of the channel
     public String process(String message) {
         // Process the message
-        return message;
+        return message.toUpperCase();
     }
 }
 ```
@@ -142,9 +142,9 @@ want to use Kafka to handle communication between the `passenger-service` and th
 Prepare a new class `BaggageStateChange` in the `baggage-service`, which will be the payload of the message. The class
 should contain the following fields:
 
-- `baggageId` - the id of the baggage
-- `passengerId` - the id of the passenger
-- `newState` - the new state of the baggage
+- `baggageId` - the id of the baggage (Long)
+- `passengerId` - the id of the passenger (Long)
+- `newState` - the new state of the baggage (BaggageStatus)
 
 #### 2.2. Add Baggage State Change producer
 
@@ -199,7 +199,7 @@ Scenario:
 
 ### 5. Prepare the application for production
 
-Kill the dev services and prepare the application for production.
+Stop the dev services and prepare the application for production.
 
 #### 5.1. Add Zookeeper to the docker-compose
 
