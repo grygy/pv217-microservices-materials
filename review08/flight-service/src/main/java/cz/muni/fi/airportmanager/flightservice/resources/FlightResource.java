@@ -4,7 +4,12 @@ import cz.muni.fi.airportmanager.flightservice.model.CreateFlightDto;
 import cz.muni.fi.airportmanager.flightservice.model.example.Examples;
 import cz.muni.fi.airportmanager.flightservice.service.FlightService;
 import cz.muni.fi.airportmanager.flightservice.model.FlightDto;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.smallrye.mutiny.Uni;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -84,6 +89,8 @@ public class FlightResource {
             responseCode = "409",
             description = "Conflict"
     )
+    // TODO Add @Counted annotation to count how many flights have been created. The name of the counter should be "flight_create"
+    @Counted(value = "flight_create", description = "How many flights have been created")
     public Uni<RestResponse<FlightDto>> create(CreateFlightDto flight) {
         return flightService.createFlight(flight)
                 .onItem().transform(newFlight -> RestResponse.status(Response.Status.CREATED, newFlight))
@@ -177,6 +184,8 @@ public class FlightResource {
             responseCode = "404",
             description = "Flight with given id does not exist"
     )
+    // TODO Add @Timer annotation to measure how long it takes to cancel a flight. The name of the timer should be "flight_cancel"
+    @Timed(value = "flight_cancel", description = "A measure of how long it takes to cancel a flight")
     public Uni<RestResponse<Object>> cancel(@Parameter(name = "id", required = true) @PathParam("id") long id) {
         return flightService.cancelFlight(id)
                 .onItem().transform(wasCancelled -> {

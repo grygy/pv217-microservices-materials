@@ -31,7 +31,6 @@ services:
       QUARKUS_DATASOURCE_REACTIVE_URL: vertx-reactive:postgresql://passenger-db:5432/passenger-database
 #      It communicates on the internal port not exposed one
       QUARKUS_BAGGAGE_RESOURCE_URL: http://baggage-service:8077
-      # TODO add KAFKA_BOOTSTRAP_SERVERS to the environment
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - passenger-db
@@ -49,7 +48,6 @@ services:
       QUARKUS_DATASOURCE_USERNAME: user
       QUARKUS_DATASOURCE_PASSWORD: password
       QUARKUS_DATASOURCE_REACTIVE_URL: vertx-reactive:postgresql://baggage-db:5432/baggage-database
-      # TODO add KAFKA_BOOTSTRAP_SERVERS to the environment
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - baggage-db
@@ -89,8 +87,6 @@ services:
     networks:
       - app-network
 
-# TODO add the Zookeeper service
-
   zookeeper:
     image: quay.io/strimzi/kafka:0.39.0-kafka-3.6.1
     command: [
@@ -103,8 +99,6 @@ services:
       LOG_DIR: /tmp/logs
     networks:
       - app-network
-
-  # TODO add the Kafka service
 
   kafka:
     image: quay.io/strimzi/kafka:0.39.0-kafka-3.6.1
@@ -121,6 +115,35 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    networks:
+      - app-network
+
+  prometheus:
+    image: prom/prometheus:v2.22.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - flight-service
+      - passenger-service
+      - baggage-service
+    networks:
+      - app-network
+
+
+  grafana:
+    image: grafana/grafana:8.2.0
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: "secret"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
     networks:
       - app-network
 
