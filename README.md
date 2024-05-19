@@ -55,3 +55,14 @@ The repository contains assignments and solutions. Assignments have `-assignment
 In each assignment, you will find a README.md file with an explanation of the topic and tasks. The solution contains an example of the implementation of the tasks.
 
 The repository also includes the `evaluation_results.csv` file that includes raw data from the feedback given by other students.
+
+## How to use the exercises
+
+Prerequisites:
+- Have OpenJDK 21 installed
+- Have Docker installed
+- Have Quarkus CLI installed
+
+Start with the first exercise (assignment or solution folder) and go through the README.md file. Check the tasks and follow the instructions or see the solution.
+
+It is highly recommended to go through the exercises in order to gain knowledge how to run each exercise.
